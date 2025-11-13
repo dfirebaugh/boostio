@@ -470,7 +470,7 @@ void graphics_draw_text(struct Graphics *graphics, const char *text, int x, int 
 	indices = (unsigned int *)malloc(sizeof(unsigned int) * index_capacity);
 
 	float cursor_x = (float)x;
-	float baseline_y = (float)y + (float)size / 2.0f;
+	float baseline_y = (float)y;
 	uint32_t prev_char = 0;
 
 	float atlas_font_size = msdf_atlas_get_font_size(graphics->font_atlas);
