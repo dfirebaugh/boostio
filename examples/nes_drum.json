@@ -4,7 +4,7 @@
 	"length_ms":	5922,
 	"selected_scale":	"pentatonic_minor",
 	"selected_root":	"C",
-	"fold_mode":	false,
+	"fold_mode":	true,
 	"notes":	[{
 			"id":	1,
 			"ms":	0,
