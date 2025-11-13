@@ -12,6 +12,64 @@ local function get_voice_state()
 	}
 end
 
+local function is_any_other_voice_visible(clicked_voice, voice_state)
+	for v = 0, 7 do
+		if v ~= clicked_voice and not voice_state.hidden[v + 1] then
+			return true
+		end
+	end
+	return false
+end
+
+local function toggle_all_other_voices(clicked_voice)
+	local voice_state = get_voice_state()
+	local any_other_visible = is_any_other_voice_visible(clicked_voice, voice_state)
+	local hide_others = any_other_visible
+
+	for v = 0, 7 do
+		if v ~= clicked_voice then
+			boostio.setVoiceHidden(v, hide_others)
+		end
+	end
+
+	if toast then
+		if hide_others then
+			toast.info("Hidden all other voices")
+		else
+			toast.info("Shown all other voices")
+		end
+	end
+end
+
+local function toggle_single_voice(voice, row, row_type, voice_state)
+	local new_value = not voice_state[row_type][voice + 1]
+
+	if row == 0 then
+		boostio.setVoiceHidden(voice, new_value)
+	elseif row == 1 then
+		boostio.setVoiceSolo(voice, new_value)
+	elseif row == 2 then
+		boostio.setVoiceMuted(voice, new_value)
+	end
+
+	if toast then
+		local action_names = {
+			hidden = new_value and "hidden" or "unhidden",
+			solo = new_value and "solo'd" or "unsolo'd",
+			muted = new_value and "muted" or "unmuted",
+		}
+		toast.info("Voice " .. (voice + 1) .. " " .. action_names[row_type])
+	end
+end
+
+local function handle_voice_button_click(voice, row, row_type, voice_state, ctrl_held)
+	if row == 0 and ctrl_held then
+		toggle_all_other_voices(voice)
+	else
+		toggle_single_voice(voice, row, row_type, voice_state)
+	end
+end
+
 function voice_controls.init()
 	voice_controls.isVoiceAudible = function(voice)
 		local voice_state = get_voice_state()
@@ -198,6 +256,7 @@ function voice_controls.render()
 	end
 
 	local mouse_down = boostio.isMouseButtonDown(boostio.MOUSE_BUTTON_LEFT)
+	local ctrl_held = boostio.isKeyDown("ctrl")
 
 	if mouse_down and not last_mouse_state and not click_handled then
 		for row = 0, 2 do
@@ -209,25 +268,7 @@ function voice_controls.render()
 
 				if boostio.isPointInRect(mx, my, x, y, button_width, button_height) then
 					local row_type = row_types[row + 1]
-					local new_value = not voice_state[row_type][voice + 1]
-
-					if row == 0 then
-						boostio.setVoiceHidden(voice, new_value)
-					elseif row == 1 then
-						boostio.setVoiceSolo(voice, new_value)
-					elseif row == 2 then
-						boostio.setVoiceMuted(voice, new_value)
-					end
-
-					if toast then
-						local action_names = {
-							hidden = new_value and "hidden" or "unhidden",
-							solo = new_value and "solo'd" or "unsolo'd",
-							muted = new_value and "muted" or "unmuted",
-						}
-						toast.info("Voice " .. (voice + 1) .. " " .. action_names[row_type])
-					end
-
+					handle_voice_button_click(voice, row, row_type, voice_state, ctrl_held)
 					click_handled = true
 					break
 				end
