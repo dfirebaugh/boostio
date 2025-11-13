@@ -21,6 +21,24 @@ local function is_any_other_voice_visible(clicked_voice, voice_state)
 	return false
 end
 
+local function is_any_other_voice_solo(clicked_voice, voice_state)
+	for v = 0, 7 do
+		if v ~= clicked_voice and voice_state.solo[v + 1] then
+			return true
+		end
+	end
+	return false
+end
+
+local function is_any_other_voice_muted(clicked_voice, voice_state)
+	for v = 0, 7 do
+		if v ~= clicked_voice and voice_state.muted[v + 1] then
+			return true
+		end
+	end
+	return false
+end
+
 local function toggle_all_other_voices(clicked_voice)
 	local voice_state = get_voice_state()
 	local any_other_visible = is_any_other_voice_visible(clicked_voice, voice_state)
@@ -37,6 +55,46 @@ local function toggle_all_other_voices(clicked_voice)
 			toast.info("Hidden all other voices")
 		else
 			toast.info("Shown all other voices")
+		end
+	end
+end
+
+local function toggle_all_other_voices_solo(clicked_voice)
+	local voice_state = get_voice_state()
+	local any_other_solo = is_any_other_voice_solo(clicked_voice, voice_state)
+	local solo_others = not any_other_solo
+
+	for v = 0, 7 do
+		if v ~= clicked_voice then
+			boostio.setVoiceSolo(v, solo_others)
+		end
+	end
+
+	if toast then
+		if solo_others then
+			toast.info("Solo'd all other voices")
+		else
+			toast.info("Unsolo'd all other voices")
+		end
+	end
+end
+
+local function toggle_all_other_voices_mute(clicked_voice)
+	local voice_state = get_voice_state()
+	local any_other_muted = is_any_other_voice_muted(clicked_voice, voice_state)
+	local mute_others = not any_other_muted
+
+	for v = 0, 7 do
+		if v ~= clicked_voice then
+			boostio.setVoiceMuted(v, mute_others)
+		end
+	end
+
+	if toast then
+		if mute_others then
+			toast.info("Muted all other voices")
+		else
+			toast.info("Unmuted all other voices")
 		end
 	end
 end
@@ -63,8 +121,14 @@ local function toggle_single_voice(voice, row, row_type, voice_state)
 end
 
 local function handle_voice_button_click(voice, row, row_type, voice_state, ctrl_held)
-	if row == 0 and ctrl_held then
-		toggle_all_other_voices(voice)
+	if ctrl_held then
+		if row == 0 then
+			toggle_all_other_voices(voice)
+		elseif row == 1 then
+			toggle_all_other_voices_solo(voice)
+		elseif row == 2 then
+			toggle_all_other_voices_mute(voice)
+		end
 	else
 		toggle_single_voice(voice, row, row_type, voice_state)
 	end
