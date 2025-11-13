@@ -1006,9 +1006,11 @@ local function render_piano_keys(state, theme)
 						boostio.drawLine(0, row_y, piano_width, row_y, sep_color.r, sep_color.g,
 							sep_color.b, 1.0)
 
-						if not is_black_key(key) and vp.piano_key_height >= 15.0 then
+						if vp.piano_key_height >= 15.0 then
 							local note_name = get_note_name(key)
-							local text_color = boostio.hexToRgb(theme.piano_key_white_text)
+							local text_color_key = is_black_key(key) and "piano_key_black_text" or
+							    "piano_key_white_text"
+							local text_color = boostio.hexToRgb(theme[text_color_key])
 							boostio.drawText(
 								note_name,
 								10,
