@@ -34,6 +34,7 @@ PRIVATE
     src/app/lua_service.c
     src/app/viewport_utils.c
     src/core/platform/platform.c
+    src/core/platform/path_utils.c
     src/core/lua/lua_runtime.c
     src/core/lua/lua_api.c
     src/core/graphics/window.c
@@ -47,6 +48,9 @@ PRIVATE
     src/core/audio/synth.c
     src/core/audio/sequencer.c
     src/core/audio/song_loader.c
+    src/core/audio/song_saver.c
+    src/core/audio/c_exporter.c
+    src/core/audio/wav_exporter.c
     src/core/audio/scale.c
     src/core/theme/theme.c
     external/glad_generated/src/gl.c

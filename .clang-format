@@ -1,10 +1,10 @@
-# Base style
+# Base style - Linux kernel style
 BasedOnStyle: LLVM
 
 # Indentation - Tabs
 UseTab: Always
-TabWidth: 4
-IndentWidth: 4
+TabWidth: 8
+IndentWidth: 8
 ContinuationIndentWidth: 8
 
 # Alignment and spacing
@@ -23,7 +23,7 @@ AlignTrailingComments:
 ColumnLimit: 100
 AlwaysBreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
-BreakBeforeBraces: Allman
+BreakBeforeBraces: Linux
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: BeforeColon
 BreakInheritanceList: BeforeColon
@@ -64,8 +64,8 @@ AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: None
 AllowShortLoopsOnASingleLine: false
-BinPackArguments: true
-BinPackParameters: true
+BinPackArguments: false
+BinPackParameters: false
 
 # Other formatting
 KeepEmptyLinesAtTheStartOfBlocks: false
@@ -79,6 +79,6 @@ ReflowComments: true
 SortIncludes: CaseInsensitive
 SortUsingDeclarations: true
 
-# Additional settings for C
-Language: Cpp
-Standard: c++11
+# Language settings for C
+Language: C
+Standard: Latest

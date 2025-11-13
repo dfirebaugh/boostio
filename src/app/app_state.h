@@ -95,6 +95,8 @@ struct app_state
 	uint32_t note_count;
 	struct selection selection;
 	uint32_t next_note_id;
+
+	char current_file_path[512];
 };
 
 void app_state_init(struct app_state *state);

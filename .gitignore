@@ -3,6 +3,9 @@ build/
 .build/
 cmake-build-*/
 
+examples/*.wav
+examples/*.c
+
 # CMake
 CMakeCache.txt
 CMakeFiles/

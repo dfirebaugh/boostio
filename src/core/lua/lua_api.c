@@ -3,13 +3,18 @@
 #include "app/lua_command_registry.h"
 #include "app/viewport_utils.h"
 #include "core/audio/audio.h"
+#include "core/audio/c_exporter.h"
 #include "core/audio/scale.h"
 #include "core/audio/sequencer.h"
+#include "core/audio/song_loader.h"
+#include "core/audio/song_saver.h"
 #include "core/audio/synth.h"
+#include "core/audio/wav_exporter.h"
 #include "core/graphics/color.h"
 #include "core/graphics/graphics.h"
 #include "core/graphics/window.h"
 #include "core/input/input_types.h"
+#include "core/platform/path_utils.h"
 
 #include <SDL3/SDL.h>
 #include <string.h>
@@ -605,18 +610,111 @@ static int lua_api_quit(lua_State *L)
 
 static int lua_api_save(lua_State *L)
 {
-	if (global_context == NULL)
+	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
 		return luaL_error(L, "API context not available");
-	printf("Save requested\n");
-	return 0;
+
+	const char *filepath = luaL_optstring(L, 1, NULL);
+
+	char base_path[512];
+	if (filepath != NULL) {
+		strncpy(base_path, filepath, 511);
+		base_path[511] = '\0';
+		strncpy(global_context->app_state->current_file_path, filepath, 511);
+		global_context->app_state->current_file_path[511] = '\0';
+	} else if (global_context->app_state->current_file_path[0] != '\0') {
+		strncpy(base_path, global_context->app_state->current_file_path, 511);
+		base_path[511] = '\0';
+	} else {
+		strncpy(base_path, "song.json", 511);
+		base_path[511] = '\0';
+	}
+
+	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer == NULL)
+		return luaL_error(L, "Sequencer not available");
+
+	char json_path[512];
+	char c_path[512];
+	char wav_path[512];
+
+	path_build_with_extension(base_path, ".json", json_path, sizeof(json_path));
+	path_build_with_extension(base_path, ".c", c_path, sizeof(c_path));
+	path_build_with_extension(base_path, ".wav", wav_path, sizeof(wav_path));
+
+	bool success_json = song_saver_save_to_file(
+			global_context->app_state,
+			sequencer,
+			json_path
+	);
+
+	bool success_c = c_exporter_export_to_file(sequencer, c_path);
+	bool success_wav = wav_exporter_export_to_file(sequencer, wav_path);
+
+	bool success = success_json && success_c && success_wav;
+
+	if (success) {
+		printf("Saved all formats successfully:\n");
+		printf("  - %s\n", json_path);
+		printf("  - %s\n", c_path);
+		printf("  - %s\n", wav_path);
+	}
+
+	lua_pushboolean(L, success);
+	return 1;
+}
+
+static int lua_api_save_c(lua_State *L)
+{
+	if (global_context == NULL || global_context->audio == NULL)
+		return luaL_error(L, "API context not available");
+
+	const char *filepath = luaL_optstring(L, 1, "song.c");
+
+	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer == NULL)
+		return luaL_error(L, "Sequencer not available");
+
+	bool success = c_exporter_export_to_file(sequencer, filepath);
+
+	lua_pushboolean(L, success);
+	return 1;
+}
+
+static int lua_api_save_wav(lua_State *L)
+{
+	if (global_context == NULL || global_context->audio == NULL)
+		return luaL_error(L, "API context not available");
+
+	const char *filepath = luaL_optstring(L, 1, "song.wav");
+
+	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer == NULL)
+		return luaL_error(L, "Sequencer not available");
+
+	bool success = wav_exporter_export_to_file(sequencer, filepath);
+
+	lua_pushboolean(L, success);
+	return 1;
 }
 
 static int lua_api_load(lua_State *L)
 {
-	if (global_context == NULL)
+	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
 		return luaL_error(L, "API context not available");
-	printf("Load requested\n");
-	return 0;
+
+	const char *filepath = luaL_optstring(L, 1, "song.json");
+
+	struct Audio *audio = global_context->audio;
+	bool success = song_loader_load_from_file(audio, filepath);
+
+	if (success && global_context->app_state) {
+		strncpy(global_context->app_state->current_file_path, filepath, 511);
+		global_context->app_state->current_file_path[511] = '\0';
+		printf("Loaded and set current file path: %s\n", filepath);
+	}
+
+	lua_pushboolean(L, success);
+	return 1;
 }
 
 static int lua_api_undo(lua_State *L)
@@ -1793,6 +1891,12 @@ void lua_api_register_all(struct lua_runtime *runtime, struct lua_api_context *c
 
 	lua_pushcfunction(runtime->L, lua_api_save);
 	lua_setfield(runtime->L, -2, "save");
+
+	lua_pushcfunction(runtime->L, lua_api_save_c);
+	lua_setfield(runtime->L, -2, "saveC");
+
+	lua_pushcfunction(runtime->L, lua_api_save_wav);
+	lua_setfield(runtime->L, -2, "saveWav");
 
 	lua_pushcfunction(runtime->L, lua_api_load);
 	lua_setfield(runtime->L, -2, "load");

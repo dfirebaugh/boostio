@@ -209,11 +209,29 @@ function boostio.addNote(start_ms, pitch, duration_ms, params) end
 ---Quit the application
 function boostio.quit() end
 
----Save the current project
-function boostio.save() end
+---Save the current project in all formats (.json, .c, .wav)
+---If a file was previously loaded, saves to that location
+---If filepath is provided, saves to that location and sets it as current
+---Automatically generates .json, .c, and .wav files from the base path
+---@param filepath string? Optional filepath (default: current file or "song.json")
+---@return boolean success True if all formats saved successfully
+function boostio.save(filepath) end
 
----Load a project
-function boostio.load() end
+---Export only the C code format (for individual export)
+---@param filepath string? Optional filepath (default: "song.c")
+---@return boolean success True if export succeeded
+function boostio.saveC(filepath) end
+
+---Export only the WAV audio format (for individual export)
+---@param filepath string? Optional filepath (default: "song.wav")
+---@return boolean success True if export succeeded
+function boostio.saveWav(filepath) end
+
+---Load a project from JSON file
+---Sets the loaded file as the current file for future saves
+---@param filepath string? Optional filepath (default: "song.json")
+---@return boolean success True if load succeeded
+function boostio.load(filepath) end
 
 ---Undo the last action
 function boostio.undo() end
