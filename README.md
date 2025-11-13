@@ -2,6 +2,15 @@
 
 This is a music composition program orginally made with the goal to make it easier to make music for the [rvasec badge](https://badge2025.hackrva.org/pages/about/).  It's not exactly 1to1 with the audio api on the badge (particularly the noice instrument doesn't translate over).
 
+If you are working on songs for the badge, it may make sense to create your songs in parts and take advantage of the badge music api to arrange the parts.
+
+There's currently no file loading in the app.  To create a new file, pass the desired filepath as an argument.
+e.g.
+```bash
+./boostio ./examples/another_song.json
+```
+
+<kbd>ctr+s</kbd> will save a json file and export a wav and c file.
 
 ## Building
 
