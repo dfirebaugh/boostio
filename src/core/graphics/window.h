@@ -1,7 +1,6 @@
 #ifndef BOOSTIO_WINDOW_H
 #define BOOSTIO_WINDOW_H
 
-#include <GL/gl.h>
 #include <SDL3/SDL.h>
 #include <stdbool.h>
 
