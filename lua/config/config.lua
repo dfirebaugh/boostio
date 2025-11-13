@@ -77,6 +77,11 @@ config = {
 				enabled = true,
 				priority = 80,
 			},
+			{
+				name = "voice_validation",
+				enabled = true,
+				priority = 55,
+			},
 		},
 	},
 }
