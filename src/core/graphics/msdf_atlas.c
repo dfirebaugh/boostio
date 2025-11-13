@@ -1,6 +1,7 @@
 #include "../../msdf-atlas-gen/atlas_wrapper.h"
 #include "msdf_atlas.h"
 #include <GL/gl.h>
+#include <cJSON.h>
 #include <png.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -167,134 +168,6 @@ static char *read_file(const char *path, size_t *size)
 	return string;
 }
 
-static const char *skip_whitespace(const char *json)
-{
-	while (*json && (*json == ' ' || *json == '\t' || *json == '\n' || *json == '\r'))
-	{
-		json++;
-	}
-	return json;
-}
-
-static const char *parse_number(const char *json, double *out)
-{
-	char *end;
-	*out = strtod(json, &end);
-	return end;
-}
-
-static const char *parse_string(const char *json, char *out, size_t max_len)
-{
-	if (*json != '"')
-		return NULL;
-	json++;
-
-	size_t i = 0;
-	while (*json && *json != '"' && i < max_len - 1)
-	{
-		if (*json == '\\')
-		{
-			json++;
-			if (!*json)
-				return NULL;
-		}
-		out[i++] = *json++;
-	}
-	out[i] = 0;
-
-	if (*json != '"')
-		return NULL;
-	return json + 1;
-}
-
-static const char *find_key(const char *json, const char *key)
-{
-	char key_buf[256];
-	const char *p = json;
-
-	while (*p)
-	{
-		p = skip_whitespace(p);
-		if (*p != '"')
-		{
-			p++;
-			continue;
-		}
-
-		const char *after_key = parse_string(p, key_buf, sizeof(key_buf));
-		if (!after_key)
-		{
-			p++;
-			continue;
-		}
-
-		if (strcmp(key_buf, key) == 0)
-		{
-			p = skip_whitespace(after_key);
-			if (*p == ':')
-			{
-				return skip_whitespace(p + 1);
-			}
-		}
-		p = after_key;
-	}
-
-	return NULL;
-}
-
-static const char *skip_value(const char *json)
-{
-	json = skip_whitespace(json);
-
-	if (*json == '"')
-	{
-		json++;
-		while (*json && *json != '"')
-		{
-			if (*json == '\\')
-				json++;
-			json++;
-		}
-		if (*json)
-			json++;
-	}
-	else if (*json == '{' || *json == '[')
-	{
-		char open = *json;
-		char close = (open == '{') ? '}' : ']';
-		int depth = 1;
-		json++;
-
-		while (*json && depth > 0)
-		{
-			if (*json == open)
-				depth++;
-			else if (*json == close)
-				depth--;
-			else if (*json == '"')
-			{
-				json++;
-				while (*json && *json != '"')
-				{
-					if (*json == '\\')
-						json++;
-					json++;
-				}
-			}
-			json++;
-		}
-	}
-	else
-	{
-		while (*json && *json != ',' && *json != '}' && *json != ']')
-		{
-			json++;
-		}
-	}
-
-	return json;
-}
-
 struct MSDFAtlas *msdf_atlas_load(const char *json_path, const char *png_path)
 {
 	size_t json_size;
@@ -305,10 +178,19 @@ struct MSDFAtlas *msdf_atlas_load(const char *json_path, const char *png_path)
 		return NULL;
 	}
 
+	cJSON *root = cJSON_Parse(json_content);
+	free(json_content);
+
+	if (!root)
+	{
+		fprintf(stderr, "Failed to parse JSON: %s\n", cJSON_GetErrorPtr());
+		return NULL;
+	}
+
 	struct MSDFAtlas *atlas = (struct MSDFAtlas *)malloc(sizeof(struct MSDFAtlas));
 	if (!atlas)
 	{
-		free(json_content);
+		cJSON_Delete(root);
 		return NULL;
 	}
 
@@ -319,56 +201,33 @@ struct MSDFAtlas *msdf_atlas_load(const char *json_path, const char *png_path)
 	atlas->kerning =
 			(struct KerningPair *)malloc(sizeof(struct KerningPair) * atlas->kerning_capacity);
 
-	const char *atlas_section = find_key(json_content, "atlas");
-	if (atlas_section)
+	cJSON *atlas_obj = cJSON_GetObjectItem(root, "atlas");
+	if (atlas_obj)
 	{
-		const char *width_val = find_key(atlas_section, "width");
-		const char *height_val = find_key(atlas_section, "height");
-		const char *range_val = find_key(atlas_section, "distanceRange");
-		const char *size_val = find_key(atlas_section, "size");
+		cJSON *width = cJSON_GetObjectItem(atlas_obj, "width");
+		cJSON *height = cJSON_GetObjectItem(atlas_obj, "height");
+		cJSON *distance_range = cJSON_GetObjectItem(atlas_obj, "distanceRange");
+		cJSON *size = cJSON_GetObjectItem(atlas_obj, "size");
 
-		double width, height, range, size;
-		if (width_val)
-			parse_number(width_val, &width);
-		if (height_val)
-			parse_number(height_val, &height);
-		if (range_val)
-			parse_number(range_val, &range);
-		if (size_val)
-			parse_number(size_val, &size);
-
-		atlas->width = (int)width;
-		atlas->height = (int)height;
-		atlas->pixel_range = (float)range;
-		atlas->font_size = (float)size;
+		if (width)
+			atlas->width = width->valueint;
+		if (height)
+			atlas->height = height->valueint;
+		if (distance_range)
+			atlas->pixel_range = (float)distance_range->valuedouble;
+		if (size)
+			atlas->font_size = (float)size->valuedouble;
 	}
 
-	const char *glyphs_section = find_key(json_content, "glyphs");
-	if (glyphs_section && *glyphs_section == '[')
+	cJSON *glyphs = cJSON_GetObjectItem(root, "glyphs");
+	if (cJSON_IsArray(glyphs))
 	{
-		const char *p = glyphs_section + 1;
-
-		while (*p)
+		cJSON *glyph_obj;
+		cJSON_ArrayForEach(glyph_obj, glyphs)
 		{
-			p = skip_whitespace(p);
-			if (*p == ']')
-				break;
-			if (*p != '{')
-			{
-				p++;
+			cJSON *unicode = cJSON_GetObjectItem(glyph_obj, "unicode");
+			if (!unicode)
 				continue;
-			}
-
-			const char *unicode_val = find_key(p, "unicode");
-			if (!unicode_val)
-			{
-				p = skip_value(p);
-				continue;
-			}
-
-			double unicode_d;
-			parse_number(unicode_val, &unicode_d);
-			uint32_t unicode = (uint32_t)unicode_d;
 
 			if (atlas->glyph_count >= atlas->glyph_capacity)
 			{
@@ -380,90 +239,64 @@ struct MSDFAtlas *msdf_atlas_load(const char *json_path, const char *png_path)
 
 			struct MSDFGlyph *glyph = &atlas->glyphs[atlas->glyph_count];
 			memset(glyph, 0, sizeof(struct MSDFGlyph));
-			glyph->codepoint = unicode;
+			glyph->codepoint = (uint32_t)unicode->valueint;
 
-			const char *advance_val = find_key(p, "advance");
-			if (advance_val)
-			{
-				double advance;
-				parse_number(advance_val, &advance);
-				glyph->advance = (float)advance;
-			}
+			cJSON *advance = cJSON_GetObjectItem(glyph_obj, "advance");
+			if (advance)
+				glyph->advance = (float)advance->valuedouble;
 
-			const char *atlas_bounds = find_key(p, "atlasBounds");
+			cJSON *atlas_bounds = cJSON_GetObjectItem(glyph_obj, "atlasBounds");
 			if (atlas_bounds)
 			{
-				const char *left_val = find_key(atlas_bounds, "left");
-				const char *right_val = find_key(atlas_bounds, "right");
-				const char *bottom_val = find_key(atlas_bounds, "bottom");
-				const char *top_val = find_key(atlas_bounds, "top");
+				cJSON *left = cJSON_GetObjectItem(atlas_bounds, "left");
+				cJSON *right = cJSON_GetObjectItem(atlas_bounds, "right");
+				cJSON *bottom = cJSON_GetObjectItem(atlas_bounds, "bottom");
+				cJSON *top = cJSON_GetObjectItem(atlas_bounds, "top");
 
-				double left, right, bottom, top;
-				if (left_val)
-					parse_number(left_val, &left);
-				if (right_val)
-					parse_number(right_val, &right);
-				if (bottom_val)
-					parse_number(bottom_val, &bottom);
-				if (top_val)
-					parse_number(top_val, &top);
+				if (left && right && bottom && top)
+				{
+					double left_val = left->valuedouble;
+					double right_val = right->valuedouble;
+					double top_val = top->valuedouble;
+					double bottom_val = bottom->valuedouble;
 
-				glyph->x = (float)left / atlas->width;
-				glyph->y = (atlas->height - (float)top) / atlas->height;
-				glyph->width = (float)(right - left) / atlas->width;
-				glyph->height = (float)(top - bottom) / atlas->height;
+					glyph->x = (float)left_val / atlas->width;
+					glyph->y = (atlas->height - (float)top_val) / atlas->height;
+					glyph->width = (float)(right_val - left_val) / atlas->width;
+					glyph->height = (float)(top_val - bottom_val) / atlas->height;
+				}
 			}
 
-			const char *plane_bounds = find_key(p, "planeBounds");
+			cJSON *plane_bounds = cJSON_GetObjectItem(glyph_obj, "planeBounds");
 			if (plane_bounds)
 			{
-				const char *left_val = find_key(plane_bounds, "left");
-				const char *top_val = find_key(plane_bounds, "top");
-				const char *bottom_val = find_key(plane_bounds, "bottom");
+				cJSON *left = cJSON_GetObjectItem(plane_bounds, "left");
+				cJSON *top = cJSON_GetObjectItem(plane_bounds, "top");
+				cJSON *bottom = cJSON_GetObjectItem(plane_bounds, "bottom");
 
-				double left, top, bottom;
-				if (left_val)
-					parse_number(left_val, &left);
-				if (top_val)
-					parse_number(top_val, &top);
-				if (bottom_val)
-					parse_number(bottom_val, &bottom);
-
-				glyph->bearing_x = (float)left;
-				glyph->bearing_y = (float)top;
-				glyph->plane_bottom = (float)bottom;
+				if (left)
+					glyph->bearing_x = (float)left->valuedouble;
+				if (top)
+					glyph->bearing_y = (float)top->valuedouble;
+				if (bottom)
+					glyph->plane_bottom = (float)bottom->valuedouble;
 			}
 
 			atlas->glyph_count++;
-
-			p = skip_value(p);
-			p = skip_whitespace(p);
-			if (*p == ',')
-				p++;
 		}
 	}
 
-	const char *kerning_section = find_key(json_content, "kerning");
-	if (kerning_section && *kerning_section == '[')
+	cJSON *kerning = cJSON_GetObjectItem(root, "kerning");
+	if (cJSON_IsArray(kerning))
 	{
-		const char *p = kerning_section + 1;
-
-		while (*p)
+		cJSON *kerning_obj;
+		cJSON_ArrayForEach(kerning_obj, kerning)
 		{
-			p = skip_whitespace(p);
-			if (*p == ']')
-				break;
-			if (*p != '{')
-			{
-				p++;
-				continue;
-			}
+			cJSON *u1 = cJSON_GetObjectItem(kerning_obj, "unicode1");
+			cJSON *u2 = cJSON_GetObjectItem(kerning_obj, "unicode2");
+			cJSON *adv = cJSON_GetObjectItem(kerning_obj, "advance");
 
-			const char *u1_val = find_key(p, "unicode1");
-			const char *u2_val = find_key(p, "unicode2");
-			const char *adv_val = find_key(p, "advance");
-
-			if (u1_val && u2_val && adv_val)
+			if (u1 && u2 && adv)
 			{
 				if (atlas->kerning_count >= atlas->kerning_capacity)
 				{
@@ -473,25 +306,15 @@ struct MSDFAtlas *msdf_atlas_load(const char *json_path, const char *png_path)
 					);
 				}
 
-				double u1, u2, adv;
-				parse_number(u1_val, &u1);
-				parse_number(u2_val, &u2);
-				parse_number(adv_val, &adv);
-
-				atlas->kerning[atlas->kerning_count].left = (uint32_t)u1;
-				atlas->kerning[atlas->kerning_count].right = (uint32_t)u2;
-				atlas->kerning[atlas->kerning_count].advance = (float)adv;
+				atlas->kerning[atlas->kerning_count].left = (uint32_t)u1->valueint;
+				atlas->kerning[atlas->kerning_count].right = (uint32_t)u2->valueint;
+				atlas->kerning[atlas->kerning_count].advance = (float)adv->valuedouble;
 				atlas->kerning_count++;
 			}
-
-			p = skip_value(p);
-			p = skip_whitespace(p);
-			if (*p == ',')
-				p++;
 		}
 	}
 
-	free(json_content);
+	cJSON_Delete(root);
 
 	int png_width, png_height;
 	unsigned char *image_data = load_png(png_path, &png_width, &png_height);
