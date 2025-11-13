@@ -5,12 +5,29 @@
 #include <stdint.h>
 
 #include "core/audio/scale.h"
+#include "core/audio/synth.h"
 #include "core/theme/theme.h"
 
 struct Sequencer;
 
 #define UI_MAX_NOTES 1024
 #define UI_MAX_SELECTION 256
+#define MAX_INSTRUMENTS 16
+
+struct instrument
+{
+	char name[32];
+	enum WaveformType waveform;
+	uint8_t duty_cycle;
+	int8_t amplitude_dbfs;
+	int16_t decay;
+	uint16_t default_duration_ms;
+	uint8_t color_r;
+	uint8_t color_g;
+	uint8_t color_b;
+	bool nes_noise_mode_flag;
+	uint16_t nes_noise_lfsr;
+};
 
 struct viewport
 {
@@ -54,6 +71,10 @@ struct app_state
 	bool snap_enabled;
 
 	uint8_t selected_voice;
+
+	struct instrument instruments[MAX_INSTRUMENTS];
+	uint8_t instrument_count;
+	uint8_t selected_instrument;
 
 	enum scale_type selected_scale;
 	enum root_note selected_root;

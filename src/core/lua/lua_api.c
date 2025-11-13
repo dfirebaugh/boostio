@@ -964,6 +964,9 @@ static int lua_api_get_app_state(lua_State *L)
 	lua_pushinteger(L, state->selected_voice);
 	lua_setfield(L, -2, "selected_voice");
 
+	lua_pushinteger(L, state->selected_instrument);
+	lua_setfield(L, -2, "selected_instrument");
+
 	if (synth != NULL && state->selected_voice < MAX_VOICES)
 	{
 		enum WaveformType waveform = synth->voices[state->selected_voice].waveform;
@@ -1022,6 +1025,90 @@ static int lua_api_get_app_state(lua_State *L)
 	lua_setfield(L, -2, "voice_muted");
 
 	return 1;
+}
+
+static int lua_api_get_instrument_count(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	lua_pushinteger(L, global_context->app_state->instrument_count);
+	return 1;
+}
+
+static int lua_api_get_instrument(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	int index = (int)luaL_checkinteger(L, 1);
+
+	if (index < 0 || index >= global_context->app_state->instrument_count)
+	{
+		return luaL_error(L, "Instrument index out of range");
+	}
+
+	struct instrument *inst = &global_context->app_state->instruments[index];
+
+	lua_newtable(L);
+
+	lua_pushstring(L, inst->name);
+	lua_setfield(L, -2, "name");
+
+	lua_pushinteger(L, inst->waveform);
+	lua_setfield(L, -2, "waveform");
+
+	lua_pushinteger(L, inst->duty_cycle);
+	lua_setfield(L, -2, "duty_cycle");
+
+	lua_pushinteger(L, inst->amplitude_dbfs);
+	lua_setfield(L, -2, "amplitude_dbfs");
+
+	lua_pushinteger(L, inst->decay);
+	lua_setfield(L, -2, "decay");
+
+	lua_pushinteger(L, inst->default_duration_ms);
+	lua_setfield(L, -2, "default_duration_ms");
+
+	lua_pushinteger(L, inst->color_r);
+	lua_setfield(L, -2, "color_r");
+
+	lua_pushinteger(L, inst->color_g);
+	lua_setfield(L, -2, "color_g");
+
+	lua_pushinteger(L, inst->color_b);
+	lua_setfield(L, -2, "color_b");
+
+	lua_pushboolean(L, inst->nes_noise_mode_flag);
+	lua_setfield(L, -2, "nes_noise_mode_flag");
+
+	lua_pushinteger(L, inst->nes_noise_lfsr);
+	lua_setfield(L, -2, "nes_noise_lfsr");
+
+	return 1;
+}
+
+static int lua_api_set_selected_instrument(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	int index = (int)luaL_checkinteger(L, 1);
+
+	if (index < 0 || index >= global_context->app_state->instrument_count)
+	{
+		return luaL_error(L, "Instrument index out of range");
+	}
+
+	global_context->app_state->selected_instrument = (uint8_t)index;
+
+	return 0;
 }
 
 void lua_api_register_all(struct lua_runtime *runtime, struct lua_api_context *ctx)
@@ -1160,6 +1247,15 @@ void lua_api_register_all(struct lua_runtime *runtime, struct lua_api_context *c
 
 	lua_pushcfunction(runtime->L, lua_api_is_mouse_button_pressed);
 	lua_setfield(runtime->L, -2, "isMouseButtonPressed");
+
+	lua_pushcfunction(runtime->L, lua_api_get_instrument_count);
+	lua_setfield(runtime->L, -2, "getInstrumentCount");
+
+	lua_pushcfunction(runtime->L, lua_api_get_instrument);
+	lua_setfield(runtime->L, -2, "getInstrument");
+
+	lua_pushcfunction(runtime->L, lua_api_set_selected_instrument);
+	lua_setfield(runtime->L, -2, "setSelectedInstrument");
 
 	lua_pushinteger(runtime->L, SDL_BUTTON_LEFT);
 	lua_setfield(runtime->L, -2, "MOUSE_BUTTON_LEFT");

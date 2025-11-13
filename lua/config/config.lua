@@ -126,6 +126,11 @@ config = {
 				enabled = true,
 				priority = 85,
 			},
+			{
+				name = "instrument_selector",
+				enabled = true,
+				priority = 80,
+			},
 			-- {
 			-- 	name = "test",
 			-- 	enabled = false,

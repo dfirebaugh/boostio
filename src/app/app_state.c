@@ -37,6 +37,81 @@ void app_state_init(struct app_state *state)
 	state->note_count = 0;
 	state->selection.count = 0;
 	state->next_note_id = 1;
+
+	state->instrument_count = 6;
+	state->selected_instrument = 0;
+
+	strcpy(state->instruments[0].name, "Square");
+	state->instruments[0].waveform = WAVEFORM_SQUARE;
+	state->instruments[0].duty_cycle = 128;
+	state->instruments[0].amplitude_dbfs = -6;
+	state->instruments[0].decay = 0;
+	state->instruments[0].default_duration_ms = 100;
+	state->instruments[0].color_r = 78;
+	state->instruments[0].color_g = 205;
+	state->instruments[0].color_b = 196;
+	state->instruments[0].nes_noise_mode_flag = false;
+	state->instruments[0].nes_noise_lfsr = 1;
+
+	strcpy(state->instruments[1].name, "Triangle");
+	state->instruments[1].waveform = WAVEFORM_TRIANGLE;
+	state->instruments[1].duty_cycle = 128;
+	state->instruments[1].amplitude_dbfs = -6;
+	state->instruments[1].decay = 0;
+	state->instruments[1].default_duration_ms = 100;
+	state->instruments[1].color_r = 69;
+	state->instruments[1].color_g = 170;
+	state->instruments[1].color_b = 242;
+	state->instruments[1].nes_noise_mode_flag = false;
+	state->instruments[1].nes_noise_lfsr = 1;
+
+	strcpy(state->instruments[2].name, "Sawtooth");
+	state->instruments[2].waveform = WAVEFORM_SAWTOOTH;
+	state->instruments[2].duty_cycle = 128;
+	state->instruments[2].amplitude_dbfs = -6;
+	state->instruments[2].decay = 0;
+	state->instruments[2].default_duration_ms = 100;
+	state->instruments[2].color_r = 253;
+	state->instruments[2].color_g = 150;
+	state->instruments[2].color_b = 68;
+	state->instruments[2].nes_noise_mode_flag = false;
+	state->instruments[2].nes_noise_lfsr = 1;
+
+	strcpy(state->instruments[3].name, "Sine");
+	state->instruments[3].waveform = WAVEFORM_SINE;
+	state->instruments[3].duty_cycle = 128;
+	state->instruments[3].amplitude_dbfs = -6;
+	state->instruments[3].decay = 0;
+	state->instruments[3].default_duration_ms = 100;
+	state->instruments[3].color_r = 165;
+	state->instruments[3].color_g = 94;
+	state->instruments[3].color_b = 234;
+	state->instruments[3].nes_noise_mode_flag = false;
+	state->instruments[3].nes_noise_lfsr = 1;
+
+	strcpy(state->instruments[4].name, "NES Noise");
+	state->instruments[4].waveform = WAVEFORM_NES_NOISE;
+	state->instruments[4].duty_cycle = 15;
+	state->instruments[4].amplitude_dbfs = -6;
+	state->instruments[4].decay = 200;
+	state->instruments[4].default_duration_ms = 100;
+	state->instruments[4].color_r = 231;
+	state->instruments[4].color_g = 76;
+	state->instruments[4].color_b = 60;
+	state->instruments[4].nes_noise_mode_flag = true;
+	state->instruments[4].nes_noise_lfsr = 1;
+
+	strcpy(state->instruments[5].name, "NES Metallic");
+	state->instruments[5].waveform = WAVEFORM_NES_NOISE;
+	state->instruments[5].duty_cycle = 15;
+	state->instruments[5].amplitude_dbfs = -6;
+	state->instruments[5].decay = 50;
+	state->instruments[5].default_duration_ms = 200;
+	state->instruments[5].color_r = 230;
+	state->instruments[5].color_g = 179;
+	state->instruments[5].color_b = 51;
+	state->instruments[5].nes_noise_mode_flag = false;
+	state->instruments[5].nes_noise_lfsr = 1;
 }
 
 void app_state_update_dimensions(struct app_state *state, int width, int height)
