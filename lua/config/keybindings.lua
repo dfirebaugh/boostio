@@ -23,11 +23,6 @@ boostio.registerKeybinding("h", "toggle_scale_highlighting")
 boostio.registerKeybinding("r", "cycle_scale_root", { shift = true })
 boostio.registerKeybinding("s", "cycle_scale_type", { shift = true })
 
-boostio.registerKeybinding("equals", "zoom_in")
-boostio.registerKeybinding("minus", "zoom_out")
-boostio.registerKeybinding("up", "transpose_up", { shift = true })
-boostio.registerKeybinding("down", "transpose_down", { shift = true })
-
 boostio.registerKeybinding("t", "toast_test", { ctrl = true, shift = true })
 
 print("Keybindings loaded!")

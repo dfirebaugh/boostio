@@ -40,6 +40,10 @@ bool lua_service_load_plugin(struct lua_service *service, const char *plugin_pat
 
 void lua_service_call_render_callbacks(struct lua_service *service);
 
+bool lua_service_dispatch_key_event(
+	struct lua_service *service, struct input_event_key_down *event
+);
+
 void lua_service_apply_config_to_state(struct lua_service *service, struct app_state *state);
 
 const char *

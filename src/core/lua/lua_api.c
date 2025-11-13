@@ -311,6 +311,26 @@ static int lua_api_register_command(lua_State *L)
 
 static enum key parse_key_string(const char *key_str)
 {
+	if (strcmp(key_str, "0") == 0)
+		return KEY_0;
+	if (strcmp(key_str, "1") == 0)
+		return KEY_1;
+	if (strcmp(key_str, "2") == 0)
+		return KEY_2;
+	if (strcmp(key_str, "3") == 0)
+		return KEY_3;
+	if (strcmp(key_str, "4") == 0)
+		return KEY_4;
+	if (strcmp(key_str, "5") == 0)
+		return KEY_5;
+	if (strcmp(key_str, "6") == 0)
+		return KEY_6;
+	if (strcmp(key_str, "7") == 0)
+		return KEY_7;
+	if (strcmp(key_str, "8") == 0)
+		return KEY_8;
+	if (strcmp(key_str, "9") == 0)
+		return KEY_9;
 	if (strcmp(key_str, "a") == 0)
 		return KEY_A;
 	if (strcmp(key_str, "b") == 0)
@@ -1074,6 +1094,54 @@ static int lua_api_set_voice_muted(lua_State *L)
 	return 0;
 }
 
+static int lua_api_set_selected_voice(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL) {
+		return luaL_error(L, "API context not available");
+	}
+
+	int voice = (int)luaL_checkinteger(L, 1);
+
+	if (voice < 0 || voice >= 8) {
+		return luaL_error(L, "Voice must be 0-7");
+	}
+
+	global_context->app_state->selected_voice = (uint8_t)voice;
+
+	return 0;
+}
+
+static int lua_api_set_note_voice(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL) {
+		return luaL_error(L, "API context not available");
+	}
+
+	uint32_t note_id = (uint32_t)luaL_checkinteger(L, 1);
+	int voice = (int)luaL_checkinteger(L, 2);
+
+	if (voice < 0 || voice >= 8) {
+		return luaL_error(L, "Voice must be 0-7");
+	}
+
+	struct app_state *state = global_context->app_state;
+
+	for (uint32_t i = 0; i < state->note_count; i++) {
+		if (state->notes[i].id == note_id) {
+			state->notes[i].voice = (uint8_t)voice;
+			break;
+		}
+	}
+
+	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL) {
+		app_state_sync_notes_to_sequencer(state, sequencer, global_context->audio);
+	}
+
+	return 0;
+}
+
 static const char *waveform_type_to_string(enum WaveformType type)
 {
 	switch (type) {
@@ -1720,6 +1788,26 @@ static int lua_api_play_preview_note(lua_State *L)
 static SDL_Scancode key_to_scancode(enum key key)
 {
 	switch (key) {
+	case KEY_0:
+		return SDL_SCANCODE_0;
+	case KEY_1:
+		return SDL_SCANCODE_1;
+	case KEY_2:
+		return SDL_SCANCODE_2;
+	case KEY_3:
+		return SDL_SCANCODE_3;
+	case KEY_4:
+		return SDL_SCANCODE_4;
+	case KEY_5:
+		return SDL_SCANCODE_5;
+	case KEY_6:
+		return SDL_SCANCODE_6;
+	case KEY_7:
+		return SDL_SCANCODE_7;
+	case KEY_8:
+		return SDL_SCANCODE_8;
+	case KEY_9:
+		return SDL_SCANCODE_9;
 	case KEY_A:
 		return SDL_SCANCODE_A;
 	case KEY_B:
@@ -1995,6 +2083,12 @@ void lua_api_register_all(struct lua_runtime *runtime, struct lua_api_context *c
 
 	lua_pushcfunction(runtime->L, lua_api_set_voice_muted);
 	lua_setfield(runtime->L, -2, "setVoiceMuted");
+
+	lua_pushcfunction(runtime->L, lua_api_set_selected_voice);
+	lua_setfield(runtime->L, -2, "setSelectedVoice");
+
+	lua_pushcfunction(runtime->L, lua_api_set_note_voice);
+	lua_setfield(runtime->L, -2, "setNoteVoice");
 
 	lua_pushcfunction(runtime->L, lua_api_get_app_state);
 	lua_setfield(runtime->L, -2, "getAppState");

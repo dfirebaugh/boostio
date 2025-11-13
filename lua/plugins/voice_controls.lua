@@ -35,6 +35,50 @@ function voice_controls.init()
 	end
 end
 
+function voice_controls.on_key_down(key, shift, ctrl, alt)
+	if not boostio or not boostio.setSelectedVoice or not boostio.getSelection or not boostio.setNoteVoice then
+		return false
+	end
+
+	local key_to_voice = {
+		["1"] = 0,
+		["2"] = 1,
+		["3"] = 2,
+		["4"] = 3,
+		["5"] = 4,
+		["6"] = 5,
+		["7"] = 6,
+		["8"] = 7,
+	}
+
+	local voice = key_to_voice[key]
+	if voice then
+		local success = pcall(boostio.setSelectedVoice, voice)
+		if not success then
+			return false
+		end
+
+		local selection_success, selection = pcall(boostio.getSelection)
+		if selection_success and selection and #selection > 0 then
+			for _, note_id in ipairs(selection) do
+				pcall(boostio.setNoteVoice, note_id, voice)
+			end
+
+			if toast and toast.info then
+				pcall(toast.info, "Set " .. #selection .. " note(s) to voice " .. (voice + 1))
+			end
+		else
+			if toast and toast.info then
+				pcall(toast.info, "Selected voice " .. (voice + 1))
+			end
+		end
+
+		return true
+	end
+
+	return false
+end
+
 function voice_controls.render()
 	local theme = config.theme
 	local state = boostio.getAppState()

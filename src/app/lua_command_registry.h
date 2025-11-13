@@ -55,4 +55,6 @@ const char *lua_command_registry_get_command_for_key(
 	struct lua_command_registry *registry, struct input_event_key_down *key_event
 );
 
+const char *lua_command_registry_key_to_string(enum key key);
+
 #endif

@@ -269,6 +269,71 @@ void lua_service_call_render_callbacks(struct lua_service *service)
 	}
 }
 
+bool lua_service_dispatch_key_event(
+	struct lua_service *service, struct input_event_key_down *event
+)
+{
+	if (service == NULL || !service->initialized || event == NULL) {
+		return false;
+	}
+
+	lua_State *L = service->runtime.L;
+	if (L == NULL) {
+		return false;
+	}
+
+	const char *key_name = lua_command_registry_key_to_string(event->key);
+	if (key_name == NULL) {
+		return false;
+	}
+
+	for (int i = 0; i < service->plugin_count; i++) {
+		const char *plugin_name = service->loaded_plugins[i];
+
+		lua_getglobal(L, plugin_name);
+		if (lua_type(L, -1) != LUA_TTABLE) {
+			lua_pop(L, 1);
+			continue;
+		}
+
+		lua_getfield(L, -1, "on_key_down");
+		if (lua_type(L, -1) != LUA_TFUNCTION) {
+			lua_pop(L, 2);
+			continue;
+		}
+
+		lua_pushstring(L, key_name);
+		lua_pushboolean(L, event->shift);
+		lua_pushboolean(L, event->ctrl);
+		lua_pushboolean(L, event->alt);
+
+		int result = lua_pcall(L, 4, 1, 0);
+		if (result != LUA_OK) {
+			const char *error_msg = lua_tostring(L, -1);
+			fprintf(
+				stderr,
+				"Lua key event error in %s: %s\n",
+				plugin_name,
+				error_msg ? error_msg : "unknown error"
+			);
+			lua_pop(L, 2);
+			continue;
+		}
+
+		bool handled = false;
+		if (lua_isboolean(L, -1)) {
+			handled = lua_toboolean(L, -1);
+		}
+		lua_pop(L, 2);
+
+		if (handled) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void lua_service_apply_config_to_state(struct lua_service *service, struct app_state *state)
 {
 	if (service == NULL || !service->initialized || state == NULL) {

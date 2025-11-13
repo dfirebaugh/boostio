@@ -84,6 +84,15 @@ static void handle_input_event(struct app_controller *controller, struct input_e
 		return;
 	}
 
+	if (event->type == INPUT_EVENT_KEY_DOWN) {
+		bool handled = lua_service_dispatch_key_event(
+			&controller->lua_service, &event->data.key_down
+		);
+		if (handled) {
+			return;
+		}
+	}
+
 	const char *command_name =
 		lua_service_get_command_for_event(&controller->lua_service, event);
 
