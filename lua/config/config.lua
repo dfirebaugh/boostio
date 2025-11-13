@@ -82,6 +82,16 @@ config = {
 				enabled = true,
 				priority = 55,
 			},
+			{
+				name = "splash_screen",
+				enabled = true,
+				priority = 300,
+				options = {
+					duration_ms = 200,
+					fade_in_ms = 20,
+					fade_out_ms = 100,
+				},
+			},
 		},
 	},
 }
