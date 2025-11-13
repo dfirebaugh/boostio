@@ -168,7 +168,6 @@ bool song_loader_load_from_file(struct audio *audio, struct app_state *state, co
 		cJSON *restart = cJSON_GetObjectItemCaseSensitive(note_item, "restart");
 		cJSON *nes_noise_lfsr =
 			cJSON_GetObjectItemCaseSensitive(note_item, "nes_noise_lfsr");
-		cJSON *piano_key_json = cJSON_GetObjectItemCaseSensitive(note_item, "piano_key");
 
 		if (!cJSON_IsNumber(ms)) {
 			fprintf(stderr, "Note missing 'ms' field, skipping\n");
@@ -220,10 +219,6 @@ bool song_loader_load_from_file(struct audio *audio, struct app_state *state, co
 
 		if (cJSON_IsNumber(nes_noise_lfsr)) {
 			params.nes_noise_lfsr_init = (uint16_t)nes_noise_lfsr->valueint;
-		}
-
-		if (cJSON_IsNumber(piano_key_json) && !cJSON_IsNumber(frequency_hz)) {
-			params.piano_key = (uint8_t)piano_key_json->valueint;
 		}
 
 		sequencer_add_note(sequencer, start_ms, params);

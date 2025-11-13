@@ -17,8 +17,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 2,
@@ -34,8 +33,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 3,
@@ -51,8 +49,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 4,
@@ -68,8 +65,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 5,
@@ -85,8 +81,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 6,
@@ -102,8 +97,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 17
+      "nes_noise_period": 15
     },
     {
       "id": 7,
@@ -119,8 +113,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 8,
@@ -136,8 +129,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 9,
@@ -153,8 +145,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 10,
@@ -170,8 +161,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 11,
@@ -187,8 +177,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 12,
@@ -204,8 +193,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 13,
@@ -221,8 +209,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 19
+      "nes_noise_period": 15
     },
     {
       "id": 14,
@@ -238,8 +225,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 19
+      "nes_noise_period": 15
     },
     {
       "id": 15,
@@ -255,8 +241,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 16,
@@ -272,8 +257,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 17,
@@ -289,8 +273,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 18,
@@ -306,8 +289,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 19,
@@ -323,8 +305,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 20,
@@ -340,8 +321,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 21,
@@ -357,8 +337,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 22
+      "nes_noise_period": 15
     },
     {
       "id": 22,
@@ -374,8 +353,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 23,
@@ -391,8 +369,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 24,
@@ -408,8 +385,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 25,
@@ -425,8 +401,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 26,
@@ -442,8 +417,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 27,
@@ -459,8 +433,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 28,
@@ -476,8 +449,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 29,
@@ -493,8 +465,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 30,
@@ -510,8 +481,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 31,
@@ -527,8 +497,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 32,
@@ -544,8 +513,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 33,
@@ -561,8 +529,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 34,
@@ -578,8 +545,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 35,
@@ -595,8 +561,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 36,
@@ -612,8 +577,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 37,
@@ -629,8 +593,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 38,
@@ -646,8 +609,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 39,
@@ -663,8 +625,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 40,
@@ -680,8 +641,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 41,
@@ -697,8 +657,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 39
+      "nes_noise_period": 15
     },
     {
       "id": 42,
@@ -714,8 +673,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 43,
@@ -731,8 +689,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 39
+      "nes_noise_period": 15
     },
     {
       "id": 44,
@@ -748,8 +705,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 45,
@@ -765,8 +721,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 17
+      "nes_noise_period": 15
     },
     {
       "id": 46,
@@ -782,8 +737,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 36
+      "nes_noise_period": 15
     },
     {
       "id": 47,
@@ -799,8 +753,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 48,
@@ -816,8 +769,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 49,
@@ -833,8 +785,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 29
+      "nes_noise_period": 15
     },
     {
       "id": 50,
@@ -850,8 +801,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 31
+      "nes_noise_period": 15
     },
     {
       "id": 51,
@@ -867,8 +817,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 34
+      "nes_noise_period": 15
     },
     {
       "id": 52,
@@ -884,8 +833,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 36
+      "nes_noise_period": 15
     },
     {
       "id": 53,
@@ -901,8 +849,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 39
+      "nes_noise_period": 15
     },
     {
       "id": 54,
@@ -918,8 +865,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 41
+      "nes_noise_period": 15
     },
     {
       "id": 55,
@@ -935,8 +881,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 56,
@@ -952,8 +897,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 43
+      "nes_noise_period": 15
     },
     {
       "id": 57,
@@ -969,8 +913,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 58,
@@ -986,8 +929,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 59,
@@ -1003,8 +945,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 19
+      "nes_noise_period": 15
     },
     {
       "id": 60,
@@ -1020,8 +961,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 36
+      "nes_noise_period": 15
     },
     {
       "id": 61,
@@ -1037,8 +977,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 19
+      "nes_noise_period": 15
     },
     {
       "id": 62,
@@ -1054,8 +993,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 63,
@@ -1071,8 +1009,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 64,
@@ -1088,8 +1025,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 36
+      "nes_noise_period": 15
     },
     {
       "id": 65,
@@ -1105,8 +1041,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 48
+      "nes_noise_period": 15
     },
     {
       "id": 66,
@@ -1122,8 +1057,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 46
+      "nes_noise_period": 15
     },
     {
       "id": 67,
@@ -1139,8 +1073,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 68,
@@ -1156,8 +1089,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 69,
@@ -1173,8 +1105,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 43
+      "nes_noise_period": 15
     },
     {
       "id": 70,
@@ -1190,8 +1121,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 71,
@@ -1207,8 +1137,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 72,
@@ -1224,8 +1153,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 73,
@@ -1241,8 +1169,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 74,
@@ -1258,8 +1185,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 75,
@@ -1275,8 +1201,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 43
+      "nes_noise_period": 15
     },
     {
       "id": 76,
@@ -1292,8 +1217,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 46
+      "nes_noise_period": 15
     },
     {
       "id": 77,
@@ -1309,8 +1233,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 41
+      "nes_noise_period": 15
     },
     {
       "id": 78,
@@ -1326,8 +1249,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 79,
@@ -1343,8 +1265,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 80,
@@ -1360,8 +1281,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 81,
@@ -1377,8 +1297,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 82,
@@ -1394,8 +1313,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 83,
@@ -1411,8 +1329,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 39
+      "nes_noise_period": 15
     },
     {
       "id": 84,
@@ -1428,8 +1345,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 85,
@@ -1445,8 +1361,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 43
+      "nes_noise_period": 15
     },
     {
       "id": 86,
@@ -1462,8 +1377,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 87,
@@ -1479,8 +1393,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 88,
@@ -1496,8 +1409,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 89,
@@ -1513,8 +1425,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 41
+      "nes_noise_period": 15
     },
     {
       "id": 90,
@@ -1530,8 +1441,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 91,
@@ -1547,8 +1457,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 43
+      "nes_noise_period": 15
     },
     {
       "id": 92,
@@ -1564,8 +1473,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 93,
@@ -1581,8 +1489,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 94,
@@ -1598,8 +1505,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 46
+      "nes_noise_period": 15
     },
     {
       "id": 95,
@@ -1615,8 +1521,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 96,
@@ -1632,8 +1537,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 43
+      "nes_noise_period": 15
     },
     {
       "id": 97,
@@ -1649,8 +1553,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 98,
@@ -1666,8 +1569,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 43
+      "nes_noise_period": 15
     },
     {
       "id": 99,
@@ -1683,8 +1585,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 46
+      "nes_noise_period": 15
     },
     {
       "id": 100,
@@ -1700,8 +1601,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 41
+      "nes_noise_period": 15
     },
     {
       "id": 101,
@@ -1717,8 +1617,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 39
+      "nes_noise_period": 15
     },
     {
       "id": 102,
@@ -1734,8 +1633,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 36
+      "nes_noise_period": 15
     },
     {
       "id": 103,
@@ -1751,8 +1649,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 104,
@@ -1768,8 +1665,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 41
+      "nes_noise_period": 15
     },
     {
       "id": 105,
@@ -1785,8 +1681,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 39
+      "nes_noise_period": 15
     },
     {
       "id": 106,
@@ -1802,8 +1697,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 107,
@@ -1819,8 +1713,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 108,
@@ -1836,8 +1729,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 39
+      "nes_noise_period": 15
     },
     {
       "id": 109,
@@ -1853,8 +1745,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 110,
@@ -1870,8 +1761,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 39
+      "nes_noise_period": 15
     },
     {
       "id": 111,
@@ -1887,8 +1777,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 112,
@@ -1904,8 +1793,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 17
+      "nes_noise_period": 15
     },
     {
       "id": 113,
@@ -1921,8 +1809,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 36
+      "nes_noise_period": 15
     },
     {
       "id": 114,
@@ -1938,8 +1825,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 115,
@@ -1955,8 +1841,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 116,
@@ -1972,8 +1857,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 29
+      "nes_noise_period": 15
     },
     {
       "id": 117,
@@ -1989,8 +1873,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 31
+      "nes_noise_period": 15
     },
     {
       "id": 118,
@@ -2006,8 +1889,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 34
+      "nes_noise_period": 15
     },
     {
       "id": 119,
@@ -2023,8 +1905,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 36
+      "nes_noise_period": 15
     },
     {
       "id": 120,
@@ -2040,8 +1921,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 39
+      "nes_noise_period": 15
     },
     {
       "id": 121,
@@ -2057,8 +1937,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 41
+      "nes_noise_period": 15
     },
     {
       "id": 122,
@@ -2074,8 +1953,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 123,
@@ -2091,8 +1969,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 43
+      "nes_noise_period": 15
     },
     {
       "id": 124,
@@ -2108,8 +1985,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 125,
@@ -2125,8 +2001,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 126,
@@ -2142,8 +2017,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 19
+      "nes_noise_period": 15
     },
     {
       "id": 127,
@@ -2159,8 +2033,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 36
+      "nes_noise_period": 15
     },
     {
       "id": 128,
@@ -2176,8 +2049,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 19
+      "nes_noise_period": 15
     },
     {
       "id": 129,
@@ -2193,8 +2065,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 130,
@@ -2210,8 +2081,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 131,
@@ -2227,8 +2097,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 36
+      "nes_noise_period": 15
     },
     {
       "id": 132,
@@ -2244,8 +2113,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 48
+      "nes_noise_period": 15
     },
     {
       "id": 133,
@@ -2261,8 +2129,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 46
+      "nes_noise_period": 15
     },
     {
       "id": 134,
@@ -2278,8 +2145,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 135,
@@ -2295,8 +2161,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 136,
@@ -2312,8 +2177,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 43
+      "nes_noise_period": 15
     },
     {
       "id": 137,
@@ -2329,8 +2193,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 138,
@@ -2346,8 +2209,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 139,
@@ -2363,8 +2225,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 140,
@@ -2380,8 +2241,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 141,
@@ -2397,8 +2257,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 142,
@@ -2414,8 +2273,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 43
+      "nes_noise_period": 15
     },
     {
       "id": 143,
@@ -2431,8 +2289,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 46
+      "nes_noise_period": 15
     },
     {
       "id": 144,
@@ -2448,8 +2305,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 41
+      "nes_noise_period": 15
     },
     {
       "id": 145,
@@ -2465,8 +2321,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 146,
@@ -2482,8 +2337,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 147,
@@ -2499,8 +2353,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 148,
@@ -2516,8 +2369,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 149,
@@ -2533,8 +2385,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 150,
@@ -2550,8 +2401,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 39
+      "nes_noise_period": 15
     },
     {
       "id": 151,
@@ -2567,8 +2417,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 152,
@@ -2584,8 +2433,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 43
+      "nes_noise_period": 15
     },
     {
       "id": 153,
@@ -2601,8 +2449,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 154,
@@ -2618,8 +2465,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 155,
@@ -2635,8 +2481,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 156,
@@ -2652,8 +2497,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 41
+      "nes_noise_period": 15
     },
     {
       "id": 157,
@@ -2669,8 +2513,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 158,
@@ -2686,8 +2529,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 43
+      "nes_noise_period": 15
     },
     {
       "id": 159,
@@ -2703,8 +2545,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 160,
@@ -2720,8 +2561,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 161,
@@ -2737,8 +2577,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 46
+      "nes_noise_period": 15
     },
     {
       "id": 162,
@@ -2754,8 +2593,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 163,
@@ -2771,8 +2609,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 43
+      "nes_noise_period": 15
     },
     {
       "id": 164,
@@ -2788,8 +2625,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 165,
@@ -2805,8 +2641,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 43
+      "nes_noise_period": 15
     },
     {
       "id": 166,
@@ -2822,8 +2657,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 46
+      "nes_noise_period": 15
     },
     {
       "id": 167,
@@ -2839,8 +2673,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 41
+      "nes_noise_period": 15
     },
     {
       "id": 168,
@@ -2856,8 +2689,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 39
+      "nes_noise_period": 15
     },
     {
       "id": 169,
@@ -2873,8 +2705,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 36
+      "nes_noise_period": 15
     },
     {
       "id": 170,
@@ -2890,8 +2721,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 171,
@@ -2907,8 +2737,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 41
+      "nes_noise_period": 15
     },
     {
       "id": 172,
@@ -2924,8 +2753,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 39
+      "nes_noise_period": 15
     },
     {
       "id": 173,
@@ -2941,8 +2769,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 174,
@@ -2958,8 +2785,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 175,
@@ -2975,8 +2801,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 176,
@@ -2992,8 +2817,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 177,
@@ -3009,8 +2833,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 17
+      "nes_noise_period": 15
     },
     {
       "id": 178,
@@ -3026,8 +2849,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 179,
@@ -3043,8 +2865,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 180,
@@ -3060,8 +2881,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 181,
@@ -3077,8 +2897,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 182,
@@ -3094,8 +2913,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 183,
@@ -3111,8 +2929,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 184,
@@ -3128,8 +2945,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 19
+      "nes_noise_period": 15
     },
     {
       "id": 185,
@@ -3145,8 +2961,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 19
+      "nes_noise_period": 15
     },
     {
       "id": 186,
@@ -3162,8 +2977,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 187,
@@ -3179,8 +2993,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 188,
@@ -3196,8 +3009,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 189,
@@ -3213,8 +3025,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 190,
@@ -3230,8 +3041,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 191,
@@ -3247,8 +3057,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 192,
@@ -3264,8 +3073,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 22
+      "nes_noise_period": 15
     },
     {
       "id": 193,
@@ -3281,8 +3089,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 194,
@@ -3298,8 +3105,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 195,
@@ -3315,8 +3121,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 196,
@@ -3332,8 +3137,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 197,
@@ -3349,8 +3153,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 198,
@@ -3366,8 +3169,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 199,
@@ -3383,8 +3185,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 200,
@@ -3400,8 +3201,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 201,
@@ -3417,8 +3217,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 202,
@@ -3434,8 +3233,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     },
     {
       "id": 203,
@@ -3451,8 +3249,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 204,
@@ -3468,8 +3265,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 205,
@@ -3485,8 +3281,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 21
+      "nes_noise_period": 15
     },
     {
       "id": 206,
@@ -3502,8 +3297,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 15
+      "nes_noise_period": 15
     },
     {
       "id": 207,
@@ -3519,8 +3313,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 15,
-      "piano_key": 12
+      "nes_noise_period": 15
     },
     {
       "id": 208,
@@ -3536,8 +3329,7 @@
       "restart": true,
       "nes_noise_mode": false,
       "nes_noise_lfsr": 65535,
-      "nes_noise_period": 12,
-      "piano_key": 59
+      "nes_noise_period": 12
     }
   ],
   "selected_scale": "pentatonic_minor",

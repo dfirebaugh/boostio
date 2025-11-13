@@ -107,7 +107,6 @@ bool song_saver_save_to_file(
 		cJSON_AddBoolToObject(note_obj, "nes_noise_mode", params->nes_noise_mode_flag);
 		cJSON_AddNumberToObject(note_obj, "nes_noise_lfsr", params->nes_noise_lfsr_init);
 		cJSON_AddNumberToObject(note_obj, "nes_noise_period", params->nes_noise_period);
-		cJSON_AddNumberToObject(note_obj, "piano_key", params->piano_key);
 
 		cJSON_AddItemToArray(notes_array, note_obj);
 	}
