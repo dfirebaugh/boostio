@@ -31,16 +31,18 @@ void sequencer_clear_notes(struct Sequencer *sequencer)
 void sequencer_update(
 	struct Sequencer *sequencer,
 	struct Synth *synth,
-	float delta_time_ms,
+	uint32_t samples,
 	const bool *voice_solo,
 	const bool *voice_muted
 )
 {
-	if (!sequencer->playing) {
+	if (!sequencer->playing || sequencer->sample_rate == 0) {
 		return;
 	}
 
-	sequencer->playhead_ms += (uint32_t)delta_time_ms;
+	sequencer->playhead_samples += samples;
+
+	uint32_t playhead_ms = (uint32_t)((sequencer->playhead_samples * 1000) / sequencer->sample_rate);
 
 	bool has_untriggered_notes = false;
 
@@ -57,7 +59,7 @@ void sequencer_update(
 	for (uint32_t i = 0; i < sequencer->note_count; i++) {
 		struct Note *note = &sequencer->notes[i];
 
-		if (!note->triggered && sequencer->playhead_ms >= note->time_ms) {
+		if (!note->triggered && playhead_ms >= note->time_ms) {
 			bool should_play = true;
 
 			if (voice_solo != NULL && voice_muted != NULL &&
@@ -84,7 +86,7 @@ void sequencer_update(
 
 	if (sequencer->note_count > 0 && !has_untriggered_notes) {
 		sequencer->playing = false;
-		sequencer->playhead_ms = 0;
+		sequencer->playhead_samples = 0;
 
 		for (uint32_t i = 0; i < sequencer->note_count; i++) {
 			sequencer->notes[i].triggered = false;
@@ -94,7 +96,11 @@ void sequencer_update(
 
 void sequencer_set_playhead(struct Sequencer *sequencer, uint32_t playhead_ms)
 {
-	sequencer->playhead_ms = playhead_ms;
+	if (sequencer->sample_rate == 0) {
+		return;
+	}
+
+	sequencer->playhead_samples = ((uint64_t)playhead_ms * sequencer->sample_rate) / 1000;
 
 	for (uint32_t i = 0; i < sequencer->note_count; i++) {
 		if (sequencer->notes[i].time_ms < playhead_ms) {

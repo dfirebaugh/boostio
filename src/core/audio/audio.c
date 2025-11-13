@@ -13,7 +13,32 @@ struct Audio {
 	bool initialized;
 	uint32_t sample_rate;
 	uint32_t last_update_time;
+	bool voice_solo_cache[8];
+	bool voice_muted_cache[8];
 };
+
+static void audio_callback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
+{
+	struct Audio *audio = (struct Audio *)userdata;
+	if (!audio) {
+		return;
+	}
+
+	const uint32_t buffer_size = 2048;
+	int samples_needed = additional_amount / sizeof(float);
+
+	while (samples_needed > 0) {
+		uint32_t samples = (samples_needed > (int)buffer_size) ? buffer_size : (uint32_t)samples_needed;
+		float buffer[buffer_size];
+
+		sequencer_update(&audio->sequencer, &audio->synth, samples, audio->voice_solo_cache, audio->voice_muted_cache);
+
+		synth_generate_samples(&audio->synth, buffer, samples);
+		SDL_PutAudioStreamData(stream, buffer, samples * sizeof(float));
+
+		samples_needed -= samples;
+	}
+}
 
 struct Audio *audio_create(void)
 {
@@ -56,6 +81,18 @@ struct Audio *audio_create(void)
 
 	synth_init(&audio->synth, audio->sample_rate);
 	sequencer_init(&audio->sequencer);
+	audio->sequencer.sample_rate = audio->sample_rate;
+
+	memset(audio->voice_solo_cache, 0, sizeof(audio->voice_solo_cache));
+	memset(audio->voice_muted_cache, 0, sizeof(audio->voice_muted_cache));
+
+	if (!SDL_SetAudioStreamGetCallback(audio->stream, audio_callback, audio)) {
+		SDL_Log("Failed to set audio stream callback: %s", SDL_GetError());
+		SDL_DestroyAudioStream(audio->stream);
+		SDL_CloseAudioDevice(audio->device_id);
+		free(audio);
+		return NULL;
+	}
 
 	audio->initialized = true;
 	audio->last_update_time = SDL_GetTicks();
@@ -112,22 +149,11 @@ void audio_update(struct Audio *audio, const bool *voice_solo, const bool *voice
 		return;
 	}
 
-	uint32_t current_time = SDL_GetTicks();
-	float delta_time_ms = (float)(current_time - audio->last_update_time);
-	audio->last_update_time = current_time;
-
-	sequencer_update(&audio->sequencer, &audio->synth, delta_time_ms, voice_solo, voice_muted);
-
-	const uint32_t buffer_size = 2048;
-	const uint32_t min_queued_bytes = buffer_size * sizeof(float) * 2;
-
-	int queued = SDL_GetAudioStreamQueued(audio->stream);
-
-	while (queued >= 0 && (uint32_t)queued < min_queued_bytes) {
-		float buffer[buffer_size];
-		synth_generate_samples(&audio->synth, buffer, buffer_size);
-		SDL_PutAudioStreamData(audio->stream, buffer, buffer_size * sizeof(float));
-		queued = SDL_GetAudioStreamQueued(audio->stream);
+	if (voice_solo && voice_muted) {
+		SDL_LockAudioStream(audio->stream);
+		memcpy(audio->voice_solo_cache, voice_solo, 8 * sizeof(bool));
+		memcpy(audio->voice_muted_cache, voice_muted, 8 * sizeof(bool));
+		SDL_UnlockAudioStream(audio->stream);
 	}
 }
 

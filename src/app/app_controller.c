@@ -171,7 +171,9 @@ void app_controller_update(struct app_controller *controller, float delta_time)
 	struct Sequencer *sequencer = audio_get_sequencer(controller->audio);
 	if (sequencer) {
 		controller->state.playing = sequencer->playing;
-		controller->state.playhead_ms = sequencer->playhead_ms;
+		if (sequencer->sample_rate > 0) {
+			controller->state.playhead_ms = (uint32_t)((sequencer->playhead_samples * 1000) / sequencer->sample_rate);
+		}
 	}
 
 	struct input_event events[64];

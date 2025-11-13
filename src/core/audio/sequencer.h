@@ -16,7 +16,8 @@ struct Note {
 struct Sequencer {
 	struct Note notes[SEQUENCER_MAX_NOTES];
 	uint32_t note_count;
-	uint32_t playhead_ms;
+	uint64_t playhead_samples;
+	uint32_t sample_rate;
 	uint32_t bpm;
 	bool playing;
 };
@@ -27,7 +28,7 @@ void sequencer_clear_notes(struct Sequencer *sequencer);
 void sequencer_update(
 	struct Sequencer *sequencer,
 	struct Synth *synth,
-	float delta_time_ms,
+	uint32_t samples,
 	const bool *voice_solo,
 	const bool *voice_muted
 );
