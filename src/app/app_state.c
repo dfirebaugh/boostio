@@ -299,6 +299,7 @@ void app_state_sync_notes_from_sequencer(struct app_state *state, const struct s
 					 ? (uint8_t)seq_note->params.voice_index
 					 : 0;
 		ui_note->piano_key = seq_note->params.piano_key;
+		ui_note->frequency = seq_note->params.frequency;
 		ui_note->waveform = seq_note->params.waveform;
 		ui_note->duty_cycle = seq_note->params.duty_cycle;
 		ui_note->decay = seq_note->params.decay;
@@ -326,7 +327,7 @@ void app_state_sync_notes_to_sequencer(
 		const struct ui_note *ui_note = &state->notes[i];
 
 		struct note_params params = {
-			.frequency = note_to_frequency(ui_note->piano_key),
+			.frequency = ui_note->frequency,
 			.duration_ms = (float)ui_note->duration_ms,
 			.waveform = ui_note->waveform,
 			.duty_cycle = ui_note->duty_cycle,

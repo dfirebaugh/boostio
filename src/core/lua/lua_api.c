@@ -617,6 +617,7 @@ static int lua_api_add_note(lua_State *L)
 		ui_note->duration_ms = (uint16_t)duration_ms;
 		ui_note->voice = voice;
 		ui_note->piano_key = pitch;
+		ui_note->frequency = note_to_frequency(pitch);
 		ui_note->waveform = params.waveform;
 		ui_note->duty_cycle = params.duty_cycle;
 		ui_note->decay = params.decay;
@@ -634,6 +635,7 @@ static int lua_api_add_note(lua_State *L)
 		cmd.data.add_note.note.duration_ms = ui_note->duration_ms;
 		cmd.data.add_note.note.voice = ui_note->voice;
 		cmd.data.add_note.note.piano_key = ui_note->piano_key;
+		cmd.data.add_note.note.frequency = ui_note->frequency;
 		cmd.data.add_note.note.waveform = ui_note->waveform;
 		cmd.data.add_note.note.duty_cycle = ui_note->duty_cycle;
 		cmd.data.add_note.note.decay = ui_note->decay;

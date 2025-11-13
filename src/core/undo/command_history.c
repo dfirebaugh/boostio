@@ -12,6 +12,7 @@ static void ui_note_to_stored(const struct ui_note *ui, struct stored_note *stor
 	stored->duration_ms = ui->duration_ms;
 	stored->voice = ui->voice;
 	stored->piano_key = ui->piano_key;
+	stored->frequency = ui->frequency;
 	stored->waveform = ui->waveform;
 	stored->duty_cycle = ui->duty_cycle;
 	stored->decay = ui->decay;
@@ -29,6 +30,7 @@ static void stored_to_ui_note(const struct stored_note *stored, struct ui_note *
 	ui->duration_ms = stored->duration_ms;
 	ui->voice = stored->voice;
 	ui->piano_key = stored->piano_key;
+	ui->frequency = stored->frequency;
 	ui->waveform = stored->waveform;
 	ui->duty_cycle = stored->duty_cycle;
 	ui->decay = stored->decay;

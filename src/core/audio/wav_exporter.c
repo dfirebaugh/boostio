@@ -222,7 +222,9 @@ bool wav_exporter_export_to_file(const struct sequencer *sequencer, const char *
 	struct render_voice voices[WAV_MAX_VOICES];
 	memset(voices, 0, sizeof(voices));
 
-	uint32_t next_note_index = 0;
+	bool note_triggered[SEQUENCER_MAX_NOTES];
+	memset(note_triggered, 0, sizeof(note_triggered));
+
 	uint64_t current_sample = 0;
 
 	int16_t sample_buffer[BUFFER_SIZE];
@@ -231,16 +233,16 @@ bool wav_exporter_export_to_file(const struct sequencer *sequencer, const char *
 	while (current_sample < total_samples) {
 		uint32_t current_time_ms = (uint32_t)((current_sample * 1000) / SAMPLE_RATE);
 
-		while (next_note_index < sequencer->note_count) {
-			const struct note *note = &sequencer->notes[next_note_index];
-			if (note->time_ms <= current_time_ms) {
-				int8_t voice_idx = note->params.voice_index;
-				if (voice_idx >= 0 && voice_idx < WAV_MAX_VOICES) {
-					trigger_note(&voices[voice_idx], note);
+		for (uint32_t i = 0; i < sequencer->note_count; i++) {
+			if (!note_triggered[i]) {
+				const struct note *note = &sequencer->notes[i];
+				if (note->time_ms <= current_time_ms) {
+					int8_t voice_idx = note->params.voice_index;
+					if (voice_idx >= 0 && voice_idx < WAV_MAX_VOICES) {
+						trigger_note(&voices[voice_idx], note);
+					}
+					note_triggered[i] = true;
 				}
-				next_note_index++;
-			} else {
-				break;
 			}
 		}
 

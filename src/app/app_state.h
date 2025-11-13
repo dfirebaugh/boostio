@@ -47,6 +47,7 @@ struct ui_note {
 	uint16_t duration_ms;
 	uint8_t voice;
 	uint8_t piano_key;
+	float frequency;
 	enum waveform_type waveform;
 	uint8_t duty_cycle;
 	int16_t decay;
