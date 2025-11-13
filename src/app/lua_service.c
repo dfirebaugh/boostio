@@ -147,8 +147,13 @@ bool lua_service_load_plugins(struct lua_service *service)
 		return false;
 	}
 
+	const char *base_dir = service->paths->data_dir;
+	if (getenv("BOOSTIO_BINARY_DIR") != NULL) {
+		base_dir = service->paths->binary_dir;
+	}
+
 	char plugins_dir[512];
-	snprintf(plugins_dir, sizeof(plugins_dir), "%s/plugins", service->paths->data_dir);
+	snprintf(plugins_dir, sizeof(plugins_dir), "%s/plugins", base_dir);
 	lua_runtime_add_package_path(&service->runtime, plugins_dir);
 
 	lua_getglobal(L, "config");
@@ -205,7 +210,7 @@ bool lua_service_load_plugins(struct lua_service *service)
 				plugin_path,
 				sizeof(plugin_path),
 				"%s/plugins/%s.lua",
-				service->paths->data_dir,
+				base_dir,
 				plugin_name
 			);
 

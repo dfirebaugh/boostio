@@ -1,7 +1,14 @@
 print("Loading keybindings...")
 
-local data_dir = os.getenv("XDG_DATA_HOME") or (os.getenv("HOME") .. "/.local/share")
-local commands_path = data_dir .. "/boostio/commands/init.lua"
+local binary_dir = os.getenv("BOOSTIO_BINARY_DIR")
+local commands_path
+
+if binary_dir then
+	commands_path = binary_dir .. "/commands/init.lua"
+else
+	local data_dir = os.getenv("XDG_DATA_HOME") or (os.getenv("HOME") .. "/.local/share")
+	commands_path = data_dir .. "/boostio/commands/init.lua"
+end
 
 dofile(commands_path)
 
