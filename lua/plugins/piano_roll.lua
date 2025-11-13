@@ -2,6 +2,13 @@ local piano_roll = {}
 
 piano_roll.enabled = true
 
+local function is_voice_visible(voice)
+	if voice_controls and voice_controls.isVoiceVisible then
+		return voice_controls.isVoiceVisible(voice)
+	end
+	return true
+end
+
 local default_options = {
 	edge_threshold = 5,
 	drag_threshold = 5,
@@ -221,6 +228,11 @@ local function handle_mouse_down(x, y, button, state)
 	local shift_held = boostio.isKeyDown("shift")
 
 	if note_id then
+		local note = find_note_by_id(state, note_id)
+		if not note or not is_voice_visible(note.voice) then
+			return
+		end
+
 		if is_left_edge then
 			mouse_state.drag_mode = "resize_left"
 			mouse_state.resize_from_left = true
@@ -231,7 +243,6 @@ local function handle_mouse_down(x, y, button, state)
 
 			local selection = boostio.getSelection()
 			if #selection == 0 or not boostio.isNoteSelected(note_id) then
-				local note = find_note_by_id(state, note_id)
 				if note then
 					store_note_drag_data(note_id, note, mouse_state.drag_data, true)
 				end
@@ -251,7 +262,6 @@ local function handle_mouse_down(x, y, button, state)
 
 			local selection = boostio.getSelection()
 			if #selection == 0 or not boostio.isNoteSelected(note_id) then
-				local note = find_note_by_id(state, note_id)
 				if note then
 					store_note_drag_data(note_id, note, mouse_state.drag_data, false)
 				end
@@ -276,13 +286,12 @@ local function handle_mouse_down(x, y, button, state)
 
 			local selection = boostio.getSelection()
 			if #selection == 0 or not boostio.isNoteSelected(note_id) then
-				if not ctrl_held and not shift_held then
-					boostio.clearSelection()
-				end
-				boostio.selectNote(note_id)
-
 				local note = find_note_by_id(state, note_id)
-				if note then
+				if note and is_voice_visible(note.voice) then
+					if not ctrl_held and not shift_held then
+						boostio.clearSelection()
+					end
+					boostio.selectNote(note_id)
 					store_note_drag_data(note_id, note, mouse_state.drag_data, true)
 				end
 			else
@@ -513,7 +522,7 @@ local function handle_mouse_move(x, y, state)
 			local intersects = not (note_max_x < min_x or note_min_x > max_x or
 			                       note_max_y < min_y or note_min_y > max_y)
 
-			if intersects then
+			if intersects and is_voice_visible(note.voice) then
 				boostio.selectNote(note.id)
 			end
 		end
@@ -576,17 +585,20 @@ local function handle_mouse_up(x, y, button, state)
 				mouse_state.last_click_time = current_time
 				mouse_state.last_clicked_note_id = note_id
 
-				if ctrl_held then
-					if boostio.isNoteSelected(note_id) then
-						boostio.deselectNote(note_id)
+				local note = find_note_by_id(state, note_id)
+				if note and is_voice_visible(note.voice) then
+					if ctrl_held then
+						if boostio.isNoteSelected(note_id) then
+							boostio.deselectNote(note_id)
+						else
+							boostio.selectNote(note_id)
+						end
+					elseif shift_held then
+						boostio.selectNote(note_id)
 					else
+						boostio.clearSelection()
 						boostio.selectNote(note_id)
 					end
-				elseif shift_held then
-					boostio.selectNote(note_id)
-				else
-					boostio.clearSelection()
-					boostio.selectNote(note_id)
 				end
 			end
 		else
@@ -622,8 +634,11 @@ local function handle_mouse_up(x, y, button, state)
 
 					local new_note_id = boostio.addNote(ms, piano_key, default_duration)
 					if new_note_id then
-						boostio.clearSelection()
-						boostio.selectNote(new_note_id)
+						local new_note = find_note_by_id(state, new_note_id)
+						if new_note and is_voice_visible(new_note.voice) then
+							boostio.clearSelection()
+							boostio.selectNote(new_note_id)
+						end
 					end
 				end
 			end
