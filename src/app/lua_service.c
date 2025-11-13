@@ -223,7 +223,7 @@ bool lua_service_load_plugins(struct lua_service *service)
 				if (lua_type(L, -1) == LUA_TTABLE) {
 					lua_getfield(L, -1, "init");
 					if (lua_type(L, -1) == LUA_TFUNCTION) {
-						lua_getfield(L, -3, "options");
+						lua_getfield(L, -4, "options");
 						if (lua_type(L, -1) != LUA_TTABLE) {
 							lua_pop(L, 1);
 							lua_pushnil(L);
