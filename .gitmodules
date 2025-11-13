@@ -1,0 +1,24 @@
+[submodule "external/SDL"]
+	path = external/SDL
+	url = https://github.com/libsdl-org/SDL
+[submodule "external/SDL_ttf"]
+	path = external/SDL_ttf
+	url = https://github.com/libsdl-org/SDL_ttf
+[submodule "external/SDL_mixer"]
+	path = external/SDL_mixer
+	url = https://github.com/libsdl-org/SDL_mixer
+[submodule "external/SDL_image"]
+	path = external/SDL_image
+	url = https://github.com/libsdl-org/SDL_image
+[submodule "external/lua"]
+	path = external/lua
+	url = https://github.com/lua/lua.git
+[submodule "external/glew"]
+	path = external/glew
+	url = https://github.com/Perlmint/glew-cmake.git
+[submodule "external/msdf-atlas-gen"]
+	path = external/msdf-atlas-gen
+	url = https://github.com/Chlumsky/msdf-atlas-gen.git
+[submodule "external/freetype"]
+	path = external/freetype
+	url = https://github.com/freetype/freetype.git
