@@ -1,11 +1,16 @@
-#include "core/graphics/color.h"
+#include <SDL3/SDL.h>
+#include <stdio.h>
+
+#include "app/app_controller.h"
 #include "core/graphics/graphics.h"
 #include "core/graphics/msdf_atlas.h"
 #include "core/graphics/window.h"
-#include <stdio.h>
+#include "core/platform/platform.h"
 
 int main(int argc, char *argv[])
 {
+	struct platform_paths paths;
+	platform_paths_init(&paths);
 	struct WindowConfig config = {
 			.width = 800, .height = 600, .title = "Boostio", .resizable = true, .vsync = true
 	};
@@ -25,58 +30,70 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	char atlas_png_path[512];
+	char atlas_json_path[512];
+	snprintf(atlas_png_path, sizeof(atlas_png_path), "%s/noto-atlas.png", paths.data_dir);
+	snprintf(atlas_json_path, sizeof(atlas_json_path), "%s/noto-atlas.json", paths.data_dir);
+
 	if (!msdf_atlas_generate(
 				"assets/fonts/Noto/NotoSansMNerdFontMono-Regular.ttf",
-				"assets/fonts/Noto/noto-atlas.png", "assets/fonts/Noto/noto-atlas.json"
+				atlas_png_path, atlas_json_path
 		))
 	{
 		fprintf(stderr, "Failed to generate font atlas\n");
 	}
 
-	graphics_load_font(
-			graphics, "assets/fonts/Noto/noto-atlas.json", "assets/fonts/Noto/noto-atlas.png"
-	);
-
-	bool running = true;
-	while (running)
+	if (!graphics_load_font(graphics, atlas_json_path, atlas_png_path))
 	{
-		running = graphics_poll_events(graphics);
+		fprintf(stderr, "Failed to load font atlas from %s\n", atlas_json_path);
+		graphics_destroy(graphics);
+		window_destroy(window);
+		platform_paths_free(&paths);
+		return 1;
+	}
+
+	struct app_controller controller;
+	if (!app_controller_init(&controller, graphics, &paths))
+	{
+		fprintf(stderr, "Failed to initialize app controller\n");
+		graphics_destroy(graphics);
+		window_destroy(window);
+		platform_paths_free(&paths);
+		return 1;
+	}
+
+	char config_path[512];
+	snprintf(config_path, sizeof(config_path), "%s/init.lua", paths.config_dir);
+
+	if (!app_controller_init_lua(&controller, config_path))
+	{
+		fprintf(stderr, "Warning: Failed to initialize Lua system from %s\n", config_path);
+	}
+
+	while (app_controller_is_running(&controller))
+	{
+		if (!graphics_poll_events(graphics))
+		{
+			app_controller_stop(&controller);
+		}
 
 		if (window_is_scancode_pressed(window, SDL_SCANCODE_ESCAPE))
 		{
-			running = false;
+			app_controller_stop(&controller);
 		}
 
-		graphics_clear(graphics, color_rgb(20, 30, 50));
-
-		graphics_set_color(graphics, COLOR_RED);
-		graphics_fill_rect(graphics, 100, 100, 200, 150);
-
-		graphics_set_color(graphics, COLOR_GREEN);
-		graphics_draw_rect(graphics, 350, 100, 200, 150);
-
-		graphics_set_color(graphics, COLOR_BLUE);
-		graphics_draw_line(graphics, 50, 300, 750, 300);
-
-		graphics_set_color(graphics, COLOR_YELLOW);
-		graphics_fill_rounded_rect_outlined(graphics, 100, 350, 200, 150, 20, COLOR_RED, 3);
-
-		graphics_set_color(graphics, COLOR_CYAN);
-		graphics_draw_rounded_rect_outlined(graphics, 350, 350, 200, 150, 40, COLOR_MAGENTA, 5);
-
-		graphics_set_color(graphics, COLOR_WHITE);
-		graphics_draw_text(graphics, "Hello Boostio!", config.width / 2 - 240, 20, 64);
-		graphics_draw_text(
-				graphics, "Press ESC to quit", config.width / 2 - 120, config.height - 60, 24
-		);
+		app_controller_update(&controller, 0.016f);
+		app_controller_render(&controller);
 
 		graphics_present(graphics);
 
 		SDL_Delay(16);
 	}
 
+	app_controller_deinit(&controller);
 	graphics_destroy(graphics);
 	window_destroy(window);
+	platform_paths_free(&paths);
 
 	return 0;
 }

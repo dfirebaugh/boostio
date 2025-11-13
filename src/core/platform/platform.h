@@ -7,6 +7,7 @@ struct platform_paths
 {
 	char *binary_dir;
 	char *config_dir;
+	char *data_dir;
 };
 
 void platform_paths_init(struct platform_paths *paths);

@@ -432,6 +432,12 @@ void graphics_draw_text(struct Graphics *graphics, const char *text, int x, int 
 	int window_width, window_height;
 	SDL_GetWindowSize(graphics->window->window, &window_width, &window_height);
 
+	if (graphics->primitive_buffer)
+	{
+		primitive_buffer_render(graphics->primitive_buffer, window_width, window_height);
+		primitive_buffer_begin(graphics->primitive_buffer);
+	}
+
 	glViewport(0, 0, window_width, window_height);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

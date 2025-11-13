@@ -94,6 +94,25 @@ static char *get_config_dir(void)
 #endif
 }
 
+static char *get_data_dir(void)
+{
+	const char *override = getenv("BOOSTIO_DATA_DIR");
+	if (override != NULL)
+	{
+		return expand_path(override);
+	}
+
+#if defined(PLATFORM_LINUX)
+	return expand_path("~/.local/share/boostio");
+#elif defined(PLATFORM_MACOS)
+	return expand_path("~/Library/Application Support/Boostio");
+#elif defined(PLATFORM_WINDOWS)
+	return expand_path("%APPDATA%\\Boostio");
+#else
+	return strdup(".");
+#endif
+}
+
 void platform_paths_init(struct platform_paths *paths)
 {
 	if (paths == NULL)
@@ -103,6 +122,7 @@ void platform_paths_init(struct platform_paths *paths)
 
 	paths->binary_dir = get_binary_dir();
 	paths->config_dir = get_config_dir();
+	paths->data_dir = get_data_dir();
 }
 
 void platform_paths_free(struct platform_paths *paths)
@@ -114,6 +134,8 @@ void platform_paths_free(struct platform_paths *paths)
 
 	free(paths->binary_dir);
 	free(paths->config_dir);
+	free(paths->data_dir);
 	paths->binary_dir = NULL;
 	paths->config_dir = NULL;
+	paths->data_dir = NULL;
 }

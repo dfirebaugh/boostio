@@ -28,7 +28,12 @@ endif()
 target_sources(${EXECUTABLE_NAME}
 PRIVATE
     src/main.c
+    src/app/app_state.c
+    src/app/app_controller.c
+    src/app/lua_service.c
     src/core/platform/platform.c
+    src/core/lua/lua_runtime.c
+    src/core/lua/lua_api.c
     src/core/graphics/window.c
     src/core/graphics/graphics.c
     src/core/graphics/msdf_atlas.c
@@ -45,6 +50,7 @@ endif()
 
 find_package(OpenGL REQUIRED)
 find_package(PNG REQUIRED)
+find_package(Lua REQUIRED)
 
 add_subdirectory(external/SDL EXCLUDE_FROM_ALL)
 add_subdirectory(external/freetype EXCLUDE_FROM_ALL)
@@ -56,6 +62,7 @@ target_link_libraries(${EXECUTABLE_NAME} PUBLIC
     PNG::PNG
     freetype
     msdf-atlas-gen
+    ${LUA_LIBRARIES}
     m
 )
 
@@ -65,6 +72,7 @@ target_include_directories(${EXECUTABLE_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/msdf-atlas-gen
     ${CMAKE_CURRENT_SOURCE_DIR}/external/glad_generated/include
+    ${LUA_INCLUDE_DIR}
 )
 
 add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
@@ -72,6 +80,13 @@ add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
     ${CMAKE_CURRENT_SOURCE_DIR}/assets
     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets
     COMMENT "Copying assets to build directory"
+)
+
+add_custom_command(TARGET ${EXECUTABLE_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_CURRENT_SOURCE_DIR}/lua
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/lua
+    COMMENT "Copying Lua files to build directory"
 )
 
 if(IOS)
