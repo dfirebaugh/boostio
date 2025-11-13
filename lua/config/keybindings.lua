@@ -7,7 +7,6 @@ dofile(commands_path)
 
 boostio.registerKeybinding("q", "quit", { ctrl = true })
 boostio.registerKeybinding("s", "save", { ctrl = true })
-boostio.registerKeybinding("o", "load", { ctrl = true })
 
 boostio.registerKeybinding("z", "undo", { ctrl = true })
 boostio.registerKeybinding("z", "redo", { ctrl = true, shift = true })

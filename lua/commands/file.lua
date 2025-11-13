@@ -12,7 +12,3 @@ boostio.registerCommand("save", function()
 		end
 	end
 end)
-
-boostio.registerCommand("load", function()
-	boostio.load()
-end)
