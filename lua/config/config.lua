@@ -107,9 +107,19 @@ config = {
 	plugins = {
 		load_list = {
 			{
+				name = "toast",
+				enabled = true,
+				priority = 200,
+			},
+			{
 				name = "statusline",
 				enabled = true,
 				priority = 100,
+			},
+			{
+				name = "playback_controls",
+				enabled = true,
+				priority = 90,
 			},
 			-- {
 			-- 	name = "test",

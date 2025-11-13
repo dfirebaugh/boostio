@@ -443,11 +443,6 @@ void piano_roll_render_notes(struct Graphics *graphics, const struct app_state *
 
 void piano_roll_render_playhead(struct Graphics *graphics, const struct app_state *state)
 {
-	if (!state->playing)
-	{
-		return;
-	}
-
 	const struct viewport *vp = &state->viewport;
 	const struct theme *theme = &state->theme;
 	float x;
@@ -456,7 +451,6 @@ void piano_roll_render_playhead(struct Graphics *graphics, const struct app_stat
 	if (x >= vp->grid_x && x <= vp->grid_x + vp->grid_width)
 	{
 		graphics_set_color(graphics, color_rgba(theme->playhead.r, theme->playhead.g, theme->playhead.b, theme->playhead.a));
-		/* graphics_draw_line(graphics, (int)x, 0, (int)x, state->window_height); */
 		graphics_fill_rect(graphics, (int)(x - 1), (int)(vp->grid_y), 1, state->window_height);
 
 		graphics_fill_rect(graphics, (int)(x - 5), (int)(vp->grid_y - 10), 10, 10);

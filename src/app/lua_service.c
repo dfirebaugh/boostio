@@ -139,6 +139,26 @@ bool lua_service_load_plugin(struct lua_service *service, const char *plugin_pat
 
 	lua_setglobal(L, name_buffer);
 
+	lua_getglobal(L, name_buffer);
+	if (lua_type(L, -1) == LUA_TTABLE)
+	{
+		lua_getfield(L, -1, "init");
+		if (lua_type(L, -1) == LUA_TFUNCTION)
+		{
+			if (lua_pcall(L, 0, 0, 0) != LUA_OK)
+			{
+				fprintf(stderr, "Failed to initialize plugin %s: %s\n", name_buffer, lua_tostring(L, -1));
+				lua_pop(L, 2);
+				return false;
+			}
+		}
+		else
+		{
+			lua_pop(L, 1);
+		}
+	}
+	lua_pop(L, 1);
+
 	printf("Loaded plugin: %s (as %s)\n", plugin_path, name_buffer);
 	return true;
 }

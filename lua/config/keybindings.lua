@@ -28,4 +28,6 @@ boostio.registerKeybinding("minus", "zoom_out")
 boostio.registerKeybinding("up", "transpose_up", { shift = true })
 boostio.registerKeybinding("down", "transpose_down", { shift = true })
 
+boostio.registerKeybinding("t", "toast_test", { ctrl = true, shift = true })
+
 print("Keybindings loaded!")

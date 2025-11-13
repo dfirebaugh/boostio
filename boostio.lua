@@ -11,6 +11,11 @@ boostio.WAVEFORM_TRIANGLE = 2
 boostio.WAVEFORM_SAWTOOTH = 3
 boostio.WAVEFORM_NES_NOISE = 4
 
+---Mouse button constants
+boostio.MOUSE_BUTTON_LEFT = 1
+boostio.MOUSE_BUTTON_MIDDLE = 2
+boostio.MOUSE_BUTTON_RIGHT = 3
+
 ---Draw a filled rectangle
 ---@param x number X position
 ---@param y number Y position
@@ -122,6 +127,21 @@ function boostio.measureText(text, size) end
 ---@return number width Window width in pixels
 ---@return number height Window height in pixels
 function boostio.getWindowSize() end
+
+---Get the current mouse position
+---@return number x Mouse X position in pixels
+---@return number y Mouse Y position in pixels
+function boostio.getMousePosition() end
+
+---Check if a mouse button is currently held down
+---@param button number Mouse button (use boostio.MOUSE_BUTTON_LEFT, MIDDLE, or RIGHT)
+---@return boolean down True if the button is currently pressed
+function boostio.isMouseButtonDown(button) end
+
+---Check if a mouse button was just pressed this frame
+---@param button number Mouse button (use boostio.MOUSE_BUTTON_LEFT, MIDDLE, or RIGHT)
+---@return boolean pressed True if the button was just pressed (only true for one frame)
+function boostio.isMouseButtonPressed(button) end
 
 ---Get a configuration value
 ---@param key string Configuration key (e.g., "window.width")

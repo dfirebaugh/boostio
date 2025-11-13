@@ -8,22 +8,28 @@ local function hex_to_rgb(hex)
 	return {
 		r = tonumber(hex_clean:sub(1, 2), 16) / 255,
 		g = tonumber(hex_clean:sub(3, 4), 16) / 255,
-		b = tonumber(hex_clean:sub(5, 6), 16) / 255
+		b = tonumber(hex_clean:sub(5, 6), 16) / 255,
 	}
 end
 
 local theme = config.theme
 local bg_color_rgb = hex_to_rgb(theme.statusline_bg)
-statusline.bg_color = {r = bg_color_rgb.r, g = bg_color_rgb.g, b = bg_color_rgb.b, a = theme.statusline_bg_alpha}
+statusline.bg_color = { r = bg_color_rgb.r, g = bg_color_rgb.g, b = bg_color_rgb.b, a = theme.statusline_bg_alpha }
 statusline.text_color_rgb = hex_to_rgb(theme.statusline_text)
-statusline.text_color = {r = statusline.text_color_rgb.r, g = statusline.text_color_rgb.g, b = statusline.text_color_rgb.b, a = 1.0}
+statusline.text_color =
+	{ r = statusline.text_color_rgb.r, g = statusline.text_color_rgb.g, b = statusline.text_color_rgb.b, a = 1.0 }
 statusline.separator_color_rgb = hex_to_rgb(theme.statusline_separator)
-statusline.separator_color = {r = statusline.separator_color_rgb.r, g = statusline.separator_color_rgb.g, b = statusline.separator_color_rgb.b, a = 0.8}
+statusline.separator_color = {
+	r = statusline.separator_color_rgb.r,
+	g = statusline.separator_color_rgb.g,
+	b = statusline.separator_color_rgb.b,
+	a = 0.8,
+}
 
 local voice_colors = {}
 for i, hex in ipairs(theme.voice_colors) do
 	local rgb = hex_to_rgb(hex)
-	voice_colors[i] = {r = rgb.r, g = rgb.g, b = rgb.b, a = 0.9}
+	voice_colors[i] = { r = rgb.r, g = rgb.g, b = rgb.b, a = 0.9 }
 end
 
 local function draw_group(items, x, y, height)
@@ -90,7 +96,7 @@ local function create_bpm_component(state)
 	local bpm_color_rgb = hex_to_rgb(theme.statusline_bpm)
 	return {
 		text = string.format("%d BPM", state.bpm),
-		color = {r = bpm_color_rgb.r, g = bpm_color_rgb.g, b = bpm_color_rgb.b, a = 1.0}
+		color = { r = bpm_color_rgb.r, g = bpm_color_rgb.g, b = bpm_color_rgb.b, a = 1.0 },
 	}
 end
 
@@ -99,7 +105,7 @@ local function create_voice_component(state)
 	return {
 		text = string.format("Voice %d", state.selected_voice + 1),
 		color = voice_color,
-		bg_color = {r = voice_color.r * 0.3, g = voice_color.g * 0.3, b = voice_color.b * 0.3, a = 0.8}
+		bg_color = { r = voice_color.r * 0.3, g = voice_color.g * 0.3, b = voice_color.b * 0.3, a = 0.8 },
 	}
 end
 
@@ -119,17 +125,17 @@ local function create_waveform_component(state)
 
 	return {
 		text = icon .. " " .. state.waveform,
-		color = statusline.text_color
+		color = statusline.text_color,
 	}
 end
 
 local function create_playback_component(state)
 	local icon = "[STOP]"
-	local color = {r = 0.5, g = 0.5, b = 0.5, a = 1.0}
+	local color = { r = 0.5, g = 0.5, b = 0.5, a = 1.0 }
 
 	if state.is_playing then
 		icon = "[PLAY]"
-		color = {r = 0.2, g = 0.8, b = 0.2, a = 1.0}
+		color = { r = 0.2, g = 0.8, b = 0.2, a = 1.0 }
 	end
 
 	local seconds = math.floor(state.playhead_ms / 1000)
@@ -139,14 +145,14 @@ local function create_playback_component(state)
 
 	return {
 		text = icon .. " " .. time_text,
-		color = color
+		color = color,
 	}
 end
 
 local function create_notes_component(state)
 	return {
 		text = string.format("%d notes", state.note_count),
-		color = statusline.text_color
+		color = statusline.text_color,
 	}
 end
 
@@ -154,7 +160,7 @@ local function create_scale_component(state)
 	local scale_info = boostio.getScaleInfo()
 	return {
 		text = string.format("%s %s", scale_info.root, scale_info.scale),
-		color = statusline.text_color
+		color = statusline.text_color,
 	}
 end
 
@@ -170,7 +176,7 @@ local function create_highlight_component(state)
 
 	return {
 		text = text,
-		color = {r = color_rgb.r, g = color_rgb.g, b = color_rgb.b}
+		color = { r = color_rgb.r, g = color_rgb.g, b = color_rgb.b },
 	}
 end
 
@@ -181,7 +187,7 @@ local function create_snap_component(state)
 
 	return {
 		text = string.format("[S:%dms]", state.snap_ms),
-		color = {r = 0.7, g = 0.7, b = 0.9, a = 1.0}
+		color = { r = 0.7, g = 0.7, b = 0.9, a = 1.0 },
 	}
 end
 
@@ -206,8 +212,10 @@ function statusline.render()
 	)
 
 	boostio.drawLine(
-		0, y_pos,
-		window_width, y_pos,
+		0,
+		y_pos,
+		window_width,
+		y_pos,
 		statusline.separator_color.r,
 		statusline.separator_color.g,
 		statusline.separator_color.b,
@@ -217,16 +225,16 @@ function statusline.render()
 	local group_spacing = 25
 
 	local left_groups = {
-		{create_bpm_component(state), create_voice_component(state), create_waveform_component(state)}
+		{ create_bpm_component(state), create_voice_component(state), create_waveform_component(state) },
 	}
 
 	local center_groups = {
-		{create_playback_component(state)}
+		{ create_playback_component(state) },
 	}
 
 	local right_groups = {
-		{create_notes_component(state)},
-		{create_scale_component(state), create_highlight_component(state), create_snap_component(state)}
+		{ create_notes_component(state) },
+		{ create_scale_component(state), create_highlight_component(state), create_snap_component(state) },
 	}
 
 	local current_x = 15

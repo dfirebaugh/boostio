@@ -7,8 +7,10 @@
 #include "core/audio/synth.h"
 #include "core/graphics/color.h"
 #include "core/graphics/graphics.h"
+#include "core/graphics/window.h"
 #include "core/input/input_types.h"
 
+#include <SDL3/SDL.h>
 #include <string.h>
 
 static struct lua_api_context *global_context = NULL;
@@ -611,7 +613,6 @@ static int lua_api_toggle_play(lua_State *L)
 		}
 	}
 
-	printf("Playback %s\n", global_context->app_state->playing ? "started" : "stopped");
 	return 0;
 }
 
@@ -628,7 +629,6 @@ static int lua_api_play(lua_State *L)
 		sequencer_play(sequencer);
 	}
 
-	printf("Playback started\n");
 	return 0;
 }
 
@@ -645,7 +645,6 @@ static int lua_api_pause(lua_State *L)
 		sequencer_pause(sequencer);
 	}
 
-	printf("Playback paused\n");
 	return 0;
 }
 
@@ -663,7 +662,6 @@ static int lua_api_stop(lua_State *L)
 		sequencer_stop(sequencer);
 	}
 
-	printf("Playback stopped\n");
 	return 0;
 }
 
@@ -672,8 +670,8 @@ static int lua_api_toggle_snap(lua_State *L)
 	if (global_context == NULL || global_context->app_state == NULL)
 		return luaL_error(L, "App state not available");
 	global_context->app_state->snap_enabled = !global_context->app_state->snap_enabled;
-	printf("Snap %s\n", global_context->app_state->snap_enabled ? "enabled" : "disabled");
-	return 0;
+	lua_pushboolean(L, global_context->app_state->snap_enabled);
+	return 1;
 }
 
 static int lua_api_zoom_in(lua_State *L)
@@ -782,6 +780,70 @@ static int lua_api_get_scale_info(lua_State *L)
 
 	lua_pushboolean(L, global_context->app_state->show_scale_highlights);
 	lua_setfield(L, -2, "highlight");
+
+	return 1;
+}
+
+static int lua_api_get_mouse_position(lua_State *L)
+{
+	if (global_context == NULL || global_context->graphics == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	struct Window *window = graphics_get_window(global_context->graphics);
+	if (window == NULL)
+	{
+		return luaL_error(L, "Window not available");
+	}
+
+	int x, y;
+	window_get_mouse_position(window, &x, &y);
+
+	lua_pushinteger(L, x);
+	lua_pushinteger(L, y);
+
+	return 2;
+}
+
+static int lua_api_is_mouse_button_down(lua_State *L)
+{
+	if (global_context == NULL || global_context->graphics == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	int button = (int)luaL_checkinteger(L, 1);
+
+	struct Window *window = graphics_get_window(global_context->graphics);
+	if (window == NULL)
+	{
+		return luaL_error(L, "Window not available");
+	}
+
+	bool is_down = window_is_mouse_button_down(window, button - 1);
+	lua_pushboolean(L, is_down);
+
+	return 1;
+}
+
+static int lua_api_is_mouse_button_pressed(lua_State *L)
+{
+	if (global_context == NULL || global_context->graphics == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	int button = (int)luaL_checkinteger(L, 1);
+
+	struct Window *window = graphics_get_window(global_context->graphics);
+	if (window == NULL)
+	{
+		return luaL_error(L, "Window not available");
+	}
+
+	bool is_pressed = window_is_mouse_button_pressed(window, button - 1);
+	lua_pushboolean(L, is_pressed);
 
 	return 1;
 }
@@ -996,6 +1058,24 @@ void lua_api_register_all(struct lua_runtime *runtime, struct lua_api_context *c
 
 	lua_pushcfunction(runtime->L, lua_api_get_app_state);
 	lua_setfield(runtime->L, -2, "getAppState");
+
+	lua_pushcfunction(runtime->L, lua_api_get_mouse_position);
+	lua_setfield(runtime->L, -2, "getMousePosition");
+
+	lua_pushcfunction(runtime->L, lua_api_is_mouse_button_down);
+	lua_setfield(runtime->L, -2, "isMouseButtonDown");
+
+	lua_pushcfunction(runtime->L, lua_api_is_mouse_button_pressed);
+	lua_setfield(runtime->L, -2, "isMouseButtonPressed");
+
+	lua_pushinteger(runtime->L, SDL_BUTTON_LEFT);
+	lua_setfield(runtime->L, -2, "MOUSE_BUTTON_LEFT");
+
+	lua_pushinteger(runtime->L, SDL_BUTTON_MIDDLE);
+	lua_setfield(runtime->L, -2, "MOUSE_BUTTON_MIDDLE");
+
+	lua_pushinteger(runtime->L, SDL_BUTTON_RIGHT);
+	lua_setfield(runtime->L, -2, "MOUSE_BUTTON_RIGHT");
 
 	lua_pushinteger(runtime->L, WAVEFORM_SINE);
 	lua_setfield(runtime->L, -2, "WAVEFORM_SINE");
