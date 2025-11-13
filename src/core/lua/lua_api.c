@@ -1743,6 +1743,7 @@ static int lua_api_move_note(lua_State *L)
 			if (new_key > 127)
 				new_key = 127;
 			state->notes[i].piano_key = (uint8_t)new_key;
+			state->notes[i].frequency = note_to_frequency(new_key);
 
 			found = true;
 			break;

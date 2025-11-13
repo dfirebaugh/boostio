@@ -165,6 +165,7 @@ static bool undo_move_note(struct app_state *state, struct move_note_data *data)
 			if (new_key > 127)
 				new_key = 127;
 			state->notes[i].piano_key = (uint8_t)new_key;
+			state->notes[i].frequency = note_to_frequency(new_key);
 			return true;
 		}
 	}
@@ -187,6 +188,7 @@ static bool redo_move_note(struct app_state *state, struct move_note_data *data)
 			if (new_key > 127)
 				new_key = 127;
 			state->notes[i].piano_key = (uint8_t)new_key;
+			state->notes[i].frequency = note_to_frequency(new_key);
 			return true;
 		}
 	}
