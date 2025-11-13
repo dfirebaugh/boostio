@@ -412,14 +412,4 @@ function boostio.setNoteInstrument(note_id, instrument_index) end
 ---@return boolean is_down True if the key is currently pressed
 function boostio.isKeyDown(key) end
 
----Zoom horizontally (time axis) centered on the mouse cursor position
----@param factor number Zoom factor (>1 zooms in, <1 zooms out)
----@param mouse_x number X position of mouse cursor
-function boostio.zoomHorizontalAtMouse(factor, mouse_x) end
-
----Zoom vertically (pitch axis) centered on the mouse cursor position
----@param factor number Zoom factor (>1 zooms in, <1 zooms out)
----@param mouse_y number Y position of mouse cursor
-function boostio.zoomVerticalAtMouse(factor, mouse_y) end
-
 return boostio

@@ -2315,12 +2315,6 @@ void lua_api_register_all(struct lua_runtime *runtime, struct lua_api_context *c
 	lua_pushcfunction(runtime->L, lua_api_is_key_down);
 	lua_setfield(runtime->L, -2, "isKeyDown");
 
-	lua_pushcfunction(runtime->L, lua_api_zoom_horizontal_at_mouse);
-	lua_setfield(runtime->L, -2, "zoomHorizontalAtMouse");
-
-	lua_pushcfunction(runtime->L, lua_api_zoom_vertical_at_mouse);
-	lua_setfield(runtime->L, -2, "zoomVerticalAtMouse");
-
 	lua_pushinteger(runtime->L, SDL_BUTTON_LEFT);
 	lua_setfield(runtime->L, -2, "MOUSE_BUTTON_LEFT");
 
