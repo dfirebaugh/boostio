@@ -18,8 +18,11 @@ function instrument_selector.render()
 	local button_height = 24
 	local button_spacing = 3
 
-	local start_x = 140
-	local start_y = 10 + 3
+	local inst_panel_width = cols * button_width + (cols - 1) * button_spacing
+	local inst_panel_height = rows * button_height + (rows - 1) * button_spacing
+
+	local start_x = 491
+	local start_y = 10
 
 	local text_color = boostio.hexToRgb(theme.statusline_text)
 

@@ -10,11 +10,11 @@ function playback_controls.render()
 	local state = boostio.getAppState()
 	local mx, my = boostio.getMousePosition()
 
-	local button_y = 10
 	local button_height = 30
 	local button_width = 50
 	local button_spacing = 10
 	local start_x = 10
+	local button_y = 10
 
 	local play_x = start_x
 	local stop_x = play_x + button_width + button_spacing

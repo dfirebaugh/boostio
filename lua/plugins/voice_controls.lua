@@ -208,18 +208,19 @@ function voice_controls.render()
 	local mx, my = boostio.getMousePosition()
 
 	local w, h = boostio.getWindowSize()
-	local panel_width = 8 * 40 + 7 * 3 + 10
-	local start_x = (w - panel_width) / 2
-	local start_y = 10
 	local button_width = 40
 	local button_height = 20
 	local button_spacing = 3
 	local row_spacing = 2
+	local panel_width = 8 * button_width + 7 * button_spacing + 10
+	local panel_height = button_height * 3 + row_spacing * 2 + 10
+
+	local start_x = 130
+	local start_y = 10
 
 	local text_color = boostio.hexToRgb(theme.statusline_text)
 	local bg_color = boostio.hexToRgb(theme.statusline_bg)
 
-	local panel_height = button_height * 3 + row_spacing * 2 + 10
 	boostio.drawRoundedRectangle(
 		start_x - 5,
 		start_y - 5,
