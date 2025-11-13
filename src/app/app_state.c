@@ -297,7 +297,47 @@ void app_state_sync_notes_from_sequencer(struct app_state *state, const struct S
 					 ? (uint8_t)seq_note->params.voice_index
 					 : 0;
 		ui_note->piano_key = seq_note->params.piano_key;
+		ui_note->waveform = seq_note->params.waveform;
+		ui_note->duty_cycle = seq_note->params.duty_cycle;
+		ui_note->decay = seq_note->params.decay;
+		ui_note->amplitude_dbfs = seq_note->params.amplitude_dbfs;
+		ui_note->nes_noise_period = seq_note->params.nes_noise_period;
+		ui_note->nes_noise_mode_flag = seq_note->params.nes_noise_mode_flag;
+		ui_note->nes_noise_lfsr_init = seq_note->params.nes_noise_lfsr_init;
+		ui_note->restart_phase = seq_note->params.restart_phase;
 	}
 
 	state->note_count = count;
+}
+
+void app_state_sync_notes_to_sequencer(
+	const struct app_state *state, struct Sequencer *sequencer, struct Audio *audio
+)
+{
+	if (state == NULL || sequencer == NULL || audio == NULL) {
+		return;
+	}
+
+	sequencer_clear_notes(sequencer);
+
+	for (uint32_t i = 0; i < state->note_count; i++) {
+		const struct ui_note *ui_note = &state->notes[i];
+
+		struct NoteParams params = {
+			.frequency = note_to_frequency(ui_note->piano_key),
+			.duration_ms = (float)ui_note->duration_ms,
+			.waveform = ui_note->waveform,
+			.duty_cycle = ui_note->duty_cycle,
+			.decay = ui_note->decay,
+			.amplitude_dbfs = ui_note->amplitude_dbfs,
+			.nes_noise_period = ui_note->nes_noise_period,
+			.nes_noise_mode_flag = ui_note->nes_noise_mode_flag,
+			.nes_noise_lfsr_init = ui_note->nes_noise_lfsr_init,
+			.restart_phase = ui_note->restart_phase,
+			.voice_index = ui_note->voice,
+			.piano_key = ui_note->piano_key
+		};
+
+		sequencer_add_note(sequencer, ui_note->ms, params);
+	}
 }

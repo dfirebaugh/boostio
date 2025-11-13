@@ -9,6 +9,7 @@
 #include "core/theme/theme.h"
 
 struct Sequencer;
+struct Audio;
 
 #define UI_MAX_NOTES 1024
 #define UI_MAX_SELECTION 256
@@ -45,6 +46,14 @@ struct ui_note {
 	uint16_t duration_ms;
 	uint8_t voice;
 	uint8_t piano_key;
+	enum WaveformType waveform;
+	uint8_t duty_cycle;
+	int16_t decay;
+	int8_t amplitude_dbfs;
+	uint8_t nes_noise_period;
+	bool nes_noise_mode_flag;
+	uint16_t nes_noise_lfsr_init;
+	bool restart_phase;
 };
 
 struct selection {
@@ -116,6 +125,10 @@ void app_state_zoom_vertical_at_mouse(struct app_state *state, float factor, flo
 
 void app_state_sync_notes_from_sequencer(
 	struct app_state *state, const struct Sequencer *sequencer
+);
+
+void app_state_sync_notes_to_sequencer(
+	const struct app_state *state, struct Sequencer *sequencer, struct Audio *audio
 );
 
 #endif

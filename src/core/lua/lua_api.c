@@ -407,6 +407,12 @@ static enum key parse_key_string(const char *key_str)
 		return KEY_MINUS;
 	if (strcmp(key_str, "equals") == 0)
 		return KEY_EQUALS;
+	if (strcmp(key_str, "shift") == 0)
+		return KEY_LEFT_SHIFT;
+	if (strcmp(key_str, "ctrl") == 0)
+		return KEY_LEFT_CONTROL;
+	if (strcmp(key_str, "alt") == 0)
+		return KEY_LEFT_ALT;
 
 	return KEY_COUNT;
 }
@@ -580,11 +586,6 @@ static int lua_api_add_note(lua_State *L)
 		params.waveform = (enum WaveformType)lua_tointeger(L, 4);
 	}
 
-	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
-	if (sequencer != NULL) {
-		sequencer_add_note(sequencer, start_ms, params);
-	}
-
 	if (state->note_count < UI_MAX_NOTES) {
 		struct ui_note *ui_note = &state->notes[state->note_count];
 		ui_note->id = state->next_note_id++;
@@ -592,7 +593,20 @@ static int lua_api_add_note(lua_State *L)
 		ui_note->duration_ms = (uint16_t)duration_ms;
 		ui_note->voice = voice;
 		ui_note->piano_key = pitch;
+		ui_note->waveform = params.waveform;
+		ui_note->duty_cycle = params.duty_cycle;
+		ui_note->decay = params.decay;
+		ui_note->amplitude_dbfs = params.amplitude_dbfs;
+		ui_note->nes_noise_period = params.nes_noise_period;
+		ui_note->nes_noise_mode_flag = params.nes_noise_mode_flag;
+		ui_note->nes_noise_lfsr_init = params.nes_noise_lfsr_init;
+		ui_note->restart_phase = params.restart_phase;
 		state->note_count++;
+
+		struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+		if (sequencer != NULL) {
+			app_state_sync_notes_to_sequencer(state, sequencer, global_context->audio);
+		}
 
 		lua_pushinteger(L, ui_note->id);
 		return 1;
@@ -1182,6 +1196,22 @@ static int lua_api_get_app_state(lua_State *L)
 		lua_setfield(L, -2, "voice");
 		lua_pushinteger(L, state->notes[i].piano_key);
 		lua_setfield(L, -2, "piano_key");
+		lua_pushinteger(L, state->notes[i].waveform);
+		lua_setfield(L, -2, "waveform");
+		lua_pushinteger(L, state->notes[i].duty_cycle);
+		lua_setfield(L, -2, "duty_cycle");
+		lua_pushinteger(L, state->notes[i].decay);
+		lua_setfield(L, -2, "decay");
+		lua_pushinteger(L, state->notes[i].amplitude_dbfs);
+		lua_setfield(L, -2, "amplitude_dbfs");
+		lua_pushinteger(L, state->notes[i].nes_noise_period);
+		lua_setfield(L, -2, "nes_noise_period");
+		lua_pushboolean(L, state->notes[i].nes_noise_mode_flag);
+		lua_setfield(L, -2, "nes_noise_mode_flag");
+		lua_pushinteger(L, state->notes[i].nes_noise_lfsr_init);
+		lua_setfield(L, -2, "nes_noise_lfsr_init");
+		lua_pushboolean(L, state->notes[i].restart_phase);
+		lua_setfield(L, -2, "restart_phase");
 		lua_rawseti(L, -2, i + 1);
 	}
 	lua_setfield(L, -2, "notes");
@@ -1524,7 +1554,8 @@ static int lua_api_is_note_selected(lua_State *L)
 
 static int lua_api_move_note(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL) {
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1551,12 +1582,18 @@ static int lua_api_move_note(lua_State *L)
 		}
 	}
 
+	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL) {
+		app_state_sync_notes_to_sequencer(state, sequencer, global_context->audio);
+	}
+
 	return 0;
 }
 
 static int lua_api_resize_note(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL) {
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1569,9 +1606,9 @@ static int lua_api_resize_note(lua_State *L)
 	for (uint32_t i = 0; i < state->note_count; i++) {
 		if (state->notes[i].id == note_id) {
 			if (from_left) {
-				int32_t new_ms = (int32_t)state->notes[i].ms + delta_duration_ms;
+				int32_t new_ms = (int32_t)state->notes[i].ms - delta_duration_ms;
 				int32_t new_duration =
-					(int32_t)state->notes[i].duration_ms - delta_duration_ms;
+					(int32_t)state->notes[i].duration_ms + delta_duration_ms;
 
 				if (new_ms < 0)
 					new_ms = 0;
@@ -1591,12 +1628,18 @@ static int lua_api_resize_note(lua_State *L)
 		}
 	}
 
+	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL) {
+		app_state_sync_notes_to_sequencer(state, sequencer, global_context->audio);
+	}
+
 	return 0;
 }
 
 static int lua_api_delete_note(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL) {
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1609,8 +1652,25 @@ static int lua_api_delete_note(lua_State *L)
 				state->notes[j] = state->notes[j + 1];
 			}
 			state->note_count--;
+
+			for (uint32_t j = 0; j < state->selection.count; j++) {
+				if (state->selection.selected_ids[j] == note_id) {
+					for (uint32_t k = j; k < state->selection.count - 1; k++) {
+						state->selection.selected_ids[k] =
+							state->selection.selected_ids[k + 1];
+					}
+					state->selection.count--;
+					break;
+				}
+			}
+
 			break;
 		}
+	}
+
+	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL) {
+		app_state_sync_notes_to_sequencer(state, sequencer, global_context->audio);
 	}
 
 	return 0;

@@ -21,6 +21,8 @@ local mouse_state = {
 		initial_durations = {},
 		initial_piano_keys = {},
 		primary_note_id = nil,
+		copied_note_ids = {},
+		original_note_ids = {},
 	},
 	clicked_note_id = nil,
 	resize_from_left = false,
@@ -156,6 +158,7 @@ local function handle_mouse_down(x, y, button, state)
 	mouse_state.clicked_note_id = note_id
 
 	local ctrl_held = boostio.isKeyDown("ctrl")
+	local shift_held = boostio.isKeyDown("shift")
 
 	if note_id then
 		if is_left_edge then
@@ -218,12 +221,18 @@ local function handle_mouse_down(x, y, button, state)
 				end
 			end
 		else
-			mouse_state.drag_mode = "move"
-			mouse_state.drag_data.primary_note_id = note_id
+			if shift_held then
+				mouse_state.drag_mode = "copy"
+			else
+				mouse_state.drag_mode = "move"
+			end
 
+			mouse_state.drag_data.primary_note_id = note_id
 			mouse_state.drag_data.initial_positions = {}
 			mouse_state.drag_data.initial_durations = {}
 			mouse_state.drag_data.initial_piano_keys = {}
+			mouse_state.drag_data.copied_note_ids = {}
+			mouse_state.drag_data.original_note_ids = {}
 
 			local selection = boostio.getSelection()
 			if #selection == 0 or not boostio.isNoteSelected(note_id) then
@@ -280,16 +289,79 @@ local function handle_mouse_move(x, y, state)
 	local distance = math.sqrt(dx * dx + dy * dy)
 
 	if distance > mouse_state.drag_threshold then
-		mouse_state.drag_started = true
+		if not mouse_state.drag_started then
+			mouse_state.drag_started = true
+
+			if mouse_state.drag_mode == "copy" then
+				local new_positions = {}
+				local new_durations = {}
+				local new_piano_keys = {}
+				local copied_ids = {}
+				local original_ids = {}
+
+				for note_id, initial_ms in pairs(mouse_state.drag_data.initial_positions) do
+					local initial_duration = mouse_state.drag_data.initial_durations[note_id]
+					local initial_piano_key = mouse_state.drag_data.initial_piano_keys[note_id]
+
+					for _, note in ipairs(state.notes) do
+						if note.id == note_id then
+							local params = {
+								voice = note.voice,
+								waveform = note.waveform,
+								duty_cycle = note.duty_cycle,
+								decay = note.decay,
+								amplitude_dbfs = note.amplitude_dbfs,
+								nes_noise_period = note.nes_noise_period,
+								nes_noise_mode_flag = note.nes_noise_mode_flag,
+							}
+							local new_note_id = boostio.addNote(note.ms, note.piano_key, note.duration_ms, params)
+							if new_note_id then
+								table.insert(copied_ids, new_note_id)
+								table.insert(original_ids, note_id)
+								new_positions[new_note_id] = initial_ms
+								new_durations[new_note_id] = initial_duration
+								new_piano_keys[new_note_id] = initial_piano_key
+							end
+							break
+						end
+					end
+				end
+
+				mouse_state.drag_data.initial_positions = new_positions
+				mouse_state.drag_data.initial_durations = new_durations
+				mouse_state.drag_data.initial_piano_keys = new_piano_keys
+				mouse_state.drag_data.copied_note_ids = copied_ids
+				mouse_state.drag_data.original_note_ids = original_ids
+
+				if #copied_ids > 0 then
+					mouse_state.drag_data.primary_note_id = copied_ids[1]
+				end
+
+				boostio.clearSelection()
+				for _, copied_id in ipairs(copied_ids) do
+					boostio.selectNote(copied_id)
+				end
+			end
+		end
 	end
 
 	if not mouse_state.drag_started then
 		return
 	end
 
-	if mouse_state.drag_mode == "move" then
+	if mouse_state.drag_mode == "move" or mouse_state.drag_mode == "copy" then
 		local delta_ms = boostio.xToMs(x) - boostio.xToMs(mouse_state.down_x)
-		local delta_piano_key = boostio.yToPianoKey(y) - boostio.yToPianoKey(mouse_state.down_y)
+		local delta_piano_key
+
+		if state.fold_mode then
+			local current_key = y_to_piano_key_folded(y, state.viewport, state.selected_scale, state.selected_root)
+			local initial_key = y_to_piano_key_folded(mouse_state.down_y, state.viewport, state.selected_scale, state.selected_root)
+			local current_row = piano_key_to_folded_row(current_key, state.selected_scale, state.selected_root)
+			local initial_row = piano_key_to_folded_row(initial_key, state.selected_scale, state.selected_root)
+			delta_piano_key = current_row - initial_row
+		else
+			delta_piano_key = boostio.yToPianoKey(y) - boostio.yToPianoKey(mouse_state.down_y)
+		end
 
 		local primary_note = nil
 		if mouse_state.drag_data.primary_note_id then
@@ -313,8 +385,27 @@ local function handle_mouse_move(x, y, state)
 			for _, note in ipairs(state.notes) do
 				if note.id == note_id then
 					note.ms = math.max(0, initial_ms + delta_ms)
-					local new_key = initial_piano_key + delta_piano_key
-					note.piano_key = math.max(0, math.min(127, math.floor(new_key + 0.5)))
+
+					if state.fold_mode then
+						local initial_row = piano_key_to_folded_row(initial_piano_key, state.selected_scale, state.selected_root)
+						local target_row = initial_row + delta_piano_key
+
+						local current_row = 0
+						local new_key = initial_piano_key
+						for key = 99, 45, -1 do
+							if boostio.isNoteInScale(key, state.selected_scale, state.selected_root) then
+								if current_row == target_row then
+									new_key = key
+									break
+								end
+								current_row = current_row + 1
+							end
+						end
+						note.piano_key = new_key
+					else
+						local new_key = initial_piano_key + delta_piano_key
+						note.piano_key = math.max(0, math.min(127, math.floor(new_key + 0.5)))
+					end
 					break
 				end
 			end
@@ -414,6 +505,44 @@ local function handle_mouse_up(x, y, button, state)
 		return
 	end
 
+	if mouse_state.drag_started then
+		if mouse_state.drag_mode == "move" or mouse_state.drag_mode == "copy" then
+			for note_id, initial_ms in pairs(mouse_state.drag_data.initial_positions) do
+				local initial_piano_key = mouse_state.drag_data.initial_piano_keys[note_id]
+				for _, note in ipairs(state.notes) do
+					if note.id == note_id then
+						local delta_ms = math.floor(note.ms - initial_ms)
+						local delta_piano_key = math.floor(note.piano_key - initial_piano_key)
+						boostio.moveNote(note_id, delta_ms, delta_piano_key)
+						break
+					end
+				end
+			end
+		elseif mouse_state.drag_mode == "resize_left" then
+			for note_id, initial_ms in pairs(mouse_state.drag_data.initial_positions) do
+				local initial_duration = mouse_state.drag_data.initial_durations[note_id]
+				for _, note in ipairs(state.notes) do
+					if note.id == note_id then
+						local delta_ms = math.floor(note.ms - initial_ms)
+						local delta_duration = math.floor(note.duration_ms - initial_duration)
+						boostio.resizeNote(note_id, delta_duration, true)
+						break
+					end
+				end
+			end
+		elseif mouse_state.drag_mode == "resize_right" then
+			for note_id, initial_duration in pairs(mouse_state.drag_data.initial_durations) do
+				for _, note in ipairs(state.notes) do
+					if note.id == note_id then
+						local delta_duration = math.floor(note.duration_ms - initial_duration)
+						boostio.resizeNote(note_id, delta_duration, false)
+						break
+					end
+				end
+			end
+		end
+	end
+
 	if mouse_state.down and not mouse_state.drag_started then
 		local note_id = mouse_state.clicked_note_id
 		local ctrl_held = boostio.isKeyDown("ctrl")
@@ -491,7 +620,10 @@ local function handle_mouse_up(x, y, button, state)
 	mouse_state.clicked_note_id = nil
 	mouse_state.drag_data.initial_positions = {}
 	mouse_state.drag_data.initial_durations = {}
+	mouse_state.drag_data.initial_piano_keys = {}
 	mouse_state.drag_data.primary_note_id = nil
+	mouse_state.drag_data.copied_note_ids = {}
+	mouse_state.drag_data.original_note_ids = {}
 end
 
 local function update(state)
