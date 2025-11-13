@@ -1,61 +1,60 @@
-#include "color.h"
-#include <glad/gl.h>
 #include "graphics.h"
+#include "color.h"
 #include "msdf_atlas.h"
 #include "primitive_buffer.h"
 #include "shader.h"
 #include "window.h"
+#include <glad/gl.h>
 #include <SDL3/SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 static const char *msdf_vertex_shader = "#version 330 core\n"
-										"layout (location = 0) in vec2 aPos;\n"
-										"layout (location = 1) in vec2 aTexCoord;\n"
-										"layout (location = 2) in vec4 aColor;\n"
-										"\n"
-										"out vec2 TexCoord;\n"
-										"out vec4 Color;\n"
-										"\n"
-										"uniform mat4 projection;\n"
-										"\n"
-										"void main() {\n"
-										"    gl_Position = projection * vec4(aPos, 0.0, 1.0);\n"
-										"    TexCoord = aTexCoord;\n"
-										"    Color = aColor;\n"
-										"}\n";
+					"layout (location = 0) in vec2 aPos;\n"
+					"layout (location = 1) in vec2 aTexCoord;\n"
+					"layout (location = 2) in vec4 aColor;\n"
+					"\n"
+					"out vec2 TexCoord;\n"
+					"out vec4 Color;\n"
+					"\n"
+					"uniform mat4 projection;\n"
+					"\n"
+					"void main() {\n"
+					"    gl_Position = projection * vec4(aPos, 0.0, 1.0);\n"
+					"    TexCoord = aTexCoord;\n"
+					"    Color = aColor;\n"
+					"}\n";
 
 static const char *msdf_fragment_shader =
-		"#version 330 core\n"
-		"in vec2 TexCoord;\n"
-		"in vec4 Color;\n"
-		"out vec4 FragColor;\n"
-		"\n"
-		"uniform sampler2D msdfTexture;\n"
-		"uniform float pxRange;\n"
-		"uniform vec2 texSize;\n"
-		"\n"
-		"float median(float r, float g, float b) {\n"
-		"    return max(min(r, g), min(max(r, g), b));\n"
-		"}\n"
-		"\n"
-		"float screenPxRange() {\n"
-		"    vec2 unitRange = vec2(pxRange)/texSize;\n"
-		"    vec2 screenTexSize = vec2(1.0)/fwidth(TexCoord);\n"
-		"    return max(0.5*dot(unitRange, screenTexSize), 1.0);\n"
-		"}\n"
-		"\n"
-		"void main() {\n"
-		"    vec3 msd = texture(msdfTexture, TexCoord).rgb;\n"
-		"    float sd = median(msd.r, msd.g, msd.b);\n"
-		"    float screenPxDistance = screenPxRange()*(sd - 0.5);\n"
-		"    float opacity = clamp(screenPxDistance + 0.5, 0.0, 1.0);\n"
-		"    FragColor = vec4(Color.rgb, Color.a * opacity);\n"
-		"}\n";
+	"#version 330 core\n"
+	"in vec2 TexCoord;\n"
+	"in vec4 Color;\n"
+	"out vec4 FragColor;\n"
+	"\n"
+	"uniform sampler2D msdfTexture;\n"
+	"uniform float pxRange;\n"
+	"uniform vec2 texSize;\n"
+	"\n"
+	"float median(float r, float g, float b) {\n"
+	"    return max(min(r, g), min(max(r, g), b));\n"
+	"}\n"
+	"\n"
+	"float screenPxRange() {\n"
+	"    vec2 unitRange = vec2(pxRange)/texSize;\n"
+	"    vec2 screenTexSize = vec2(1.0)/fwidth(TexCoord);\n"
+	"    return max(0.5*dot(unitRange, screenTexSize), 1.0);\n"
+	"}\n"
+	"\n"
+	"void main() {\n"
+	"    vec3 msd = texture(msdfTexture, TexCoord).rgb;\n"
+	"    float sd = median(msd.r, msd.g, msd.b);\n"
+	"    float screenPxDistance = screenPxRange()*(sd - 0.5);\n"
+	"    float opacity = clamp(screenPxDistance + 0.5, 0.0, 1.0);\n"
+	"    FragColor = vec4(Color.rgb, Color.a * opacity);\n"
+	"}\n";
 
-struct Graphics
-{
+struct Graphics {
 	struct Window *window;
 	SDL_GLContext gl_context;
 	struct Color current_color;
@@ -75,15 +74,13 @@ struct Graphics
 
 struct Graphics *graphics_create(struct Window *window)
 {
-	if (!window)
-	{
+	if (!window) {
 		fprintf(stderr, "Window is NULL\n");
 		return NULL;
 	}
 
 	struct Graphics *graphics = (struct Graphics *)malloc(sizeof(struct Graphics));
-	if (!graphics)
-	{
+	if (!graphics) {
 		fprintf(stderr, "Failed to allocate graphics context\n");
 		return NULL;
 	}
@@ -101,8 +98,7 @@ struct Graphics *graphics_create(struct Window *window)
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	graphics->gl_context = SDL_GL_CreateContext(window->window);
-	if (!graphics->gl_context)
-	{
+	if (!graphics->gl_context) {
 		fprintf(stderr, "SDL_GL_CreateContext failed: %s\n", SDL_GetError());
 		free(graphics);
 		return NULL;
@@ -111,8 +107,7 @@ struct Graphics *graphics_create(struct Window *window)
 	SDL_GL_MakeCurrent(window->window, graphics->gl_context);
 	SDL_GL_SetSwapInterval(1);
 
-	if (!gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress))
-	{
+	if (!gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress)) {
 		fprintf(stderr, "Failed to initialize GLAD\n");
 		SDL_GL_DestroyContext(graphics->gl_context);
 		free(graphics);
@@ -126,8 +121,7 @@ struct Graphics *graphics_create(struct Window *window)
 	glDisable(GL_CULL_FACE);
 
 	graphics->msdf_shader = shader_create(msdf_vertex_shader, msdf_fragment_shader);
-	if (!graphics->msdf_shader)
-	{
+	if (!graphics->msdf_shader) {
 		fprintf(stderr, "Failed to create MSDF shader\n");
 	}
 
@@ -136,8 +130,7 @@ struct Graphics *graphics_create(struct Window *window)
 	glGenBuffers(1, &graphics->text_ebo);
 
 	graphics->primitive_buffer = primitive_buffer_create();
-	if (!graphics->primitive_buffer)
-	{
+	if (!graphics->primitive_buffer) {
 		fprintf(stderr, "Failed to create primitive buffer\n");
 	}
 
@@ -146,43 +139,35 @@ struct Graphics *graphics_create(struct Window *window)
 
 void graphics_destroy(struct Graphics *graphics)
 {
-	if (!graphics)
-	{
+	if (!graphics) {
 		return;
 	}
 
-	if (graphics->font_atlas)
-	{
+	if (graphics->font_atlas) {
 		msdf_atlas_destroy(graphics->font_atlas);
 	}
 
-	if (graphics->primitive_buffer)
-	{
+	if (graphics->primitive_buffer) {
 		primitive_buffer_destroy(graphics->primitive_buffer);
 	}
 
-	if (graphics->msdf_shader)
-	{
+	if (graphics->msdf_shader) {
 		shader_destroy(graphics->msdf_shader);
 	}
 
-	if (graphics->text_vao)
-	{
+	if (graphics->text_vao) {
 		glDeleteVertexArrays(1, &graphics->text_vao);
 	}
 
-	if (graphics->text_vbo)
-	{
+	if (graphics->text_vbo) {
 		glDeleteBuffers(1, &graphics->text_vbo);
 	}
 
-	if (graphics->text_ebo)
-	{
+	if (graphics->text_ebo) {
 		glDeleteBuffers(1, &graphics->text_ebo);
 	}
 
-	if (graphics->gl_context)
-	{
+	if (graphics->gl_context) {
 		SDL_GL_DestroyContext(graphics->gl_context);
 	}
 
@@ -191,24 +176,21 @@ void graphics_destroy(struct Graphics *graphics)
 
 void graphics_clear(struct Graphics *graphics, struct Color color)
 {
-	if (!graphics)
-	{
+	if (!graphics) {
 		return;
 	}
 
 	glClearColor(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f, color.a / 255.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	if (graphics->primitive_buffer)
-	{
+	if (graphics->primitive_buffer) {
 		primitive_buffer_begin(graphics->primitive_buffer);
 	}
 }
 
 void graphics_set_color(struct Graphics *graphics, struct Color color)
 {
-	if (!graphics)
-	{
+	if (!graphics) {
 		return;
 	}
 
@@ -217,179 +199,241 @@ void graphics_set_color(struct Graphics *graphics, struct Color color)
 
 void graphics_fill_rect(struct Graphics *graphics, int x, int y, int width, int height)
 {
-	if (!graphics)
-	{
+	if (!graphics) {
 		return;
 	}
 
-	if (graphics->primitive_buffer)
-	{
+	if (graphics->primitive_buffer) {
 		struct Color no_outline = {0, 0, 0, 0};
 		primitive_buffer_add_rect(
-				graphics->primitive_buffer, (float)x, (float)y, (float)width, (float)height,
-				graphics->current_color, 0.0f, 0.0f, no_outline
+			graphics->primitive_buffer,
+			(float)x,
+			(float)y,
+			(float)width,
+			(float)height,
+			graphics->current_color,
+			0.0f,
+			0.0f,
+			no_outline
 		);
 	}
 }
 
 void graphics_fill_rect_outlined(
-		struct Graphics *graphics, int x, int y, int width, int height, struct Color outline_color,
-		int outline_width
+	struct Graphics *graphics,
+	int x,
+	int y,
+	int width,
+	int height,
+	struct Color outline_color,
+	int outline_width
 )
 {
-	if (!graphics)
-	{
+	if (!graphics) {
 		return;
 	}
 
-	if (graphics->primitive_buffer)
-	{
+	if (graphics->primitive_buffer) {
 		primitive_buffer_add_rect(
-				graphics->primitive_buffer, (float)x, (float)y, (float)width, (float)height,
-				graphics->current_color, 0.0f, (float)outline_width, outline_color
+			graphics->primitive_buffer,
+			(float)x,
+			(float)y,
+			(float)width,
+			(float)height,
+			graphics->current_color,
+			0.0f,
+			(float)outline_width,
+			outline_color
 		);
 	}
 }
 
 void graphics_draw_rect(struct Graphics *graphics, int x, int y, int width, int height)
 {
-	if (!graphics)
-	{
+	if (!graphics) {
 		return;
 	}
 
-	if (graphics->primitive_buffer)
-	{
+	if (graphics->primitive_buffer) {
 		struct Color transparent = {0, 0, 0, 0};
 		primitive_buffer_add_rect(
-				graphics->primitive_buffer, (float)x, (float)y, (float)width, (float)height,
-				transparent, 0.0f, 1.0f, graphics->current_color
+			graphics->primitive_buffer,
+			(float)x,
+			(float)y,
+			(float)width,
+			(float)height,
+			transparent,
+			0.0f,
+			1.0f,
+			graphics->current_color
 		);
 	}
 }
 
 void graphics_draw_rect_outlined(
-		struct Graphics *graphics, int x, int y, int width, int height, struct Color outline_color,
-		int outline_width
+	struct Graphics *graphics,
+	int x,
+	int y,
+	int width,
+	int height,
+	struct Color outline_color,
+	int outline_width
 )
 {
-	if (!graphics)
-	{
+	if (!graphics) {
 		return;
 	}
 
-	if (graphics->primitive_buffer)
-	{
+	if (graphics->primitive_buffer) {
 		struct Color transparent = {0, 0, 0, 0};
 		primitive_buffer_add_rect(
-				graphics->primitive_buffer, (float)x, (float)y, (float)width, (float)height,
-				transparent, 0.0f, (float)outline_width, outline_color
+			graphics->primitive_buffer,
+			(float)x,
+			(float)y,
+			(float)width,
+			(float)height,
+			transparent,
+			0.0f,
+			(float)outline_width,
+			outline_color
 		);
 	}
 }
 
 void graphics_fill_rounded_rect(
-		struct Graphics *graphics, int x, int y, int width, int height, int radius
+	struct Graphics *graphics, int x, int y, int width, int height, int radius
 )
 {
-	if (!graphics)
-	{
+	if (!graphics) {
 		return;
 	}
 
-	if (graphics->primitive_buffer)
-	{
+	if (graphics->primitive_buffer) {
 		struct Color no_outline = {0, 0, 0, 0};
 		primitive_buffer_add_rect(
-				graphics->primitive_buffer, (float)x, (float)y, (float)width, (float)height,
-				graphics->current_color, (float)radius, 0.0f, no_outline
+			graphics->primitive_buffer,
+			(float)x,
+			(float)y,
+			(float)width,
+			(float)height,
+			graphics->current_color,
+			(float)radius,
+			0.0f,
+			no_outline
 		);
 	}
 }
 
 void graphics_fill_rounded_rect_outlined(
-		struct Graphics *graphics, int x, int y, int width, int height, int radius,
-		struct Color outline_color, int outline_width
+	struct Graphics *graphics,
+	int x,
+	int y,
+	int width,
+	int height,
+	int radius,
+	struct Color outline_color,
+	int outline_width
 )
 {
-	if (!graphics)
-	{
+	if (!graphics) {
 		return;
 	}
 
-	if (graphics->primitive_buffer)
-	{
+	if (graphics->primitive_buffer) {
 		primitive_buffer_add_rect(
-				graphics->primitive_buffer, (float)x, (float)y, (float)width, (float)height,
-				graphics->current_color, (float)radius, (float)outline_width, outline_color
+			graphics->primitive_buffer,
+			(float)x,
+			(float)y,
+			(float)width,
+			(float)height,
+			graphics->current_color,
+			(float)radius,
+			(float)outline_width,
+			outline_color
 		);
 	}
 }
 
 void graphics_draw_rounded_rect(
-		struct Graphics *graphics, int x, int y, int width, int height, int radius
+	struct Graphics *graphics, int x, int y, int width, int height, int radius
 )
 {
-	if (!graphics)
-	{
+	if (!graphics) {
 		return;
 	}
 
-	if (graphics->primitive_buffer)
-	{
+	if (graphics->primitive_buffer) {
 		struct Color transparent = {0, 0, 0, 0};
 		primitive_buffer_add_rect(
-				graphics->primitive_buffer, (float)x, (float)y, (float)width, (float)height,
-				transparent, (float)radius, 1.0f, graphics->current_color
+			graphics->primitive_buffer,
+			(float)x,
+			(float)y,
+			(float)width,
+			(float)height,
+			transparent,
+			(float)radius,
+			1.0f,
+			graphics->current_color
 		);
 	}
 }
 
 void graphics_draw_rounded_rect_outlined(
-		struct Graphics *graphics, int x, int y, int width, int height, int radius,
-		struct Color outline_color, int outline_width
+	struct Graphics *graphics,
+	int x,
+	int y,
+	int width,
+	int height,
+	int radius,
+	struct Color outline_color,
+	int outline_width
 )
 {
-	if (!graphics)
-	{
+	if (!graphics) {
 		return;
 	}
 
-	if (graphics->primitive_buffer)
-	{
+	if (graphics->primitive_buffer) {
 		struct Color transparent = {0, 0, 0, 0};
 		primitive_buffer_add_rect(
-				graphics->primitive_buffer, (float)x, (float)y, (float)width, (float)height,
-				transparent, (float)radius, (float)outline_width, outline_color
+			graphics->primitive_buffer,
+			(float)x,
+			(float)y,
+			(float)width,
+			(float)height,
+			transparent,
+			(float)radius,
+			(float)outline_width,
+			outline_color
 		);
 	}
 }
 
 void graphics_draw_line(struct Graphics *graphics, int x1, int y1, int x2, int y2)
 {
-	if (!graphics)
-	{
+	if (!graphics) {
 		return;
 	}
 
-	if (graphics->primitive_buffer)
-	{
+	if (graphics->primitive_buffer) {
 		primitive_buffer_add_line(
-				graphics->primitive_buffer, (float)x1, (float)y1, (float)x2, (float)y2,
-				graphics->current_color
+			graphics->primitive_buffer,
+			(float)x1,
+			(float)y1,
+			(float)x2,
+			(float)y2,
+			graphics->current_color
 		);
 	}
 }
 
 void graphics_present(struct Graphics *graphics)
 {
-	if (!graphics)
-	{
+	if (!graphics) {
 		return;
 	}
 
-	if (graphics->primitive_buffer)
-	{
+	if (graphics->primitive_buffer) {
 		int window_width, window_height;
 		SDL_GetWindowSize(graphics->window->window, &window_width, &window_height);
 		primitive_buffer_render(graphics->primitive_buffer, window_width, window_height);
@@ -403,8 +447,7 @@ void graphics_present(struct Graphics *graphics)
 	uint64_t frequency = SDL_GetPerformanceFrequency();
 	double elapsed = (double)(current_time - graphics->last_fps_update_time) / frequency;
 
-	if (elapsed >= 0.5)
-	{
+	if (elapsed >= 0.5) {
 		graphics->current_fps = graphics->frame_count / elapsed;
 		graphics->frame_count = 0;
 		graphics->last_fps_update_time = current_time;
@@ -413,8 +456,7 @@ void graphics_present(struct Graphics *graphics)
 
 bool graphics_should_close(const struct Graphics *graphics)
 {
-	if (!graphics || !graphics->window)
-	{
+	if (!graphics || !graphics->window) {
 		return true;
 	}
 
@@ -423,13 +465,11 @@ bool graphics_should_close(const struct Graphics *graphics)
 
 bool graphics_load_font(struct Graphics *graphics, const char *json_path, const char *png_path)
 {
-	if (!graphics)
-	{
+	if (!graphics) {
 		return false;
 	}
 
-	if (graphics->font_atlas)
-	{
+	if (graphics->font_atlas) {
 		msdf_atlas_destroy(graphics->font_atlas);
 	}
 
@@ -439,21 +479,18 @@ bool graphics_load_font(struct Graphics *graphics, const char *json_path, const 
 
 void graphics_draw_text(struct Graphics *graphics, const char *text, int x, int y, int size)
 {
-	if (!graphics || !text)
-	{
+	if (!graphics || !text) {
 		return;
 	}
 
-	if (!graphics->font_atlas || !graphics->msdf_shader)
-	{
+	if (!graphics->font_atlas || !graphics->msdf_shader) {
 		return;
 	}
 
 	int window_width, window_height;
 	SDL_GetWindowSize(graphics->window->window, &window_width, &window_height);
 
-	if (graphics->primitive_buffer)
-	{
+	if (graphics->primitive_buffer) {
 		primitive_buffer_render(graphics->primitive_buffer, window_width, window_height);
 		primitive_buffer_begin(graphics->primitive_buffer);
 	}
@@ -468,11 +505,13 @@ void graphics_draw_text(struct Graphics *graphics, const char *text, int x, int 
 	shader_use(graphics->msdf_shader);
 	shader_set_mat4(graphics->msdf_shader, "projection", projection);
 	shader_set_float(
-			graphics->msdf_shader, "pxRange", msdf_atlas_get_pixel_range(graphics->font_atlas)
+		graphics->msdf_shader, "pxRange", msdf_atlas_get_pixel_range(graphics->font_atlas)
 	);
 	shader_set_vec2(
-			graphics->msdf_shader, "texSize", (float)msdf_atlas_get_width(graphics->font_atlas),
-			(float)msdf_atlas_get_height(graphics->font_atlas)
+		graphics->msdf_shader,
+		"texSize",
+		(float)msdf_atlas_get_width(graphics->font_atlas),
+		(float)msdf_atlas_get_height(graphics->font_atlas)
 	);
 	shader_set_int(graphics->msdf_shader, "msdfTexture", 0);
 
@@ -496,33 +535,32 @@ void graphics_draw_text(struct Graphics *graphics, const char *text, int x, int 
 	float atlas_font_size = msdf_atlas_get_font_size(graphics->font_atlas);
 	int atlas_width = msdf_atlas_get_width(graphics->font_atlas);
 
-	for (const char *p = text; *p; p++)
-	{
+	for (const char *p = text; *p; p++) {
 		uint32_t char_code = (uint32_t)(unsigned char)*p;
 
-		if (prev_char)
-		{
-			float kerning = msdf_atlas_get_kerning(graphics->font_atlas, prev_char, char_code);
+		if (prev_char) {
+			float kerning =
+				msdf_atlas_get_kerning(graphics->font_atlas, prev_char, char_code);
 			cursor_x += kerning * (float)size;
 		}
 
-		const struct MSDFGlyph *glyph = msdf_atlas_get_glyph(graphics->font_atlas, char_code);
-		if (!glyph)
-		{
+		const struct MSDFGlyph *glyph =
+			msdf_atlas_get_glyph(graphics->font_atlas, char_code);
+		if (!glyph) {
 			prev_char = char_code;
 			continue;
 		}
 
-		if (vertex_count + 4 > vertex_capacity)
-		{
+		if (vertex_count + 4 > vertex_capacity) {
 			vertex_capacity *= 2;
 			vertices = (float *)realloc(vertices, sizeof(float) * vertex_capacity * 8);
 		}
 
-		if (index_count + 6 > index_capacity)
-		{
+		if (index_count + 6 > index_capacity) {
 			index_capacity *= 2;
-			indices = (unsigned int *)realloc(indices, sizeof(unsigned int) * index_capacity);
+			indices = (unsigned int *)realloc(
+				indices, sizeof(unsigned int) * index_capacity
+			);
 		}
 
 		float atlas_pixel_width = glyph->width * (float)atlas_width;
@@ -589,29 +627,32 @@ void graphics_draw_text(struct Graphics *graphics, const char *text, int x, int 
 		prev_char = char_code;
 	}
 
-	if (vertex_count > 0)
-	{
+	if (vertex_count > 0) {
 		glBindVertexArray(graphics->text_vao);
 
 		glBindBuffer(GL_ARRAY_BUFFER, graphics->text_vbo);
-		glBufferData(GL_ARRAY_BUFFER, vertex_count * 8 * sizeof(float), vertices, GL_DYNAMIC_DRAW);
+		glBufferData(
+			GL_ARRAY_BUFFER, vertex_count * 8 * sizeof(float), vertices, GL_DYNAMIC_DRAW
+		);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, graphics->text_ebo);
 		glBufferData(
-				GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices,
-				GL_DYNAMIC_DRAW
+			GL_ELEMENT_ARRAY_BUFFER,
+			index_count * sizeof(unsigned int),
+			indices,
+			GL_DYNAMIC_DRAW
 		);
 
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)0);
 		glEnableVertexAttribArray(0);
 
 		glVertexAttribPointer(
-				1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(2 * sizeof(float))
+			1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(2 * sizeof(float))
 		);
 		glEnableVertexAttribArray(1);
 
 		glVertexAttribPointer(
-				2, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(4 * sizeof(float))
+			2, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(4 * sizeof(float))
 		);
 		glEnableVertexAttribArray(2);
 
@@ -626,13 +667,11 @@ void graphics_draw_text(struct Graphics *graphics, const char *text, int x, int 
 
 float graphics_measure_text(struct Graphics *graphics, const char *text, int size)
 {
-	if (!graphics || !text)
-	{
+	if (!graphics || !text) {
 		return 0.0f;
 	}
 
-	if (!graphics->font_atlas)
-	{
+	if (!graphics->font_atlas) {
 		return (float)(strlen(text) * size) * 0.6f;
 	}
 
@@ -641,8 +680,7 @@ float graphics_measure_text(struct Graphics *graphics, const char *text, int siz
 
 bool graphics_poll_events(struct Graphics *graphics)
 {
-	if (!graphics || !graphics->window)
-	{
+	if (!graphics || !graphics->window) {
 		return false;
 	}
 
@@ -651,8 +689,7 @@ bool graphics_poll_events(struct Graphics *graphics)
 
 struct Window *graphics_get_window(struct Graphics *graphics)
 {
-	if (graphics == NULL)
-	{
+	if (graphics == NULL) {
 		return NULL;
 	}
 
@@ -661,8 +698,7 @@ struct Window *graphics_get_window(struct Graphics *graphics)
 
 float graphics_get_fps(const struct Graphics *graphics)
 {
-	if (graphics == NULL)
-	{
+	if (graphics == NULL) {
 		return 0.0f;
 	}
 

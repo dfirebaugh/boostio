@@ -14,7 +14,7 @@ static const char *waveform_to_audio_out_type(enum WaveformType waveform)
 	case WAVEFORM_SQUARE:
 		return "AUDIO_OUT_TYPE_SQUARE";
 	case WAVEFORM_TRIANGLE:
-		return "AUDIO_OUT_TYPE_TRIANGE"; // Note: typo in badge firmware
+		return "AUDIO_OUT_TYPE_TRIANGE";  // Note: typo in badge firmware
 	case WAVEFORM_SAWTOOTH:
 		return "AUDIO_OUT_TYPE_SAWTOOTH";
 	case WAVEFORM_NES_NOISE:
@@ -276,12 +276,16 @@ bool c_exporter_export_to_file(const struct Sequencer *sequencer, const char *fi
 			if (duty_macro) {
 				fprintf(file, "\t\t\t.square.duty_cycle = %s,\n", duty_macro);
 			} else {
-				fprintf(file, "\t\t\t.square.duty_cycle = %u,\n", params->duty_cycle);
+				fprintf(file,
+					"\t\t\t.square.duty_cycle = %u,\n",
+					params->duty_cycle);
 			}
 			break;
 		}
 		case WAVEFORM_NES_NOISE:
-			fprintf(file, "\t\t\t.nes_noise.lfsr_val = 0x%04X,\n", params->nes_noise_lfsr_init);
+			fprintf(file,
+				"\t\t\t.nes_noise.lfsr_val = 0x%04X,\n",
+				params->nes_noise_lfsr_init);
 			fprintf(file,
 				"\t\t\t.nes_noise.mode_flag = %s,\n",
 				params->nes_noise_mode_flag ? "true" : "false");

@@ -5,8 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Audio
-{
+struct Audio {
 	SDL_AudioDeviceID device_id;
 	SDL_AudioStream *stream;
 	struct Synth synth;
@@ -19,8 +18,7 @@ struct Audio
 struct Audio *audio_create(void)
 {
 	struct Audio *audio = malloc(sizeof(struct Audio));
-	if (!audio)
-	{
+	if (!audio) {
 		return NULL;
 	}
 
@@ -34,24 +32,21 @@ struct Audio *audio_create(void)
 	spec.channels = 1;
 
 	audio->device_id = SDL_OpenAudioDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec);
-	if (audio->device_id == 0)
-	{
+	if (audio->device_id == 0) {
 		SDL_Log("Failed to open audio device: %s", SDL_GetError());
 		free(audio);
 		return NULL;
 	}
 
 	audio->stream = SDL_CreateAudioStream(&spec, &spec);
-	if (!audio->stream)
-	{
+	if (!audio->stream) {
 		SDL_Log("Failed to create audio stream: %s", SDL_GetError());
 		SDL_CloseAudioDevice(audio->device_id);
 		free(audio);
 		return NULL;
 	}
 
-	if (!SDL_BindAudioStream(audio->device_id, audio->stream))
-	{
+	if (!SDL_BindAudioStream(audio->device_id, audio->stream)) {
 		SDL_Log("Failed to bind audio stream: %s", SDL_GetError());
 		SDL_DestroyAudioStream(audio->stream);
 		SDL_CloseAudioDevice(audio->device_id);
@@ -72,18 +67,15 @@ struct Audio *audio_create(void)
 
 void audio_destroy(struct Audio *audio)
 {
-	if (!audio)
-	{
+	if (!audio) {
 		return;
 	}
 
-	if (audio->stream)
-	{
+	if (audio->stream) {
 		SDL_DestroyAudioStream(audio->stream);
 	}
 
-	if (audio->device_id)
-	{
+	if (audio->device_id) {
 		SDL_CloseAudioDevice(audio->device_id);
 	}
 
@@ -97,8 +89,7 @@ bool audio_is_initialized(const struct Audio *audio)
 
 void audio_start(struct Audio *audio)
 {
-	if (!audio || !audio->initialized)
-	{
+	if (!audio || !audio->initialized) {
 		return;
 	}
 
@@ -108,8 +99,7 @@ void audio_start(struct Audio *audio)
 
 void audio_stop(struct Audio *audio)
 {
-	if (!audio || !audio->initialized)
-	{
+	if (!audio || !audio->initialized) {
 		return;
 	}
 
@@ -118,8 +108,7 @@ void audio_stop(struct Audio *audio)
 
 void audio_update(struct Audio *audio, const bool *voice_solo, const bool *voice_muted)
 {
-	if (!audio || !audio->initialized)
-	{
+	if (!audio || !audio->initialized) {
 		return;
 	}
 
@@ -134,8 +123,7 @@ void audio_update(struct Audio *audio, const bool *voice_solo, const bool *voice
 
 	int queued = SDL_GetAudioStreamQueued(audio->stream);
 
-	while (queued >= 0 && (uint32_t)queued < min_queued_bytes)
-	{
+	while (queued >= 0 && (uint32_t)queued < min_queued_bytes) {
 		float buffer[buffer_size];
 		synth_generate_samples(&audio->synth, buffer, buffer_size);
 		SDL_PutAudioStreamData(audio->stream, buffer, buffer_size * sizeof(float));
@@ -145,8 +133,7 @@ void audio_update(struct Audio *audio, const bool *voice_solo, const bool *voice
 
 struct Synth *audio_get_synth(struct Audio *audio)
 {
-	if (!audio)
-	{
+	if (!audio) {
 		return NULL;
 	}
 	return &audio->synth;
@@ -154,8 +141,7 @@ struct Synth *audio_get_synth(struct Audio *audio)
 
 struct Sequencer *audio_get_sequencer(struct Audio *audio)
 {
-	if (!audio)
-	{
+	if (!audio) {
 		return NULL;
 	}
 	return &audio->sequencer;

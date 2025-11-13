@@ -23,8 +23,7 @@ static struct lua_api_context *global_context = NULL;
 
 static int lua_api_draw_rectangle(lua_State *L)
 {
-	if (global_context == NULL || global_context->graphics == NULL)
-	{
+	if (global_context == NULL || global_context->graphics == NULL) {
 		return luaL_error(L, "Graphics context not available");
 	}
 
@@ -46,8 +45,7 @@ static int lua_api_draw_rectangle(lua_State *L)
 
 static int lua_api_draw_text(lua_State *L)
 {
-	if (global_context == NULL || global_context->graphics == NULL)
-	{
+	if (global_context == NULL || global_context->graphics == NULL) {
 		return luaL_error(L, "Graphics context not available");
 	}
 
@@ -69,8 +67,7 @@ static int lua_api_draw_text(lua_State *L)
 
 static int lua_api_draw_rounded_rectangle(lua_State *L)
 {
-	if (global_context == NULL || global_context->graphics == NULL)
-	{
+	if (global_context == NULL || global_context->graphics == NULL) {
 		return luaL_error(L, "Graphics context not available");
 	}
 
@@ -93,8 +90,7 @@ static int lua_api_draw_rounded_rectangle(lua_State *L)
 
 static int lua_api_draw_rectangle_outlined(lua_State *L)
 {
-	if (global_context == NULL || global_context->graphics == NULL)
-	{
+	if (global_context == NULL || global_context->graphics == NULL) {
 		return luaL_error(L, "Graphics context not available");
 	}
 
@@ -116,7 +112,7 @@ static int lua_api_draw_rectangle_outlined(lua_State *L)
 	struct Color outline_color = color_from_floats(or, og, ob, oa);
 	graphics_set_color(global_context->graphics, color);
 	graphics_fill_rect_outlined(
-			global_context->graphics, x, y, width, height, outline_color, outline_width
+		global_context->graphics, x, y, width, height, outline_color, outline_width
 	);
 
 	return 0;
@@ -124,8 +120,7 @@ static int lua_api_draw_rectangle_outlined(lua_State *L)
 
 static int lua_api_stroke_rectangle(lua_State *L)
 {
-	if (global_context == NULL || global_context->graphics == NULL)
-	{
+	if (global_context == NULL || global_context->graphics == NULL) {
 		return luaL_error(L, "Graphics context not available");
 	}
 
@@ -147,8 +142,7 @@ static int lua_api_stroke_rectangle(lua_State *L)
 
 static int lua_api_draw_rounded_rectangle_outlined(lua_State *L)
 {
-	if (global_context == NULL || global_context->graphics == NULL)
-	{
+	if (global_context == NULL || global_context->graphics == NULL) {
 		return luaL_error(L, "Graphics context not available");
 	}
 
@@ -171,7 +165,7 @@ static int lua_api_draw_rounded_rectangle_outlined(lua_State *L)
 	struct Color outline_color = color_from_floats(or, og, ob, oa);
 	graphics_set_color(global_context->graphics, color);
 	graphics_fill_rounded_rect_outlined(
-			global_context->graphics, x, y, width, height, radius, outline_color, outline_width
+		global_context->graphics, x, y, width, height, radius, outline_color, outline_width
 	);
 
 	return 0;
@@ -179,8 +173,7 @@ static int lua_api_draw_rounded_rectangle_outlined(lua_State *L)
 
 static int lua_api_stroke_rounded_rectangle(lua_State *L)
 {
-	if (global_context == NULL || global_context->graphics == NULL)
-	{
+	if (global_context == NULL || global_context->graphics == NULL) {
 		return luaL_error(L, "Graphics context not available");
 	}
 
@@ -203,8 +196,7 @@ static int lua_api_stroke_rounded_rectangle(lua_State *L)
 
 static int lua_api_draw_line(lua_State *L)
 {
-	if (global_context == NULL || global_context->graphics == NULL)
-	{
+	if (global_context == NULL || global_context->graphics == NULL) {
 		return luaL_error(L, "Graphics context not available");
 	}
 
@@ -226,8 +218,7 @@ static int lua_api_draw_line(lua_State *L)
 
 static int lua_api_measure_text(lua_State *L)
 {
-	if (global_context == NULL || global_context->graphics == NULL)
-	{
+	if (global_context == NULL || global_context->graphics == NULL) {
 		return luaL_error(L, "Graphics context not available");
 	}
 
@@ -244,14 +235,12 @@ static int lua_api_hex_to_rgb(lua_State *L)
 {
 	const char *hex = luaL_checkstring(L, 1);
 
-	if (hex[0] == '#')
-	{
+	if (hex[0] == '#') {
 		hex++;
 	}
 
 	unsigned int r = 0, g = 0, b = 0;
-	if (sscanf(hex, "%02x%02x%02x", &r, &g, &b) != 3)
-	{
+	if (sscanf(hex, "%02x%02x%02x", &r, &g, &b) != 3) {
 		return luaL_error(L, "Invalid hex color format");
 	}
 
@@ -286,8 +275,7 @@ static int lua_api_get_config(lua_State *L)
 	const char *key = luaL_checkstring(L, 1);
 
 	lua_getglobal(L, "config");
-	if (!lua_istable(L, -1))
-	{
+	if (!lua_istable(L, -1)) {
 		lua_pop(L, 1);
 		lua_pushnil(L);
 		return 1;
@@ -301,8 +289,7 @@ static int lua_api_get_config(lua_State *L)
 
 static int lua_api_register_command(lua_State *L)
 {
-	if (global_context == NULL || global_context->command_registry == NULL)
-	{
+	if (global_context == NULL || global_context->command_registry == NULL) {
 		return luaL_error(L, "Command registry not available");
 	}
 
@@ -313,9 +300,8 @@ static int lua_api_register_command(lua_State *L)
 	int callback_ref = luaL_ref(L, LUA_REGISTRYINDEX);
 
 	if (!lua_command_registry_register_lua_command(
-				global_context->command_registry, command_name, callback_ref
-		))
-	{
+		    global_context->command_registry, command_name, callback_ref
+	    )) {
 		luaL_unref(L, LUA_REGISTRYINDEX, callback_ref);
 		return luaL_error(L, "Failed to register command: %s", command_name);
 	}
@@ -427,8 +413,7 @@ static enum key parse_key_string(const char *key_str)
 
 static int lua_api_register_keybinding(lua_State *L)
 {
-	if (global_context == NULL || global_context->command_registry == NULL)
-	{
+	if (global_context == NULL || global_context->command_registry == NULL) {
 		return luaL_error(L, "Command registry not available");
 	}
 
@@ -439,40 +424,34 @@ static int lua_api_register_keybinding(lua_State *L)
 	bool ctrl = false;
 	bool alt = false;
 
-	if (lua_istable(L, 3))
-	{
+	if (lua_istable(L, 3)) {
 		lua_getfield(L, 3, "shift");
-		if (lua_isboolean(L, -1))
-		{
+		if (lua_isboolean(L, -1)) {
 			shift = lua_toboolean(L, -1);
 		}
 		lua_pop(L, 1);
 
 		lua_getfield(L, 3, "ctrl");
-		if (lua_isboolean(L, -1))
-		{
+		if (lua_isboolean(L, -1)) {
 			ctrl = lua_toboolean(L, -1);
 		}
 		lua_pop(L, 1);
 
 		lua_getfield(L, 3, "alt");
-		if (lua_isboolean(L, -1))
-		{
+		if (lua_isboolean(L, -1)) {
 			alt = lua_toboolean(L, -1);
 		}
 		lua_pop(L, 1);
 	}
 
 	enum key key = parse_key_string(key_str);
-	if (key == KEY_COUNT)
-	{
+	if (key == KEY_COUNT) {
 		return luaL_error(L, "Invalid key: %s", key_str);
 	}
 
 	if (!lua_command_registry_register_keybinding(
-				global_context->command_registry, key, shift, ctrl, alt, command_name
-		))
-	{
+		    global_context->command_registry, key, shift, ctrl, alt, command_name
+	    )) {
 		return luaL_error(L, "Failed to register keybinding for: %s", key_str);
 	}
 
@@ -481,17 +460,16 @@ static int lua_api_register_keybinding(lua_State *L)
 
 static int lua_api_set_bpm(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL) {
 		return luaL_error(L, "App state or audio not available");
 	}
 
 	uint32_t bpm = (uint32_t)luaL_checknumber(L, 1);
 	global_context->app_state->bpm = bpm;
 
-	struct Sequencer* sequencer = audio_get_sequencer(global_context->audio);
-	if (sequencer != NULL)
-	{
+	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL) {
 		sequencer_set_bpm(sequencer, bpm);
 	}
 
@@ -502,17 +480,16 @@ static int lua_api_set_bpm(lua_State *L)
 
 static int lua_api_set_playhead(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL) {
 		return luaL_error(L, "App state or audio not available");
 	}
 
 	uint32_t position_ms = (uint32_t)luaL_checknumber(L, 1);
 	global_context->app_state->playhead_ms = position_ms;
 
-	struct Sequencer* sequencer = audio_get_sequencer(global_context->audio);
-	if (sequencer != NULL)
-	{
+	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL) {
 		sequencer_set_playhead(sequencer, position_ms);
 	}
 
@@ -523,8 +500,7 @@ static int lua_api_set_playhead(lua_State *L)
 
 static int lua_api_add_note(lua_State *L)
 {
-	if (global_context == NULL || global_context->audio == NULL)
-	{
+	if (global_context == NULL || global_context->audio == NULL) {
 		return luaL_error(L, "Audio not available");
 	}
 
@@ -585,14 +561,17 @@ static int lua_api_add_note(lua_State *L)
 		params.waveform = (enum WaveformType)lua_tointeger(L, 4);
 	}
 
-	struct Sequencer* sequencer = audio_get_sequencer(global_context->audio);
-	if (sequencer != NULL)
-	{
+	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL) {
 		sequencer_add_note(sequencer, start_ms, params);
 	}
 
 	printf("Note added: pitch=%d (%.2f Hz) at %ums for %ums waveform=%d\n",
-		   pitch, params.frequency, start_ms, duration_ms, params.waveform);
+	       pitch,
+	       params.frequency,
+	       start_ms,
+	       duration_ms,
+	       params.waveform);
 
 	return 0;
 }
@@ -610,7 +589,8 @@ static int lua_api_quit(lua_State *L)
 
 static int lua_api_save(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL)
 		return luaL_error(L, "API context not available");
 
 	const char *filepath = luaL_optstring(L, 1, NULL);
@@ -641,11 +621,8 @@ static int lua_api_save(lua_State *L)
 	path_build_with_extension(base_path, ".c", c_path, sizeof(c_path));
 	path_build_with_extension(base_path, ".wav", wav_path, sizeof(wav_path));
 
-	bool success_json = song_saver_save_to_file(
-			global_context->app_state,
-			sequencer,
-			json_path
-	);
+	bool success_json =
+		song_saver_save_to_file(global_context->app_state, sequencer, json_path);
 
 	bool success_c = c_exporter_export_to_file(sequencer, c_path);
 	bool success_wav = wav_exporter_export_to_file(sequencer, wav_path);
@@ -699,7 +676,8 @@ static int lua_api_save_wav(lua_State *L)
 
 static int lua_api_load(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL)
 		return luaL_error(L, "API context not available");
 
 	const char *filepath = luaL_optstring(L, 1, "song.json");
@@ -735,20 +713,17 @@ static int lua_api_redo(lua_State *L)
 
 static int lua_api_toggle_play(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL)
 		return luaL_error(L, "App state or audio not available");
 
 	global_context->app_state->playing = !global_context->app_state->playing;
 
-	struct Sequencer* sequencer = audio_get_sequencer(global_context->audio);
-	if (sequencer != NULL)
-	{
-		if (global_context->app_state->playing)
-		{
+	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL) {
+		if (global_context->app_state->playing) {
 			sequencer_play(sequencer);
-		}
-		else
-		{
+		} else {
 			sequencer_pause(sequencer);
 		}
 	}
@@ -758,14 +733,14 @@ static int lua_api_toggle_play(lua_State *L)
 
 static int lua_api_play(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL)
 		return luaL_error(L, "App state or audio not available");
 
 	global_context->app_state->playing = true;
 
-	struct Sequencer* sequencer = audio_get_sequencer(global_context->audio);
-	if (sequencer != NULL)
-	{
+	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL) {
 		sequencer_play(sequencer);
 	}
 
@@ -774,14 +749,14 @@ static int lua_api_play(lua_State *L)
 
 static int lua_api_pause(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL)
 		return luaL_error(L, "App state or audio not available");
 
 	global_context->app_state->playing = false;
 
-	struct Sequencer* sequencer = audio_get_sequencer(global_context->audio);
-	if (sequencer != NULL)
-	{
+	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL) {
 		sequencer_pause(sequencer);
 	}
 
@@ -790,15 +765,15 @@ static int lua_api_pause(lua_State *L)
 
 static int lua_api_stop(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL)
 		return luaL_error(L, "App state or audio not available");
 
 	global_context->app_state->playing = false;
 	global_context->app_state->playhead_ms = 0;
 
-	struct Sequencer* sequencer = audio_get_sequencer(global_context->audio);
-	if (sequencer != NULL)
-	{
+	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL) {
 		sequencer_stop(sequencer);
 	}
 
@@ -848,8 +823,7 @@ static int lua_api_transpose_down(lua_State *L)
 
 static int lua_api_get_window_size(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -861,8 +835,7 @@ static int lua_api_get_window_size(lua_State *L)
 
 static int lua_api_get_fps(lua_State *L)
 {
-	if (global_context == NULL || global_context->graphics == NULL)
-	{
+	if (global_context == NULL || global_context->graphics == NULL) {
 		return luaL_error(L, "Graphics context not available");
 	}
 
@@ -874,13 +847,12 @@ static int lua_api_get_fps(lua_State *L)
 
 static int lua_api_toggle_scale_highlight(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
 	global_context->app_state->show_scale_highlights =
-			!global_context->app_state->show_scale_highlights;
+		!global_context->app_state->show_scale_highlights;
 	lua_pushboolean(L, global_context->app_state->show_scale_highlights);
 
 	return 1;
@@ -888,8 +860,7 @@ static int lua_api_toggle_scale_highlight(lua_State *L)
 
 static int lua_api_cycle_scale_type(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -903,8 +874,7 @@ static int lua_api_cycle_scale_type(lua_State *L)
 
 static int lua_api_cycle_scale_root(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -918,8 +888,7 @@ static int lua_api_cycle_scale_root(lua_State *L)
 
 static int lua_api_get_scale_info(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -939,14 +908,12 @@ static int lua_api_get_scale_info(lua_State *L)
 
 static int lua_api_get_mouse_position(lua_State *L)
 {
-	if (global_context == NULL || global_context->graphics == NULL)
-	{
+	if (global_context == NULL || global_context->graphics == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
 	struct Window *window = graphics_get_window(global_context->graphics);
-	if (window == NULL)
-	{
+	if (window == NULL) {
 		return luaL_error(L, "Window not available");
 	}
 
@@ -961,16 +928,14 @@ static int lua_api_get_mouse_position(lua_State *L)
 
 static int lua_api_is_mouse_button_down(lua_State *L)
 {
-	if (global_context == NULL || global_context->graphics == NULL)
-	{
+	if (global_context == NULL || global_context->graphics == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
 	int button = (int)luaL_checkinteger(L, 1);
 
 	struct Window *window = graphics_get_window(global_context->graphics);
-	if (window == NULL)
-	{
+	if (window == NULL) {
 		return luaL_error(L, "Window not available");
 	}
 
@@ -982,16 +947,14 @@ static int lua_api_is_mouse_button_down(lua_State *L)
 
 static int lua_api_is_mouse_button_pressed(lua_State *L)
 {
-	if (global_context == NULL || global_context->graphics == NULL)
-	{
+	if (global_context == NULL || global_context->graphics == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
 	int button = (int)luaL_checkinteger(L, 1);
 
 	struct Window *window = graphics_get_window(global_context->graphics);
-	if (window == NULL)
-	{
+	if (window == NULL) {
 		return luaL_error(L, "Window not available");
 	}
 
@@ -1003,15 +966,13 @@ static int lua_api_is_mouse_button_pressed(lua_State *L)
 
 static int lua_api_toggle_fold(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
 	global_context->app_state->fold_mode = !global_context->app_state->fold_mode;
 
-	if (global_context->app_state->fold_mode)
-	{
+	if (global_context->app_state->fold_mode) {
 		global_context->app_state->viewport.note_offset = 0;
 	}
 
@@ -1022,16 +983,14 @@ static int lua_api_toggle_fold(lua_State *L)
 
 static int lua_api_set_voice_hidden(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
 	int voice = (int)luaL_checkinteger(L, 1);
 	bool hidden = lua_toboolean(L, 2);
 
-	if (voice < 0 || voice >= 8)
-	{
+	if (voice < 0 || voice >= 8) {
 		return luaL_error(L, "Voice must be 0-7");
 	}
 
@@ -1042,16 +1001,14 @@ static int lua_api_set_voice_hidden(lua_State *L)
 
 static int lua_api_set_voice_solo(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
 	int voice = (int)luaL_checkinteger(L, 1);
 	bool solo = lua_toboolean(L, 2);
 
-	if (voice < 0 || voice >= 8)
-	{
+	if (voice < 0 || voice >= 8) {
 		return luaL_error(L, "Voice must be 0-7");
 	}
 
@@ -1062,16 +1019,14 @@ static int lua_api_set_voice_solo(lua_State *L)
 
 static int lua_api_set_voice_muted(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
 	int voice = (int)luaL_checkinteger(L, 1);
 	bool muted = lua_toboolean(L, 2);
 
-	if (voice < 0 || voice >= 8)
-	{
+	if (voice < 0 || voice >= 8) {
 		return luaL_error(L, "Voice must be 0-7");
 	}
 
@@ -1082,8 +1037,7 @@ static int lua_api_set_voice_muted(lua_State *L)
 
 static const char *waveform_type_to_string(enum WaveformType type)
 {
-	switch (type)
-	{
+	switch (type) {
 	case WAVEFORM_SINE:
 		return "sine";
 	case WAVEFORM_SQUARE:
@@ -1101,8 +1055,8 @@ static const char *waveform_type_to_string(enum WaveformType type)
 
 static int lua_api_get_app_state(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1120,14 +1074,11 @@ static int lua_api_get_app_state(lua_State *L)
 	lua_pushinteger(L, state->selected_instrument);
 	lua_setfield(L, -2, "selected_instrument");
 
-	if (synth != NULL && state->selected_voice < MAX_VOICES)
-	{
+	if (synth != NULL && state->selected_voice < MAX_VOICES) {
 		enum WaveformType waveform = synth->voices[state->selected_voice].waveform;
 		lua_pushstring(L, waveform_type_to_string(waveform));
 		lua_setfield(L, -2, "waveform");
-	}
-	else
-	{
+	} else {
 		lua_pushstring(L, "square");
 		lua_setfield(L, -2, "waveform");
 	}
@@ -1154,24 +1105,21 @@ static int lua_api_get_app_state(lua_State *L)
 	lua_setfield(L, -2, "selected_root");
 
 	lua_newtable(L);
-	for (int i = 0; i < 8; i++)
-	{
+	for (int i = 0; i < 8; i++) {
 		lua_pushboolean(L, state->voice_hidden[i]);
 		lua_rawseti(L, -2, i + 1);
 	}
 	lua_setfield(L, -2, "voice_hidden");
 
 	lua_newtable(L);
-	for (int i = 0; i < 8; i++)
-	{
+	for (int i = 0; i < 8; i++) {
 		lua_pushboolean(L, state->voice_solo[i]);
 		lua_rawseti(L, -2, i + 1);
 	}
 	lua_setfield(L, -2, "voice_solo");
 
 	lua_newtable(L);
-	for (int i = 0; i < 8; i++)
-	{
+	for (int i = 0; i < 8; i++) {
 		lua_pushboolean(L, state->voice_muted[i]);
 		lua_rawseti(L, -2, i + 1);
 	}
@@ -1197,8 +1145,7 @@ static int lua_api_get_app_state(lua_State *L)
 	lua_setfield(L, -2, "viewport");
 
 	lua_newtable(L);
-	for (uint32_t i = 0; i < state->note_count; i++)
-	{
+	for (uint32_t i = 0; i < state->note_count; i++) {
 		lua_newtable(L);
 		lua_pushinteger(L, state->notes[i].id);
 		lua_setfield(L, -2, "id");
@@ -1225,8 +1172,7 @@ static int lua_api_get_app_state(lua_State *L)
 
 static int lua_api_get_instrument_count(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1236,15 +1182,13 @@ static int lua_api_get_instrument_count(lua_State *L)
 
 static int lua_api_get_instrument(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
 	int index = (int)luaL_checkinteger(L, 1);
 
-	if (index < 0 || index >= global_context->app_state->instrument_count)
-	{
+	if (index < 0 || index >= global_context->app_state->instrument_count) {
 		return luaL_error(L, "Instrument index out of range");
 	}
 
@@ -1290,15 +1234,13 @@ static int lua_api_get_instrument(lua_State *L)
 
 static int lua_api_set_selected_instrument(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
 	int index = (int)luaL_checkinteger(L, 1);
 
-	if (index < 0 || index >= global_context->app_state->instrument_count)
-	{
+	if (index < 0 || index >= global_context->app_state->instrument_count) {
 		return luaL_error(L, "Instrument index out of range");
 	}
 
@@ -1399,8 +1341,7 @@ static int lua_api_is_root_note(lua_State *L)
 
 static int lua_api_ms_to_x(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1415,8 +1356,7 @@ static int lua_api_ms_to_x(lua_State *L)
 
 static int lua_api_x_to_ms(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1431,8 +1371,7 @@ static int lua_api_x_to_ms(lua_State *L)
 
 static int lua_api_piano_key_to_y(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1447,8 +1386,7 @@ static int lua_api_piano_key_to_y(lua_State *L)
 
 static int lua_api_y_to_piano_key(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1463,16 +1401,14 @@ static int lua_api_y_to_piano_key(lua_State *L)
 
 static int lua_api_get_selection(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
 	struct app_state *state = global_context->app_state;
 
 	lua_newtable(L);
-	for (uint32_t i = 0; i < state->selection.count; i++)
-	{
+	for (uint32_t i = 0; i < state->selection.count; i++) {
 		lua_pushinteger(L, state->selection.selected_ids[i]);
 		lua_rawseti(L, -2, i + 1);
 	}
@@ -1482,8 +1418,7 @@ static int lua_api_get_selection(lua_State *L)
 
 static int lua_api_clear_selection(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1494,8 +1429,7 @@ static int lua_api_clear_selection(lua_State *L)
 
 static int lua_api_select_note(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1503,17 +1437,14 @@ static int lua_api_select_note(lua_State *L)
 	struct app_state *state = global_context->app_state;
 
 	bool already_selected = false;
-	for (uint32_t i = 0; i < state->selection.count; i++)
-	{
-		if (state->selection.selected_ids[i] == note_id)
-		{
+	for (uint32_t i = 0; i < state->selection.count; i++) {
+		if (state->selection.selected_ids[i] == note_id) {
 			already_selected = true;
 			break;
 		}
 	}
 
-	if (!already_selected && state->selection.count < UI_MAX_SELECTION)
-	{
+	if (!already_selected && state->selection.count < UI_MAX_SELECTION) {
 		state->selection.selected_ids[state->selection.count] = note_id;
 		state->selection.count++;
 	}
@@ -1523,21 +1454,18 @@ static int lua_api_select_note(lua_State *L)
 
 static int lua_api_deselect_note(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
 	uint32_t note_id = (uint32_t)luaL_checkinteger(L, 1);
 	struct app_state *state = global_context->app_state;
 
-	for (uint32_t i = 0; i < state->selection.count; i++)
-	{
-		if (state->selection.selected_ids[i] == note_id)
-		{
-			for (uint32_t j = i; j < state->selection.count - 1; j++)
-			{
-				state->selection.selected_ids[j] = state->selection.selected_ids[j + 1];
+	for (uint32_t i = 0; i < state->selection.count; i++) {
+		if (state->selection.selected_ids[i] == note_id) {
+			for (uint32_t j = i; j < state->selection.count - 1; j++) {
+				state->selection.selected_ids[j] =
+					state->selection.selected_ids[j + 1];
 			}
 			state->selection.count--;
 			break;
@@ -1549,8 +1477,7 @@ static int lua_api_deselect_note(lua_State *L)
 
 static int lua_api_is_note_selected(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1558,10 +1485,8 @@ static int lua_api_is_note_selected(lua_State *L)
 	struct app_state *state = global_context->app_state;
 
 	bool is_selected = false;
-	for (uint32_t i = 0; i < state->selection.count; i++)
-	{
-		if (state->selection.selected_ids[i] == note_id)
-		{
+	for (uint32_t i = 0; i < state->selection.count; i++) {
+		if (state->selection.selected_ids[i] == note_id) {
 			is_selected = true;
 			break;
 		}
@@ -1574,8 +1499,7 @@ static int lua_api_is_note_selected(lua_State *L)
 
 static int lua_api_move_note(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1585,17 +1509,18 @@ static int lua_api_move_note(lua_State *L)
 
 	struct app_state *state = global_context->app_state;
 
-	for (uint32_t i = 0; i < state->note_count; i++)
-	{
-		if (state->notes[i].id == note_id)
-		{
+	for (uint32_t i = 0; i < state->note_count; i++) {
+		if (state->notes[i].id == note_id) {
 			int32_t new_ms = (int32_t)state->notes[i].ms + delta_ms;
-			if (new_ms < 0) new_ms = 0;
+			if (new_ms < 0)
+				new_ms = 0;
 			state->notes[i].ms = (uint32_t)new_ms;
 
 			int32_t new_key = (int32_t)state->notes[i].piano_key + delta_piano_key;
-			if (new_key < 0) new_key = 0;
-			if (new_key > 127) new_key = 127;
+			if (new_key < 0)
+				new_key = 0;
+			if (new_key > 127)
+				new_key = 127;
 			state->notes[i].piano_key = (uint8_t)new_key;
 			break;
 		}
@@ -1606,8 +1531,7 @@ static int lua_api_move_note(lua_State *L)
 
 static int lua_api_resize_note(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1617,25 +1541,25 @@ static int lua_api_resize_note(lua_State *L)
 
 	struct app_state *state = global_context->app_state;
 
-	for (uint32_t i = 0; i < state->note_count; i++)
-	{
-		if (state->notes[i].id == note_id)
-		{
-			if (from_left)
-			{
+	for (uint32_t i = 0; i < state->note_count; i++) {
+		if (state->notes[i].id == note_id) {
+			if (from_left) {
 				int32_t new_ms = (int32_t)state->notes[i].ms + delta_duration_ms;
-				int32_t new_duration = (int32_t)state->notes[i].duration_ms - delta_duration_ms;
+				int32_t new_duration =
+					(int32_t)state->notes[i].duration_ms - delta_duration_ms;
 
-				if (new_ms < 0) new_ms = 0;
-				if (new_duration < 10) new_duration = 10;
+				if (new_ms < 0)
+					new_ms = 0;
+				if (new_duration < 10)
+					new_duration = 10;
 
 				state->notes[i].ms = (uint32_t)new_ms;
 				state->notes[i].duration_ms = (uint16_t)new_duration;
-			}
-			else
-			{
-				int32_t new_duration = (int32_t)state->notes[i].duration_ms + delta_duration_ms;
-				if (new_duration < 10) new_duration = 10;
+			} else {
+				int32_t new_duration =
+					(int32_t)state->notes[i].duration_ms + delta_duration_ms;
+				if (new_duration < 10)
+					new_duration = 10;
 				state->notes[i].duration_ms = (uint16_t)new_duration;
 			}
 			break;
@@ -1647,20 +1571,16 @@ static int lua_api_resize_note(lua_State *L)
 
 static int lua_api_delete_note(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
 	uint32_t note_id = (uint32_t)luaL_checkinteger(L, 1);
 	struct app_state *state = global_context->app_state;
 
-	for (uint32_t i = 0; i < state->note_count; i++)
-	{
-		if (state->notes[i].id == note_id)
-		{
-			for (uint32_t j = i; j < state->note_count - 1; j++)
-			{
+	for (uint32_t i = 0; i < state->note_count; i++) {
+		if (state->notes[i].id == note_id) {
+			for (uint32_t j = i; j < state->note_count - 1; j++) {
 				state->notes[j] = state->notes[j + 1];
 			}
 			state->note_count--;
@@ -1673,8 +1593,8 @@ static int lua_api_delete_note(lua_State *L)
 
 static int lua_api_play_preview_note(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1682,13 +1602,11 @@ static int lua_api_play_preview_note(lua_State *L)
 	struct app_state *state = global_context->app_state;
 	struct Synth *synth = audio_get_synth(global_context->audio);
 
-	if (synth == NULL)
-	{
+	if (synth == NULL) {
 		return luaL_error(L, "Synth not available");
 	}
 
-	if (state->selected_instrument >= state->instrument_count)
-	{
+	if (state->selected_instrument >= state->instrument_count) {
 		return luaL_error(L, "Invalid selected instrument");
 	}
 
@@ -1716,74 +1634,106 @@ static int lua_api_play_preview_note(lua_State *L)
 
 static SDL_Scancode key_to_scancode(enum key key)
 {
-	switch (key)
-	{
-	case KEY_A: return SDL_SCANCODE_A;
-	case KEY_B: return SDL_SCANCODE_B;
-	case KEY_C: return SDL_SCANCODE_C;
-	case KEY_D: return SDL_SCANCODE_D;
-	case KEY_E: return SDL_SCANCODE_E;
-	case KEY_F: return SDL_SCANCODE_F;
-	case KEY_G: return SDL_SCANCODE_G;
-	case KEY_H: return SDL_SCANCODE_H;
-	case KEY_I: return SDL_SCANCODE_I;
-	case KEY_J: return SDL_SCANCODE_J;
-	case KEY_K: return SDL_SCANCODE_K;
-	case KEY_L: return SDL_SCANCODE_L;
-	case KEY_M: return SDL_SCANCODE_M;
-	case KEY_N: return SDL_SCANCODE_N;
-	case KEY_O: return SDL_SCANCODE_O;
-	case KEY_P: return SDL_SCANCODE_P;
-	case KEY_Q: return SDL_SCANCODE_Q;
-	case KEY_R: return SDL_SCANCODE_R;
-	case KEY_S: return SDL_SCANCODE_S;
-	case KEY_T: return SDL_SCANCODE_T;
-	case KEY_U: return SDL_SCANCODE_U;
-	case KEY_V: return SDL_SCANCODE_V;
-	case KEY_W: return SDL_SCANCODE_W;
-	case KEY_X: return SDL_SCANCODE_X;
-	case KEY_Y: return SDL_SCANCODE_Y;
-	case KEY_Z: return SDL_SCANCODE_Z;
-	case KEY_SPACE: return SDL_SCANCODE_SPACE;
-	case KEY_ESCAPE: return SDL_SCANCODE_ESCAPE;
-	case KEY_ENTER: return SDL_SCANCODE_RETURN;
-	case KEY_TAB: return SDL_SCANCODE_TAB;
-	case KEY_LEFT_SHIFT: return SDL_SCANCODE_LSHIFT;
-	case KEY_RIGHT_SHIFT: return SDL_SCANCODE_RSHIFT;
-	case KEY_LEFT_CONTROL: return SDL_SCANCODE_LCTRL;
-	case KEY_RIGHT_CONTROL: return SDL_SCANCODE_RCTRL;
-	case KEY_LEFT_ALT: return SDL_SCANCODE_LALT;
-	case KEY_RIGHT_ALT: return SDL_SCANCODE_RALT;
-	default: return SDL_SCANCODE_UNKNOWN;
+	switch (key) {
+	case KEY_A:
+		return SDL_SCANCODE_A;
+	case KEY_B:
+		return SDL_SCANCODE_B;
+	case KEY_C:
+		return SDL_SCANCODE_C;
+	case KEY_D:
+		return SDL_SCANCODE_D;
+	case KEY_E:
+		return SDL_SCANCODE_E;
+	case KEY_F:
+		return SDL_SCANCODE_F;
+	case KEY_G:
+		return SDL_SCANCODE_G;
+	case KEY_H:
+		return SDL_SCANCODE_H;
+	case KEY_I:
+		return SDL_SCANCODE_I;
+	case KEY_J:
+		return SDL_SCANCODE_J;
+	case KEY_K:
+		return SDL_SCANCODE_K;
+	case KEY_L:
+		return SDL_SCANCODE_L;
+	case KEY_M:
+		return SDL_SCANCODE_M;
+	case KEY_N:
+		return SDL_SCANCODE_N;
+	case KEY_O:
+		return SDL_SCANCODE_O;
+	case KEY_P:
+		return SDL_SCANCODE_P;
+	case KEY_Q:
+		return SDL_SCANCODE_Q;
+	case KEY_R:
+		return SDL_SCANCODE_R;
+	case KEY_S:
+		return SDL_SCANCODE_S;
+	case KEY_T:
+		return SDL_SCANCODE_T;
+	case KEY_U:
+		return SDL_SCANCODE_U;
+	case KEY_V:
+		return SDL_SCANCODE_V;
+	case KEY_W:
+		return SDL_SCANCODE_W;
+	case KEY_X:
+		return SDL_SCANCODE_X;
+	case KEY_Y:
+		return SDL_SCANCODE_Y;
+	case KEY_Z:
+		return SDL_SCANCODE_Z;
+	case KEY_SPACE:
+		return SDL_SCANCODE_SPACE;
+	case KEY_ESCAPE:
+		return SDL_SCANCODE_ESCAPE;
+	case KEY_ENTER:
+		return SDL_SCANCODE_RETURN;
+	case KEY_TAB:
+		return SDL_SCANCODE_TAB;
+	case KEY_LEFT_SHIFT:
+		return SDL_SCANCODE_LSHIFT;
+	case KEY_RIGHT_SHIFT:
+		return SDL_SCANCODE_RSHIFT;
+	case KEY_LEFT_CONTROL:
+		return SDL_SCANCODE_LCTRL;
+	case KEY_RIGHT_CONTROL:
+		return SDL_SCANCODE_RCTRL;
+	case KEY_LEFT_ALT:
+		return SDL_SCANCODE_LALT;
+	case KEY_RIGHT_ALT:
+		return SDL_SCANCODE_RALT;
+	default:
+		return SDL_SCANCODE_UNKNOWN;
 	}
 }
 
 static int lua_api_is_key_down(lua_State *L)
 {
-	if (global_context == NULL || global_context->graphics == NULL)
-	{
+	if (global_context == NULL || global_context->graphics == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
 	const char *key_str = luaL_checkstring(L, 1);
 	enum key key = parse_key_string(key_str);
 
-	if (key == KEY_COUNT)
-	{
+	if (key == KEY_COUNT) {
 		lua_pushboolean(L, false);
 		return 1;
 	}
 
 	struct Window *window = graphics_get_window(global_context->graphics);
-	if (window == NULL)
-	{
+	if (window == NULL) {
 		lua_pushboolean(L, false);
 		return 1;
 	}
 
 	SDL_Scancode scancode = key_to_scancode(key);
-	if (scancode == SDL_SCANCODE_UNKNOWN)
-	{
+	if (scancode == SDL_SCANCODE_UNKNOWN) {
 		lua_pushboolean(L, false);
 		return 1;
 	}
@@ -1796,8 +1746,7 @@ static int lua_api_is_key_down(lua_State *L)
 
 static int lua_api_zoom_horizontal_at_mouse(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1811,8 +1760,7 @@ static int lua_api_zoom_horizontal_at_mouse(lua_State *L)
 
 static int lua_api_zoom_vertical_at_mouse(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-	{
+	if (global_context == NULL || global_context->app_state == NULL) {
 		return luaL_error(L, "API context not available");
 	}
 
@@ -1826,8 +1774,7 @@ static int lua_api_zoom_vertical_at_mouse(lua_State *L)
 
 void lua_api_register_all(struct lua_runtime *runtime, struct lua_api_context *ctx)
 {
-	if (runtime == NULL || runtime->L == NULL)
-	{
+	if (runtime == NULL || runtime->L == NULL) {
 		return;
 	}
 

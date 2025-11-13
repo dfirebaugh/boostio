@@ -1,11 +1,10 @@
-#include <glad/gl.h>
 #include "shader.h"
+#include <glad/gl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-struct Shader
-{
+struct Shader {
 	unsigned int program_id;
 	unsigned int vertex_shader;
 	unsigned int fragment_shader;
@@ -14,8 +13,7 @@ struct Shader
 struct Shader *shader_create(const char *vertex_source, const char *fragment_source)
 {
 	struct Shader *shader = (struct Shader *)malloc(sizeof(struct Shader));
-	if (!shader)
-	{
+	if (!shader) {
 		return NULL;
 	}
 
@@ -28,8 +26,7 @@ struct Shader *shader_create(const char *vertex_source, const char *fragment_sou
 	int success;
 	char info_log[512];
 	glGetShaderiv(shader->vertex_shader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
+	if (!success) {
 		glGetShaderInfoLog(shader->vertex_shader, 512, NULL, info_log);
 		fprintf(stderr, "Vertex shader compilation failed: %s\n", info_log);
 		glDeleteShader(shader->vertex_shader);
@@ -42,8 +39,7 @@ struct Shader *shader_create(const char *vertex_source, const char *fragment_sou
 	glCompileShader(shader->fragment_shader);
 
 	glGetShaderiv(shader->fragment_shader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
+	if (!success) {
 		glGetShaderInfoLog(shader->fragment_shader, 512, NULL, info_log);
 		fprintf(stderr, "Fragment shader compilation failed: %s\n", info_log);
 		glDeleteShader(shader->vertex_shader);
@@ -58,8 +54,7 @@ struct Shader *shader_create(const char *vertex_source, const char *fragment_sou
 	glLinkProgram(shader->program_id);
 
 	glGetProgramiv(shader->program_id, GL_LINK_STATUS, &success);
-	if (!success)
-	{
+	if (!success) {
 		glGetProgramInfoLog(shader->program_id, 512, NULL, info_log);
 		fprintf(stderr, "Shader linking failed: %s\n", info_log);
 		glDeleteShader(shader->vertex_shader);
@@ -74,23 +69,19 @@ struct Shader *shader_create(const char *vertex_source, const char *fragment_sou
 
 void shader_destroy(struct Shader *shader)
 {
-	if (!shader)
-	{
+	if (!shader) {
 		return;
 	}
 
-	if (shader->program_id)
-	{
+	if (shader->program_id) {
 		glDeleteProgram(shader->program_id);
 	}
 
-	if (shader->vertex_shader)
-	{
+	if (shader->vertex_shader) {
 		glDeleteShader(shader->vertex_shader);
 	}
 
-	if (shader->fragment_shader)
-	{
+	if (shader->fragment_shader) {
 		glDeleteShader(shader->fragment_shader);
 	}
 
@@ -99,8 +90,7 @@ void shader_destroy(struct Shader *shader)
 
 void shader_use(const struct Shader *shader)
 {
-	if (shader)
-	{
+	if (shader) {
 		glUseProgram(shader->program_id);
 	}
 }
@@ -110,8 +100,7 @@ void shader_set_mat4(const struct Shader *shader, const char *name, const float 
 	if (!shader)
 		return;
 	int location = glGetUniformLocation(shader->program_id, name);
-	if (location >= 0)
-	{
+	if (location >= 0) {
 		glUniformMatrix4fv(location, 1, GL_FALSE, matrix);
 	}
 }
@@ -121,8 +110,7 @@ void shader_set_float(const struct Shader *shader, const char *name, float value
 	if (!shader)
 		return;
 	int location = glGetUniformLocation(shader->program_id, name);
-	if (location >= 0)
-	{
+	if (location >= 0) {
 		glUniform1f(location, value);
 	}
 }
@@ -132,8 +120,7 @@ void shader_set_vec2(const struct Shader *shader, const char *name, float x, flo
 	if (!shader)
 		return;
 	int location = glGetUniformLocation(shader->program_id, name);
-	if (location >= 0)
-	{
+	if (location >= 0) {
 		glUniform2f(location, x, y);
 	}
 }
@@ -143,14 +130,13 @@ void shader_set_int(const struct Shader *shader, const char *name, int value)
 	if (!shader)
 		return;
 	int location = glGetUniformLocation(shader->program_id, name);
-	if (location >= 0)
-	{
+	if (location >= 0) {
 		glUniform1i(location, value);
 	}
 }
 
 void ortho_projection(
-		float left, float right, float bottom, float top, float near, float far, float *out
+	float left, float right, float bottom, float top, float near, float far, float *out
 )
 {
 	memset(out, 0, 16 * sizeof(float));

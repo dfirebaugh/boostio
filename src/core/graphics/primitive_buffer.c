@@ -1,6 +1,6 @@
+#include "primitive_buffer.h"
 #include "color.h"
 #include <glad/gl.h>
-#include "primitive_buffer.h"
 #include <math.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -8,82 +8,81 @@
 #include <string.h>
 
 static const char *primitive_vertex_shader = "#version 120\n"
-											 "attribute vec2 in_pos;\n"
-											 "attribute vec2 in_local_pos;\n"
-											 "attribute float in_op_code;\n"
-											 "attribute float in_radius;\n"
-											 "attribute vec4 in_color;\n"
-											 "attribute float in_width;\n"
-											 "attribute float in_height;\n"
-											 "attribute float in_outline_width;\n"
-											 "attribute vec4 in_outline_color;\n"
-											 "\n"
-											 "varying vec2 local_pos;\n"
-											 "varying float op_code;\n"
-											 "varying float radius;\n"
-											 "varying vec4 color;\n"
-											 "varying float width;\n"
-											 "varying float height;\n"
-											 "varying float outline_width;\n"
-											 "varying vec4 outline_color;\n"
-											 "\n"
-											 "void main() {\n"
-											 "    gl_Position = vec4(in_pos, 0.0, 1.0);\n"
-											 "    local_pos = in_local_pos;\n"
-											 "    op_code = in_op_code;\n"
-											 "    radius = in_radius;\n"
-											 "    color = in_color;\n"
-											 "    width = in_width;\n"
-											 "    height = in_height;\n"
-											 "    outline_width = in_outline_width;\n"
-											 "    outline_color = in_outline_color;\n"
-											 "}\n";
+					     "attribute vec2 in_pos;\n"
+					     "attribute vec2 in_local_pos;\n"
+					     "attribute float in_op_code;\n"
+					     "attribute float in_radius;\n"
+					     "attribute vec4 in_color;\n"
+					     "attribute float in_width;\n"
+					     "attribute float in_height;\n"
+					     "attribute float in_outline_width;\n"
+					     "attribute vec4 in_outline_color;\n"
+					     "\n"
+					     "varying vec2 local_pos;\n"
+					     "varying float op_code;\n"
+					     "varying float radius;\n"
+					     "varying vec4 color;\n"
+					     "varying float width;\n"
+					     "varying float height;\n"
+					     "varying float outline_width;\n"
+					     "varying vec4 outline_color;\n"
+					     "\n"
+					     "void main() {\n"
+					     "    gl_Position = vec4(in_pos, 0.0, 1.0);\n"
+					     "    local_pos = in_local_pos;\n"
+					     "    op_code = in_op_code;\n"
+					     "    radius = in_radius;\n"
+					     "    color = in_color;\n"
+					     "    width = in_width;\n"
+					     "    height = in_height;\n"
+					     "    outline_width = in_outline_width;\n"
+					     "    outline_color = in_outline_color;\n"
+					     "}\n";
 
 static const char *primitive_fragment_shader =
-		"#version 120\n"
-		"varying vec2 local_pos;\n"
-		"varying float op_code;\n"
-		"varying float radius;\n"
-		"varying vec4 color;\n"
-		"varying float width;\n"
-		"varying float height;\n"
-		"varying float outline_width;\n"
-		"varying vec4 outline_color;\n"
-		"\n"
-		"const float OP_CODE_RECT = 3.0;\n"
-		"\n"
-		"float sdRoundedRect(vec2 p, vec2 bounds, float r) {\n"
-		"    vec2 b = bounds - vec2(r);\n"
-		"    vec2 q = abs(p) - b;\n"
-		"    return length(max(q, 0.0)) - r;\n"
-		"}\n"
-		"\n"
-		"float sdRect(vec2 p, vec2 bounds) {\n"
-		"    vec2 q = abs(p) - bounds;\n"
-		"    return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0);\n"
-		"}\n"
-		"\n"
-		"void main() {\n"
-		"    vec2 p = local_pos;\n"
-		"    gl_FragColor = vec4(0.0);\n"
-		"\n"
-		"    if (op_code == OP_CODE_RECT) {\n"
-		"        float sdf;\n"
-		"        if (radius <= 0.0) {\n"
-		"            sdf = sdRect(p, vec2(width * 0.5, height * 0.5));\n"
-		"        } else {\n"
-		"            sdf = sdRoundedRect(p, vec2(width * 0.5, height * 0.5), radius);\n"
-		"        }\n"
-		"        if (sdf < 0.0) {\n"
-		"            gl_FragColor = color;\n"
-		"        } else if (outline_width > 0.0 && sdf < outline_width) {\n"
-		"            gl_FragColor = outline_color;\n"
-		"        }\n"
-		"    }\n"
-		"}\n";
+	"#version 120\n"
+	"varying vec2 local_pos;\n"
+	"varying float op_code;\n"
+	"varying float radius;\n"
+	"varying vec4 color;\n"
+	"varying float width;\n"
+	"varying float height;\n"
+	"varying float outline_width;\n"
+	"varying vec4 outline_color;\n"
+	"\n"
+	"const float OP_CODE_RECT = 3.0;\n"
+	"\n"
+	"float sdRoundedRect(vec2 p, vec2 bounds, float r) {\n"
+	"    vec2 b = bounds - vec2(r);\n"
+	"    vec2 q = abs(p) - b;\n"
+	"    return length(max(q, 0.0)) - r;\n"
+	"}\n"
+	"\n"
+	"float sdRect(vec2 p, vec2 bounds) {\n"
+	"    vec2 q = abs(p) - bounds;\n"
+	"    return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0);\n"
+	"}\n"
+	"\n"
+	"void main() {\n"
+	"    vec2 p = local_pos;\n"
+	"    gl_FragColor = vec4(0.0);\n"
+	"\n"
+	"    if (op_code == OP_CODE_RECT) {\n"
+	"        float sdf;\n"
+	"        if (radius <= 0.0) {\n"
+	"            sdf = sdRect(p, vec2(width * 0.5, height * 0.5));\n"
+	"        } else {\n"
+	"            sdf = sdRoundedRect(p, vec2(width * 0.5, height * 0.5), radius);\n"
+	"        }\n"
+	"        if (sdf < 0.0) {\n"
+	"            gl_FragColor = color;\n"
+	"        } else if (outline_width > 0.0 && sdf < outline_width) {\n"
+	"            gl_FragColor = outline_color;\n"
+	"        }\n"
+	"    }\n"
+	"}\n";
 
-struct primitive_vertex
-{
+struct primitive_vertex {
 	float pos[2];
 	float local_pos[2];
 	float op_code;
@@ -95,8 +94,7 @@ struct primitive_vertex
 	float outline_color[4];
 };
 
-struct PrimitiveBuffer
-{
+struct PrimitiveBuffer {
 	unsigned int shader_program;
 	unsigned int vao;
 	unsigned int vbo;
@@ -109,9 +107,8 @@ struct PrimitiveBuffer
 struct PrimitiveBuffer *primitive_buffer_create(void)
 {
 	struct PrimitiveBuffer *buffer =
-			(struct PrimitiveBuffer *)malloc(sizeof(struct PrimitiveBuffer));
-	if (!buffer)
-	{
+		(struct PrimitiveBuffer *)malloc(sizeof(struct PrimitiveBuffer));
+	if (!buffer) {
 		return NULL;
 	}
 
@@ -124,8 +121,7 @@ struct PrimitiveBuffer *primitive_buffer_create(void)
 	int success;
 	char info_log[512];
 	glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
+	if (!success) {
 		glGetShaderInfoLog(vertex_shader, 512, NULL, info_log);
 		fprintf(stderr, "Primitive vertex shader failed: %s\n", info_log);
 		glDeleteShader(vertex_shader);
@@ -138,8 +134,7 @@ struct PrimitiveBuffer *primitive_buffer_create(void)
 	glCompileShader(fragment_shader);
 
 	glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
+	if (!success) {
 		glGetShaderInfoLog(fragment_shader, 512, NULL, info_log);
 		fprintf(stderr, "Primitive fragment shader failed: %s\n", info_log);
 		glDeleteShader(vertex_shader);
@@ -165,8 +160,7 @@ struct PrimitiveBuffer *primitive_buffer_create(void)
 	glLinkProgram(buffer->shader_program);
 
 	glGetProgramiv(buffer->shader_program, GL_LINK_STATUS, &success);
-	if (!success)
-	{
+	if (!success) {
 		glGetProgramInfoLog(buffer->shader_program, 512, NULL, info_log);
 		fprintf(stderr, "Primitive shader linking failed: %s\n", info_log);
 		glDeleteShader(vertex_shader);
@@ -183,35 +177,32 @@ struct PrimitiveBuffer *primitive_buffer_create(void)
 	glGenBuffers(1, &buffer->vbo);
 
 	buffer->vertex_capacity = 1024;
-	buffer->vertices = (struct primitive_vertex *)malloc(sizeof(struct primitive_vertex) * buffer->vertex_capacity);
+	buffer->vertices = (struct primitive_vertex *)malloc(
+		sizeof(struct primitive_vertex) * buffer->vertex_capacity
+	);
 
 	return buffer;
 }
 
 void primitive_buffer_destroy(struct PrimitiveBuffer *buffer)
 {
-	if (!buffer)
-	{
+	if (!buffer) {
 		return;
 	}
 
-	if (buffer->vao)
-	{
+	if (buffer->vao) {
 		glDeleteVertexArrays(1, &buffer->vao);
 	}
 
-	if (buffer->vbo)
-	{
+	if (buffer->vbo) {
 		glDeleteBuffers(1, &buffer->vbo);
 	}
 
-	if (buffer->shader_program)
-	{
+	if (buffer->shader_program) {
 		glDeleteProgram(buffer->shader_program);
 	}
 
-	if (buffer->vertices)
-	{
+	if (buffer->vertices) {
 		free(buffer->vertices);
 	}
 
@@ -220,8 +211,7 @@ void primitive_buffer_destroy(struct PrimitiveBuffer *buffer)
 
 void primitive_buffer_begin(struct PrimitiveBuffer *buffer)
 {
-	if (!buffer)
-	{
+	if (!buffer) {
 		return;
 	}
 
@@ -229,20 +219,25 @@ void primitive_buffer_begin(struct PrimitiveBuffer *buffer)
 }
 
 void primitive_buffer_add_rect(
-		struct PrimitiveBuffer *buffer, float x, float y, float width, float height,
-		struct Color color, float radius, float outline_width, struct Color outline_color
+	struct PrimitiveBuffer *buffer,
+	float x,
+	float y,
+	float width,
+	float height,
+	struct Color color,
+	float radius,
+	float outline_width,
+	struct Color outline_color
 )
 {
-	if (!buffer)
-	{
+	if (!buffer) {
 		return;
 	}
 
-	if (buffer->vertex_count + 6 > buffer->vertex_capacity)
-	{
+	if (buffer->vertex_count + 6 > buffer->vertex_capacity) {
 		buffer->vertex_capacity *= 2;
 		buffer->vertices = (struct primitive_vertex *)realloc(
-				buffer->vertices, sizeof(struct primitive_vertex) * buffer->vertex_capacity
+			buffer->vertices, sizeof(struct primitive_vertex) * buffer->vertex_capacity
 		);
 	}
 
@@ -280,7 +275,7 @@ void primitive_buffer_add_rect(
 	v[0].width = width;
 	v[0].height = height;
 	v[0].outline_width = outline_width;
-	v[0].outline_color[0] = or ;
+	v[0].outline_color[0] = or;
 	v[0].outline_color[1] = og;
 	v[0].outline_color[2] = ob;
 	v[0].outline_color[3] = oa;
@@ -298,7 +293,7 @@ void primitive_buffer_add_rect(
 	v[1].width = width;
 	v[1].height = height;
 	v[1].outline_width = outline_width;
-	v[1].outline_color[0] = or ;
+	v[1].outline_color[0] = or;
 	v[1].outline_color[1] = og;
 	v[1].outline_color[2] = ob;
 	v[1].outline_color[3] = oa;
@@ -316,7 +311,7 @@ void primitive_buffer_add_rect(
 	v[2].width = width;
 	v[2].height = height;
 	v[2].outline_width = outline_width;
-	v[2].outline_color[0] = or ;
+	v[2].outline_color[0] = or;
 	v[2].outline_color[1] = og;
 	v[2].outline_color[2] = ob;
 	v[2].outline_color[3] = oa;
@@ -334,7 +329,7 @@ void primitive_buffer_add_rect(
 	v[3].width = width;
 	v[3].height = height;
 	v[3].outline_width = outline_width;
-	v[3].outline_color[0] = or ;
+	v[3].outline_color[0] = or;
 	v[3].outline_color[1] = og;
 	v[3].outline_color[2] = ob;
 	v[3].outline_color[3] = oa;
@@ -352,7 +347,7 @@ void primitive_buffer_add_rect(
 	v[4].width = width;
 	v[4].height = height;
 	v[4].outline_width = outline_width;
-	v[4].outline_color[0] = or ;
+	v[4].outline_color[0] = or;
 	v[4].outline_color[1] = og;
 	v[4].outline_color[2] = ob;
 	v[4].outline_color[3] = oa;
@@ -370,7 +365,7 @@ void primitive_buffer_add_rect(
 	v[5].width = width;
 	v[5].height = height;
 	v[5].outline_width = outline_width;
-	v[5].outline_color[0] = or ;
+	v[5].outline_color[0] = or;
 	v[5].outline_color[1] = og;
 	v[5].outline_color[2] = ob;
 	v[5].outline_color[3] = oa;
@@ -379,31 +374,29 @@ void primitive_buffer_add_rect(
 }
 
 void primitive_buffer_add_line(
-		struct PrimitiveBuffer *buffer, float x1, float y1, float x2, float y2, struct Color color
+	struct PrimitiveBuffer *buffer, float x1, float y1, float x2, float y2, struct Color color
 )
 {
 	struct Color no_outline = {0, 0, 0, 0};
 
-	if (fabsf(y2 - y1) < 0.5f)
-	{
+	if (fabsf(y2 - y1) < 0.5f) {
 		float width = fabsf(x2 - x1);
 		float x = fminf(x1, x2);
-		primitive_buffer_add_rect(buffer, x, y1, width, 1.0f, color, 0.0f, 0.0f, no_outline);
-	}
-	else if (fabsf(x2 - x1) < 0.5f)
-	{
+		primitive_buffer_add_rect(
+			buffer, x, y1, width, 1.0f, color, 0.0f, 0.0f, no_outline
+		);
+	} else if (fabsf(x2 - x1) < 0.5f) {
 		float height = fabsf(y2 - y1);
 		float y = fminf(y1, y2);
-		primitive_buffer_add_rect(buffer, x1, y, 1.0f, height, color, 0.0f, 0.0f, no_outline);
-	}
-	else
-	{
+		primitive_buffer_add_rect(
+			buffer, x1, y, 1.0f, height, color, 0.0f, 0.0f, no_outline
+		);
+	} else {
 		float dx = x2 - x1;
 		float dy = y2 - y1;
 		float len = sqrtf(dx * dx + dy * dy);
 
-		if (len < 0.001f)
-		{
+		if (len < 0.001f) {
 			return;
 		}
 
@@ -411,21 +404,23 @@ void primitive_buffer_add_line(
 		float nx = -dy / len * thickness / 2.0f;
 		float ny = dx / len * thickness / 2.0f;
 
-		primitive_buffer_add_rect(buffer, x1 + nx, y1 + ny, len, thickness, color, 0.0f, 0.0f, no_outline);
+		primitive_buffer_add_rect(
+			buffer, x1 + nx, y1 + ny, len, thickness, color, 0.0f, 0.0f, no_outline
+		);
 	}
 }
 
 void primitive_buffer_render(struct PrimitiveBuffer *buffer, int window_width, int window_height)
 {
-	if (!buffer || buffer->vertex_count == 0)
-	{
+	if (!buffer || buffer->vertex_count == 0) {
 		return;
 	}
 
-	for (int i = 0; i < buffer->vertex_count; i++)
-	{
-		buffer->vertices[i].pos[0] = (buffer->vertices[i].pos[0] / window_width) * 2.0f - 1.0f;
-		buffer->vertices[i].pos[1] = 1.0f - (buffer->vertices[i].pos[1] / window_height) * 2.0f;
+	for (int i = 0; i < buffer->vertex_count; i++) {
+		buffer->vertices[i].pos[0] =
+			(buffer->vertices[i].pos[0] / window_width) * 2.0f - 1.0f;
+		buffer->vertices[i].pos[1] =
+			1.0f - (buffer->vertices[i].pos[1] / window_height) * 2.0f;
 	}
 
 	glUseProgram(buffer->shader_program);
@@ -433,52 +428,71 @@ void primitive_buffer_render(struct PrimitiveBuffer *buffer, int window_width, i
 
 	glBindBuffer(GL_ARRAY_BUFFER, buffer->vbo);
 	glBufferData(
-			GL_ARRAY_BUFFER, buffer->vertex_count * sizeof(struct primitive_vertex), buffer->vertices,
-			GL_DYNAMIC_DRAW
+		GL_ARRAY_BUFFER,
+		buffer->vertex_count * sizeof(struct primitive_vertex),
+		buffer->vertices,
+		GL_DYNAMIC_DRAW
 	);
 
 	size_t stride = sizeof(struct primitive_vertex);
 
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, pos));
+	glVertexAttribPointer(
+		0, 2, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, pos)
+	);
 	glEnableVertexAttribArray(0);
 
 	glVertexAttribPointer(
-			1, 2, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, local_pos)
+		1,
+		2,
+		GL_FLOAT,
+		GL_FALSE,
+		stride,
+		(void *)offsetof(struct primitive_vertex, local_pos)
 	);
 	glEnableVertexAttribArray(1);
 
 	glVertexAttribPointer(
-			2, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, op_code)
+		2, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, op_code)
 	);
 	glEnableVertexAttribArray(2);
 
 	glVertexAttribPointer(
-			3, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, radius)
+		3, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, radius)
 	);
 	glEnableVertexAttribArray(3);
 
 	glVertexAttribPointer(
-			4, 4, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, color)
+		4, 4, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, color)
 	);
 	glEnableVertexAttribArray(4);
 
 	glVertexAttribPointer(
-			5, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, width)
+		5, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, width)
 	);
 	glEnableVertexAttribArray(5);
 
 	glVertexAttribPointer(
-			6, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, height)
+		6, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, height)
 	);
 	glEnableVertexAttribArray(6);
 
 	glVertexAttribPointer(
-			7, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, outline_width)
+		7,
+		1,
+		GL_FLOAT,
+		GL_FALSE,
+		stride,
+		(void *)offsetof(struct primitive_vertex, outline_width)
 	);
 	glEnableVertexAttribArray(7);
 
 	glVertexAttribPointer(
-			8, 4, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, outline_color)
+		8,
+		4,
+		GL_FLOAT,
+		GL_FALSE,
+		stride,
+		(void *)offsetof(struct primitive_vertex, outline_color)
 	);
 	glEnableVertexAttribArray(8);
 

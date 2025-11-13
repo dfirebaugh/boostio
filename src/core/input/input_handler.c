@@ -6,14 +6,12 @@
 
 struct input_handler *input_handler_create(struct Window *window)
 {
-	if (window == NULL)
-	{
+	if (window == NULL) {
 		return NULL;
 	}
 
 	struct input_handler *handler = malloc(sizeof(struct input_handler));
-	if (handler == NULL)
-	{
+	if (handler == NULL) {
 		return NULL;
 	}
 
@@ -25,8 +23,7 @@ struct input_handler *input_handler_create(struct Window *window)
 
 void input_handler_destroy(struct input_handler *handler)
 {
-	if (handler == NULL)
-	{
+	if (handler == NULL) {
 		return;
 	}
 
@@ -36,15 +33,14 @@ void input_handler_destroy(struct input_handler *handler)
 static bool is_modifier_key(enum key key)
 {
 	return key == KEY_LEFT_SHIFT || key == KEY_RIGHT_SHIFT || key == KEY_LEFT_CONTROL ||
-				 key == KEY_RIGHT_CONTROL || key == KEY_LEFT_ALT || key == KEY_RIGHT_ALT;
+	       key == KEY_RIGHT_CONTROL || key == KEY_LEFT_ALT || key == KEY_RIGHT_ALT;
 }
 
 size_t input_handler_poll_events(
-		struct input_handler *handler, struct input_event *events, size_t max_events
+	struct input_handler *handler, struct input_event *events, size_t max_events
 )
 {
-	if (handler == NULL || events == NULL || max_events == 0)
-	{
+	if (handler == NULL || events == NULL || max_events == 0) {
 		return 0;
 	}
 
@@ -52,21 +48,17 @@ size_t input_handler_poll_events(
 	struct Window *window = handler->window;
 
 	handler->shift_held = window_is_scancode_down(window, SDL_SCANCODE_LSHIFT) ||
-												window_is_scancode_down(window, SDL_SCANCODE_RSHIFT);
+			      window_is_scancode_down(window, SDL_SCANCODE_RSHIFT);
 	handler->ctrl_held = window_is_scancode_down(window, SDL_SCANCODE_LCTRL) ||
-											 window_is_scancode_down(window, SDL_SCANCODE_RCTRL);
+			     window_is_scancode_down(window, SDL_SCANCODE_RCTRL);
 	handler->alt_held = window_is_scancode_down(window, SDL_SCANCODE_LALT) ||
-											window_is_scancode_down(window, SDL_SCANCODE_RALT);
+			    window_is_scancode_down(window, SDL_SCANCODE_RALT);
 
-	for (int scancode = 0; scancode < 512 && event_count < max_events; scancode++)
-	{
-		if (window_is_scancode_pressed(window, scancode))
-		{
+	for (int scancode = 0; scancode < 512 && event_count < max_events; scancode++) {
+		if (window_is_scancode_pressed(window, scancode)) {
 			enum key key;
-			if (input_mapper_scancode_to_key(scancode, &key))
-			{
-				if (is_modifier_key(key))
-				{
+			if (input_mapper_scancode_to_key(scancode, &key)) {
+				if (is_modifier_key(key)) {
 					continue;
 				}
 
@@ -80,15 +72,11 @@ size_t input_handler_poll_events(
 		}
 	}
 
-	for (int scancode = 0; scancode < 512 && event_count < max_events; scancode++)
-	{
-		if (window->input.scancodes_released[scancode])
-		{
+	for (int scancode = 0; scancode < 512 && event_count < max_events; scancode++) {
+		if (window->input.scancodes_released[scancode]) {
 			enum key key;
-			if (input_mapper_scancode_to_key(scancode, &key))
-			{
-				if (is_modifier_key(key))
-				{
+			if (input_mapper_scancode_to_key(scancode, &key)) {
+				if (is_modifier_key(key)) {
 					continue;
 				}
 
@@ -99,10 +87,8 @@ size_t input_handler_poll_events(
 		}
 	}
 
-	for (int button = 0; button < 3 && event_count < max_events; button++)
-	{
-		if (window_is_mouse_button_pressed(window, button))
-		{
+	for (int button = 0; button < 3 && event_count < max_events; button++) {
+		if (window_is_mouse_button_pressed(window, button)) {
 			int mouse_x, mouse_y;
 			window_get_mouse_position(window, &mouse_x, &mouse_y);
 
@@ -117,10 +103,8 @@ size_t input_handler_poll_events(
 		}
 	}
 
-	for (int button = 0; button < 3 && event_count < max_events; button++)
-	{
-		if (window->input.mouse_released[button])
-		{
+	for (int button = 0; button < 3 && event_count < max_events; button++) {
+		if (window->input.mouse_released[button]) {
 			int mouse_x, mouse_y;
 			window_get_mouse_position(window, &mouse_x, &mouse_y);
 
@@ -134,10 +118,8 @@ size_t input_handler_poll_events(
 
 	int mouse_x, mouse_y;
 	window_get_mouse_position(window, &mouse_x, &mouse_y);
-	if (mouse_x != handler->last_mouse_x || mouse_y != handler->last_mouse_y)
-	{
-		if (event_count < max_events)
-		{
+	if (mouse_x != handler->last_mouse_x || mouse_y != handler->last_mouse_y) {
+		if (event_count < max_events) {
 			events[event_count].type = INPUT_EVENT_MOUSE_MOVE;
 			events[event_count].data.mouse_move.x = (float)mouse_x;
 			events[event_count].data.mouse_move.y = (float)mouse_y;
@@ -148,8 +130,7 @@ size_t input_handler_poll_events(
 	}
 
 	if ((window->input.mouse_wheel_x != 0.0f || window->input.mouse_wheel_y != 0.0f) &&
-			event_count < max_events)
-	{
+	    event_count < max_events) {
 		events[event_count].type = INPUT_EVENT_SCROLL;
 		events[event_count].data.scroll.dx = window->input.mouse_wheel_x;
 		events[event_count].data.scroll.dy = window->input.mouse_wheel_y;

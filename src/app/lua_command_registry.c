@@ -7,8 +7,7 @@
 
 bool lua_command_registry_init(struct lua_command_registry *registry, struct lua_runtime *runtime)
 {
-	if (registry == NULL || runtime == NULL)
-	{
+	if (registry == NULL || runtime == NULL) {
 		return false;
 	}
 
@@ -18,15 +17,13 @@ bool lua_command_registry_init(struct lua_command_registry *registry, struct lua
 	registry->keybinding_capacity = 64;
 
 	registry->commands = calloc(registry->command_capacity, sizeof(struct lua_command_entry));
-	if (registry->commands == NULL)
-	{
+	if (registry->commands == NULL) {
 		return false;
 	}
 
 	registry->keybindings =
-			calloc(registry->keybinding_capacity, sizeof(struct lua_keybinding_entry));
-	if (registry->keybindings == NULL)
-	{
+		calloc(registry->keybinding_capacity, sizeof(struct lua_keybinding_entry));
+	if (registry->keybindings == NULL) {
 		free(registry->commands);
 		return false;
 	}
@@ -36,20 +33,17 @@ bool lua_command_registry_init(struct lua_command_registry *registry, struct lua
 
 void lua_command_registry_deinit(struct lua_command_registry *registry)
 {
-	if (registry == NULL)
-	{
+	if (registry == NULL) {
 		return;
 	}
 
-	for (size_t i = 0; i < registry->command_count; i++)
-	{
+	for (size_t i = 0; i < registry->command_count; i++) {
 		free(registry->commands[i].command_name);
 		lua_runtime_unref(registry->runtime, registry->commands[i].lua_callback_ref);
 	}
 	free(registry->commands);
 
-	for (size_t i = 0; i < registry->keybinding_count; i++)
-	{
+	for (size_t i = 0; i < registry->keybinding_count; i++) {
 		free(registry->keybindings[i].command_name);
 	}
 	free(registry->keybindings);
@@ -58,31 +52,29 @@ void lua_command_registry_deinit(struct lua_command_registry *registry)
 }
 
 bool lua_command_registry_register_lua_command(
-		struct lua_command_registry *registry, const char *command_name, int callback_ref
+	struct lua_command_registry *registry, const char *command_name, int callback_ref
 )
 {
-	if (registry == NULL || command_name == NULL)
-	{
+	if (registry == NULL || command_name == NULL) {
 		return false;
 	}
 
-	for (size_t i = 0; i < registry->command_count; i++)
-	{
-		if (strcmp(registry->commands[i].command_name, command_name) == 0)
-		{
-			lua_runtime_unref(registry->runtime, registry->commands[i].lua_callback_ref);
+	for (size_t i = 0; i < registry->command_count; i++) {
+		if (strcmp(registry->commands[i].command_name, command_name) == 0) {
+			lua_runtime_unref(
+				registry->runtime, registry->commands[i].lua_callback_ref
+			);
 			registry->commands[i].lua_callback_ref = callback_ref;
 			return true;
 		}
 	}
 
-	if (registry->command_count >= registry->command_capacity)
-	{
+	if (registry->command_count >= registry->command_capacity) {
 		size_t new_capacity = registry->command_capacity * 2;
 		struct lua_command_entry *new_commands =
-				realloc(registry->commands, new_capacity * sizeof(struct lua_command_entry));
-		if (new_commands == NULL)
-		{
+			realloc(registry->commands,
+				new_capacity * sizeof(struct lua_command_entry));
+		if (new_commands == NULL) {
 			return false;
 		}
 		registry->commands = new_commands;
@@ -97,35 +89,40 @@ bool lua_command_registry_register_lua_command(
 }
 
 bool lua_command_registry_register_keybinding(
-		struct lua_command_registry *registry, enum key key, bool shift, bool ctrl, bool alt,
-		const char *command_name
+	struct lua_command_registry *registry,
+	enum key key,
+	bool shift,
+	bool ctrl,
+	bool alt,
+	const char *command_name
 )
 {
-	if (registry == NULL || command_name == NULL)
-	{
+	if (registry == NULL || command_name == NULL) {
 		return false;
 	}
 
-	for (size_t i = 0; i < registry->keybinding_count; i++)
-	{
-		if (registry->keybindings[i].key == key && registry->keybindings[i].shift == shift &&
-			registry->keybindings[i].ctrl == ctrl && registry->keybindings[i].alt == alt)
-		{
+	for (size_t i = 0; i < registry->keybinding_count; i++) {
+		if (registry->keybindings[i].key == key &&
+		    registry->keybindings[i].shift == shift &&
+		    registry->keybindings[i].ctrl == ctrl && registry->keybindings[i].alt == alt) {
 			free(registry->keybindings[i].command_name);
 			registry->keybindings[i].command_name = strdup(command_name);
-			printf("Updated Lua keybinding: key=%d shift=%d ctrl=%d alt=%d -> %s\n", key, shift,
-				   ctrl, alt, command_name);
+			printf("Updated Lua keybinding: key=%d shift=%d ctrl=%d alt=%d -> %s\n",
+			       key,
+			       shift,
+			       ctrl,
+			       alt,
+			       command_name);
 			return true;
 		}
 	}
 
-	if (registry->keybinding_count >= registry->keybinding_capacity)
-	{
+	if (registry->keybinding_count >= registry->keybinding_capacity) {
 		size_t new_capacity = registry->keybinding_capacity * 2;
 		struct lua_keybinding_entry *new_keybindings =
-				realloc(registry->keybindings, new_capacity * sizeof(struct lua_keybinding_entry));
-		if (new_keybindings == NULL)
-		{
+			realloc(registry->keybindings,
+				new_capacity * sizeof(struct lua_keybinding_entry));
+		if (new_keybindings == NULL) {
 			return false;
 		}
 		registry->keybindings = new_keybindings;
@@ -139,26 +136,27 @@ bool lua_command_registry_register_keybinding(
 	registry->keybindings[registry->keybinding_count].command_name = strdup(command_name);
 	registry->keybinding_count++;
 
-	printf("Registered Lua keybinding: key=%d shift=%d ctrl=%d alt=%d -> %s\n", key, shift, ctrl,
-		   alt, command_name);
+	printf("Registered Lua keybinding: key=%d shift=%d ctrl=%d alt=%d -> %s\n",
+	       key,
+	       shift,
+	       ctrl,
+	       alt,
+	       command_name);
 	return true;
 }
 
 bool lua_command_registry_execute_command(
-		struct lua_command_registry *registry, const char *command_name
+	struct lua_command_registry *registry, const char *command_name
 )
 {
-	if (registry == NULL || command_name == NULL)
-	{
+	if (registry == NULL || command_name == NULL) {
 		return false;
 	}
 
-	for (size_t i = 0; i < registry->command_count; i++)
-	{
-		if (strcmp(registry->commands[i].command_name, command_name) == 0)
-		{
+	for (size_t i = 0; i < registry->command_count; i++) {
+		if (strcmp(registry->commands[i].command_name, command_name) == 0) {
 			return lua_runtime_call_ref(
-					registry->runtime, registry->commands[i].lua_callback_ref, 0
+				registry->runtime, registry->commands[i].lua_callback_ref, 0
 			);
 		}
 	}
@@ -168,32 +166,29 @@ bool lua_command_registry_execute_command(
 }
 
 const char *lua_command_registry_get_command_for_key(
-		struct lua_command_registry *registry, struct input_event_key_down *key_event
+	struct lua_command_registry *registry, struct input_event_key_down *key_event
 )
 {
-	if (registry == NULL || key_event == NULL)
-	{
+	if (registry == NULL || key_event == NULL) {
 		return NULL;
 	}
 
-	for (size_t i = 0; i < registry->keybinding_count; i++)
-	{
+	for (size_t i = 0; i < registry->keybinding_count; i++) {
 		if (registry->keybindings[i].key == key_event->key &&
-			registry->keybindings[i].shift == key_event->shift &&
-			registry->keybindings[i].ctrl == key_event->ctrl &&
-			registry->keybindings[i].alt == key_event->alt)
-		{
+		    registry->keybindings[i].shift == key_event->shift &&
+		    registry->keybindings[i].ctrl == key_event->ctrl &&
+		    registry->keybindings[i].alt == key_event->alt) {
 			const char *command_name = registry->keybindings[i].command_name;
 
-			for (size_t j = 0; j < registry->command_count; j++)
-			{
-				if (strcmp(registry->commands[j].command_name, command_name) == 0)
-				{
+			for (size_t j = 0; j < registry->command_count; j++) {
+				if (strcmp(registry->commands[j].command_name, command_name) == 0) {
 					return command_name;
 				}
 			}
 
-			fprintf(stderr, "Keybinding references unknown command: %s\n", command_name);
+			fprintf(stderr,
+				"Keybinding references unknown command: %s\n",
+				command_name);
 			return NULL;
 		}
 	}

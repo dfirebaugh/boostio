@@ -15,14 +15,12 @@ static void reset_frame_input(struct InputState *input)
 
 struct Window *window_create(const struct WindowConfig *config)
 {
-	if (!config)
-	{
+	if (!config) {
 		fprintf(stderr, "Window config is NULL\n");
 		return NULL;
 	}
 
-	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
-	{
+	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
 		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
 		return NULL;
 	}
@@ -34,8 +32,7 @@ struct Window *window_create(const struct WindowConfig *config)
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
 	struct Window *window = (struct Window *)malloc(sizeof(struct Window));
-	if (!window)
-	{
+	if (!window) {
 		fprintf(stderr, "Failed to allocate window\n");
 		return NULL;
 	}
@@ -47,23 +44,20 @@ struct Window *window_create(const struct WindowConfig *config)
 	window->should_close = false;
 
 	Uint32 flags = SDL_WINDOW_OPENGL;
-	if (config->resizable)
-	{
+	if (config->resizable) {
 		flags |= SDL_WINDOW_RESIZABLE;
 	}
 
 	window->window = SDL_CreateWindow(config->title, config->width, config->height, flags);
 
-	if (!window->window)
-	{
+	if (!window->window) {
 		fprintf(stderr, "SDL_CreateWindow failed: %s\n", SDL_GetError());
 		free(window);
 		return NULL;
 	}
 
 	window->gl_context = SDL_GL_CreateContext(window->window);
-	if (!window->gl_context)
-	{
+	if (!window->gl_context) {
 		fprintf(stderr, "SDL_GL_CreateContext failed: %s\n", SDL_GetError());
 		SDL_DestroyWindow(window->window);
 		free(window);
@@ -77,18 +71,15 @@ struct Window *window_create(const struct WindowConfig *config)
 
 void window_destroy(struct Window *window)
 {
-	if (!window)
-	{
+	if (!window) {
 		return;
 	}
 
-	if (window->gl_context)
-	{
+	if (window->gl_context) {
 		SDL_GL_DestroyContext(window->gl_context);
 	}
 
-	if (window->window)
-	{
+	if (window->window) {
 		SDL_DestroyWindow(window->window);
 	}
 
@@ -98,29 +89,23 @@ void window_destroy(struct Window *window)
 
 bool window_poll_events(struct Window *window)
 {
-	if (!window)
-	{
+	if (!window) {
 		return false;
 	}
 
 	reset_frame_input(&window->input);
 
 	SDL_Event event;
-	while (SDL_PollEvent(&event))
-	{
-		switch (event.type)
-		{
+	while (SDL_PollEvent(&event)) {
+		switch (event.type) {
 		case SDL_EVENT_QUIT:
 			window->should_close = true;
 			return false;
 
-		case SDL_EVENT_KEY_DOWN:
-		{
+		case SDL_EVENT_KEY_DOWN: {
 			SDL_Scancode scancode = event.key.scancode;
-			if (scancode < 512)
-			{
-				if (!window->input.scancodes_down[scancode])
-				{
+			if (scancode < 512) {
+				if (!window->input.scancodes_down[scancode]) {
 					window->input.scancodes_pressed[scancode] = true;
 				}
 				window->input.scancodes_down[scancode] = true;
@@ -128,11 +113,9 @@ bool window_poll_events(struct Window *window)
 			break;
 		}
 
-		case SDL_EVENT_KEY_UP:
-		{
+		case SDL_EVENT_KEY_UP: {
 			SDL_Scancode scancode = event.key.scancode;
-			if (scancode < 512)
-			{
+			if (scancode < 512) {
 				window->input.scancodes_released[scancode] = true;
 				window->input.scancodes_down[scancode] = false;
 			}
@@ -144,13 +127,10 @@ bool window_poll_events(struct Window *window)
 			window->input.mouse_y = (int)event.motion.y;
 			break;
 
-		case SDL_EVENT_MOUSE_BUTTON_DOWN:
-		{
+		case SDL_EVENT_MOUSE_BUTTON_DOWN: {
 			int button = event.button.button - 1;
-			if (button >= 0 && button < 8)
-			{
-				if (!window->input.mouse_buttons[button])
-				{
+			if (button >= 0 && button < 8) {
+				if (!window->input.mouse_buttons[button]) {
 					window->input.mouse_pressed[button] = true;
 				}
 				window->input.mouse_buttons[button] = true;
@@ -158,11 +138,9 @@ bool window_poll_events(struct Window *window)
 			break;
 		}
 
-		case SDL_EVENT_MOUSE_BUTTON_UP:
-		{
+		case SDL_EVENT_MOUSE_BUTTON_UP: {
 			int button = event.button.button - 1;
-			if (button >= 0 && button < 8)
-			{
+			if (button >= 0 && button < 8) {
 				window->input.mouse_released[button] = true;
 				window->input.mouse_buttons[button] = false;
 			}
@@ -186,8 +164,7 @@ bool window_poll_events(struct Window *window)
 
 void window_swap_buffers(struct Window *window)
 {
-	if (!window || !window->window)
-	{
+	if (!window || !window->window) {
 		return;
 	}
 	SDL_GL_SwapWindow(window->window);
@@ -195,8 +172,7 @@ void window_swap_buffers(struct Window *window)
 
 void window_get_size(const struct Window *window, int *width, int *height)
 {
-	if (window && width && height)
-	{
+	if (window && width && height) {
 		*width = window->width;
 		*height = window->height;
 	}
@@ -204,8 +180,7 @@ void window_get_size(const struct Window *window, int *width, int *height)
 
 void window_get_mouse_position(const struct Window *window, int *x, int *y)
 {
-	if (window && x && y)
-	{
+	if (window && x && y) {
 		*x = window->input.mouse_x;
 		*y = window->input.mouse_y;
 	}
@@ -213,8 +188,7 @@ void window_get_mouse_position(const struct Window *window, int *x, int *y)
 
 bool window_is_scancode_down(const struct Window *window, SDL_Scancode scancode)
 {
-	if (window && scancode < 512)
-	{
+	if (window && scancode < 512) {
 		return window->input.scancodes_down[scancode];
 	}
 	return false;
@@ -222,8 +196,7 @@ bool window_is_scancode_down(const struct Window *window, SDL_Scancode scancode)
 
 bool window_is_scancode_pressed(const struct Window *window, SDL_Scancode scancode)
 {
-	if (window && scancode < 512)
-	{
+	if (window && scancode < 512) {
 		return window->input.scancodes_pressed[scancode];
 	}
 	return false;
@@ -231,8 +204,7 @@ bool window_is_scancode_pressed(const struct Window *window, SDL_Scancode scanco
 
 bool window_is_mouse_button_down(const struct Window *window, int button)
 {
-	if (window && button >= 0 && button < 8)
-	{
+	if (window && button >= 0 && button < 8) {
 		return window->input.mouse_buttons[button];
 	}
 	return false;
@@ -240,8 +212,7 @@ bool window_is_mouse_button_down(const struct Window *window, int button)
 
 bool window_is_mouse_button_pressed(const struct Window *window, int button)
 {
-	if (window && button >= 0 && button < 8)
-	{
+	if (window && button >= 0 && button < 8) {
 		return window->input.mouse_pressed[button];
 	}
 	return false;

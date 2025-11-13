@@ -10,10 +10,8 @@ static void push_config_path(lua_State *L, const char *path)
 	char *path_copy = strdup(path);
 	char *token = strtok(path_copy, ".");
 
-	while (token != NULL)
-	{
-		if (lua_type(L, -1) != LUA_TTABLE)
-		{
+	while (token != NULL) {
+		if (lua_type(L, -1) != LUA_TTABLE) {
 			lua_pop(L, 1);
 			free(path_copy);
 			lua_pushnil(L);
@@ -30,14 +28,12 @@ static void push_config_path(lua_State *L, const char *path)
 
 bool lua_runtime_init(struct lua_runtime *runtime)
 {
-	if (runtime == NULL)
-	{
+	if (runtime == NULL) {
 		return false;
 	}
 
 	runtime->L = luaL_newstate();
-	if (runtime->L == NULL)
-	{
+	if (runtime->L == NULL) {
 		fprintf(stderr, "Failed to create Lua state\n");
 		return false;
 	}
@@ -48,8 +44,7 @@ bool lua_runtime_init(struct lua_runtime *runtime)
 
 void lua_runtime_deinit(struct lua_runtime *runtime)
 {
-	if (runtime == NULL || runtime->L == NULL)
-	{
+	if (runtime == NULL || runtime->L == NULL) {
 		return;
 	}
 
@@ -59,20 +54,17 @@ void lua_runtime_deinit(struct lua_runtime *runtime)
 
 bool lua_runtime_load_file(struct lua_runtime *runtime, const char *filepath)
 {
-	if (runtime == NULL || runtime->L == NULL || filepath == NULL)
-	{
+	if (runtime == NULL || runtime->L == NULL || filepath == NULL) {
 		return false;
 	}
 
-	if (luaL_loadfile(runtime->L, filepath) != LUA_OK)
-	{
+	if (luaL_loadfile(runtime->L, filepath) != LUA_OK) {
 		fprintf(stderr, "Lua load error: %s\n", lua_tostring(runtime->L, -1));
 		lua_pop(runtime->L, 1);
 		return false;
 	}
 
-	if (lua_pcall(runtime->L, 0, LUA_MULTRET, 0) != LUA_OK)
-	{
+	if (lua_pcall(runtime->L, 0, LUA_MULTRET, 0) != LUA_OK) {
 		fprintf(stderr, "Lua execution error: %s\n", lua_tostring(runtime->L, -1));
 		lua_pop(runtime->L, 1);
 		return false;
@@ -83,20 +75,17 @@ bool lua_runtime_load_file(struct lua_runtime *runtime, const char *filepath)
 
 bool lua_runtime_load_string(struct lua_runtime *runtime, const char *code)
 {
-	if (runtime == NULL || runtime->L == NULL || code == NULL)
-	{
+	if (runtime == NULL || runtime->L == NULL || code == NULL) {
 		return false;
 	}
 
-	if (luaL_loadstring(runtime->L, code) != LUA_OK)
-	{
+	if (luaL_loadstring(runtime->L, code) != LUA_OK) {
 		fprintf(stderr, "Lua load error: %s\n", lua_tostring(runtime->L, -1));
 		lua_pop(runtime->L, 1);
 		return false;
 	}
 
-	if (lua_pcall(runtime->L, 0, LUA_MULTRET, 0) != LUA_OK)
-	{
+	if (lua_pcall(runtime->L, 0, LUA_MULTRET, 0) != LUA_OK) {
 		fprintf(stderr, "Lua execution error: %s\n", lua_tostring(runtime->L, -1));
 		lua_pop(runtime->L, 1);
 		return false;
@@ -107,20 +96,17 @@ bool lua_runtime_load_string(struct lua_runtime *runtime, const char *code)
 
 bool lua_runtime_call_function(struct lua_runtime *runtime, const char *function_name)
 {
-	if (runtime == NULL || runtime->L == NULL || function_name == NULL)
-	{
+	if (runtime == NULL || runtime->L == NULL || function_name == NULL) {
 		return false;
 	}
 
 	lua_getglobal(runtime->L, function_name);
-	if (!lua_isfunction(runtime->L, -1))
-	{
+	if (!lua_isfunction(runtime->L, -1)) {
 		lua_pop(runtime->L, 1);
 		return false;
 	}
 
-	if (lua_pcall(runtime->L, 0, 0, 0) != LUA_OK)
-	{
+	if (lua_pcall(runtime->L, 0, 0, 0) != LUA_OK) {
 		fprintf(stderr, "Lua function error: %s\n", lua_tostring(runtime->L, -1));
 		lua_pop(runtime->L, 1);
 		return false;
@@ -130,11 +116,10 @@ bool lua_runtime_call_function(struct lua_runtime *runtime, const char *function
 }
 
 void lua_runtime_register_function(
-		struct lua_runtime *runtime, const char *name, lua_CFunction func
+	struct lua_runtime *runtime, const char *name, lua_CFunction func
 )
 {
-	if (runtime == NULL || runtime->L == NULL || name == NULL || func == NULL)
-	{
+	if (runtime == NULL || runtime->L == NULL || name == NULL || func == NULL) {
 		return;
 	}
 
@@ -143,18 +128,16 @@ void lua_runtime_register_function(
 }
 
 const char *lua_runtime_get_config_string(
-		struct lua_runtime *runtime, const char *path, const char *default_value
+	struct lua_runtime *runtime, const char *path, const char *default_value
 )
 {
-	if (runtime == NULL || runtime->L == NULL || path == NULL)
-	{
+	if (runtime == NULL || runtime->L == NULL || path == NULL) {
 		return default_value;
 	}
 
 	push_config_path(runtime->L, path);
 
-	if (lua_type(runtime->L, -1) != LUA_TSTRING)
-	{
+	if (lua_type(runtime->L, -1) != LUA_TSTRING) {
 		lua_pop(runtime->L, 1);
 		return default_value;
 	}
@@ -166,15 +149,13 @@ const char *lua_runtime_get_config_string(
 
 int lua_runtime_get_config_int(struct lua_runtime *runtime, const char *path, int default_value)
 {
-	if (runtime == NULL || runtime->L == NULL || path == NULL)
-	{
+	if (runtime == NULL || runtime->L == NULL || path == NULL) {
 		return default_value;
 	}
 
 	push_config_path(runtime->L, path);
 
-	if (lua_type(runtime->L, -1) != LUA_TNUMBER)
-	{
+	if (lua_type(runtime->L, -1) != LUA_TNUMBER) {
 		lua_pop(runtime->L, 1);
 		return default_value;
 	}
@@ -187,15 +168,13 @@ int lua_runtime_get_config_int(struct lua_runtime *runtime, const char *path, in
 double
 lua_runtime_get_config_number(struct lua_runtime *runtime, const char *path, double default_value)
 {
-	if (runtime == NULL || runtime->L == NULL || path == NULL)
-	{
+	if (runtime == NULL || runtime->L == NULL || path == NULL) {
 		return default_value;
 	}
 
 	push_config_path(runtime->L, path);
 
-	if (lua_type(runtime->L, -1) != LUA_TNUMBER)
-	{
+	if (lua_type(runtime->L, -1) != LUA_TNUMBER) {
 		lua_pop(runtime->L, 1);
 		return default_value;
 	}
@@ -207,15 +186,13 @@ lua_runtime_get_config_number(struct lua_runtime *runtime, const char *path, dou
 
 bool lua_runtime_get_config_bool(struct lua_runtime *runtime, const char *path, bool default_value)
 {
-	if (runtime == NULL || runtime->L == NULL || path == NULL)
-	{
+	if (runtime == NULL || runtime->L == NULL || path == NULL) {
 		return default_value;
 	}
 
 	push_config_path(runtime->L, path);
 
-	if (lua_type(runtime->L, -1) != LUA_TBOOLEAN)
-	{
+	if (lua_type(runtime->L, -1) != LUA_TBOOLEAN) {
 		lua_pop(runtime->L, 1);
 		return default_value;
 	}
@@ -227,8 +204,7 @@ bool lua_runtime_get_config_bool(struct lua_runtime *runtime, const char *path, 
 
 int lua_runtime_ref(struct lua_runtime *runtime, int stack_index)
 {
-	if (runtime == NULL || runtime->L == NULL)
-	{
+	if (runtime == NULL || runtime->L == NULL) {
 		return LUA_REFNIL;
 	}
 
@@ -238,8 +214,7 @@ int lua_runtime_ref(struct lua_runtime *runtime, int stack_index)
 
 void lua_runtime_unref(struct lua_runtime *runtime, int ref)
 {
-	if (runtime == NULL || runtime->L == NULL)
-	{
+	if (runtime == NULL || runtime->L == NULL) {
 		return;
 	}
 
@@ -248,25 +223,21 @@ void lua_runtime_unref(struct lua_runtime *runtime, int ref)
 
 bool lua_runtime_call_ref(struct lua_runtime *runtime, int ref, int num_args)
 {
-	if (runtime == NULL || runtime->L == NULL)
-	{
+	if (runtime == NULL || runtime->L == NULL) {
 		return false;
 	}
 
 	lua_rawgeti(runtime->L, LUA_REGISTRYINDEX, ref);
-	if (!lua_isfunction(runtime->L, -1))
-	{
+	if (!lua_isfunction(runtime->L, -1)) {
 		lua_pop(runtime->L, 1 + num_args);
 		return false;
 	}
 
-	if (num_args > 0)
-	{
+	if (num_args > 0) {
 		lua_insert(runtime->L, -(num_args + 1));
 	}
 
-	if (lua_pcall(runtime->L, num_args, 0, 0) != LUA_OK)
-	{
+	if (lua_pcall(runtime->L, num_args, 0, 0) != LUA_OK) {
 		fprintf(stderr, "Lua callback error: %s\n", lua_tostring(runtime->L, -1));
 		lua_pop(runtime->L, 1);
 		return false;
@@ -277,8 +248,7 @@ bool lua_runtime_call_ref(struct lua_runtime *runtime, int ref, int num_args)
 
 void lua_runtime_add_package_path(struct lua_runtime *runtime, const char *path)
 {
-	if (runtime == NULL || runtime->L == NULL || path == NULL)
-	{
+	if (runtime == NULL || runtime->L == NULL || path == NULL) {
 		return;
 	}
 

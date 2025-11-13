@@ -1,6 +1,6 @@
 #include "path_utils.h"
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 void path_remove_extension(const char *path, char *output, size_t output_size)
 {
@@ -82,10 +82,7 @@ void path_get_basename(const char *path, char *output, size_t output_size)
 }
 
 void path_build_with_extension(
-		const char *base_path,
-		const char *extension,
-		char *output,
-		size_t output_size
+	const char *base_path, const char *extension, char *output, size_t output_size
 )
 {
 	if (!base_path || !extension || !output || output_size == 0) {
