@@ -28,6 +28,7 @@ endif()
 target_sources(${EXECUTABLE_NAME}
 PRIVATE
     src/main.c
+    src/core/platform/platform.c
     src/core/graphics/window.c
     src/core/graphics/graphics.c
     src/core/graphics/msdf_atlas.c
