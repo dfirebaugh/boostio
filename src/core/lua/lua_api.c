@@ -433,6 +433,10 @@ static enum key parse_key_string(const char *key_str)
 		return KEY_LEFT_CONTROL;
 	if (strcmp(key_str, "alt") == 0)
 		return KEY_LEFT_ALT;
+	if (strcmp(key_str, "delete") == 0)
+		return KEY_DELETE;
+	if (strcmp(key_str, "backspace") == 0)
+		return KEY_BACKSPACE;
 
 	return KEY_COUNT;
 }
@@ -1868,6 +1872,10 @@ static SDL_Scancode key_to_scancode(enum key key)
 		return SDL_SCANCODE_RETURN;
 	case KEY_TAB:
 		return SDL_SCANCODE_TAB;
+	case KEY_DELETE:
+		return SDL_SCANCODE_DELETE;
+	case KEY_BACKSPACE:
+		return SDL_SCANCODE_BACKSPACE;
 	case KEY_LEFT_SHIFT:
 		return SDL_SCANCODE_LSHIFT;
 	case KEY_RIGHT_SHIFT:

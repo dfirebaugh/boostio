@@ -13,6 +13,9 @@ boostio.registerKeybinding("z", "undo", { ctrl = true })
 boostio.registerKeybinding("z", "redo", { ctrl = true, shift = true })
 boostio.registerKeybinding("y", "redo", { ctrl = true })
 
+boostio.registerKeybinding("delete", "delete_selected")
+boostio.registerKeybinding("backspace", "delete_selected")
+
 boostio.registerKeybinding("space", "toggle_play")
 boostio.registerKeybinding("escape", "stop")
 

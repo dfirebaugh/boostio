@@ -246,7 +246,7 @@ local function handle_mouse_down(x, y, button, state)
 
 			local selection = boostio.getSelection()
 			if #selection == 0 or not boostio.isNoteSelected(note_id) then
-				if not ctrl_held then
+				if not ctrl_held and not shift_held then
 					boostio.clearSelection()
 				end
 				boostio.selectNote(note_id)
@@ -277,7 +277,7 @@ local function handle_mouse_down(x, y, button, state)
 			end
 		end
 	else
-		if not ctrl_held then
+		if not ctrl_held and not shift_held then
 			boostio.clearSelection()
 		end
 		mouse_state.drag_mode = "box_select"
@@ -491,7 +491,8 @@ local function handle_mouse_move(x, y, state)
 		local max_y = math.max(box.start_y, box.end_y)
 
 		local ctrl_held = boostio.isKeyDown("ctrl")
-		if not ctrl_held then
+		local shift_held = boostio.isKeyDown("shift")
+		if not ctrl_held and not shift_held then
 			boostio.clearSelection()
 		end
 
@@ -559,6 +560,7 @@ local function handle_mouse_up(x, y, button, state)
 	if mouse_state.down and not mouse_state.drag_started then
 		local note_id = mouse_state.clicked_note_id
 		local ctrl_held = boostio.isKeyDown("ctrl")
+		local shift_held = boostio.isKeyDown("shift")
 		local current_time = os.clock() * 1000
 
 		if note_id then
@@ -580,6 +582,8 @@ local function handle_mouse_up(x, y, button, state)
 					else
 						boostio.selectNote(note_id)
 					end
+				elseif shift_held then
+					boostio.selectNote(note_id)
 				else
 					boostio.clearSelection()
 					boostio.selectNote(note_id)
@@ -589,7 +593,7 @@ local function handle_mouse_up(x, y, button, state)
 			mouse_state.last_click_time = 0
 			mouse_state.last_clicked_note_id = nil
 
-			if not ctrl_held then
+			if not ctrl_held and not shift_held then
 				boostio.clearSelection()
 			end
 
