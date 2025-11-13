@@ -4,7 +4,7 @@ statusline.enabled = true
 statusline.height = 25
 
 local theme = config.theme
-local bg_color_rgb = common.boostio.hexToRgb(theme.statusline_bg)
+local bg_color_rgb = boostio.hexToRgb(theme.statusline_bg)
 statusline.bg_color = { r = bg_color_rgb.r, g = bg_color_rgb.g, b = bg_color_rgb.b, a = theme.statusline_bg_alpha }
 statusline.text_color_rgb = boostio.hexToRgb(theme.statusline_text)
 statusline.text_color =
