@@ -1146,6 +1146,44 @@ static int lua_api_set_note_voice(lua_State *L)
 	return 0;
 }
 
+static int lua_api_set_note_instrument(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL) {
+		return luaL_error(L, "API context not available");
+	}
+
+	uint32_t note_id = (uint32_t)luaL_checkinteger(L, 1);
+	int instrument_index = (int)luaL_checkinteger(L, 2);
+
+	struct app_state *state = global_context->app_state;
+
+	if (instrument_index < 0 || instrument_index >= (int)state->instrument_count) {
+		return luaL_error(L, "Invalid instrument index");
+	}
+
+	struct instrument *instr = &state->instruments[instrument_index];
+
+	for (uint32_t i = 0; i < state->note_count; i++) {
+		if (state->notes[i].id == note_id) {
+			state->notes[i].waveform = instr->waveform;
+			state->notes[i].duty_cycle = instr->duty_cycle;
+			state->notes[i].decay = instr->decay;
+			state->notes[i].amplitude_dbfs = instr->amplitude_dbfs;
+			state->notes[i].nes_noise_mode_flag = instr->nes_noise_mode_flag;
+			state->notes[i].nes_noise_lfsr_init = instr->nes_noise_lfsr;
+			break;
+		}
+	}
+
+	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL) {
+		app_state_sync_notes_to_sequencer(state, sequencer, global_context->audio);
+	}
+
+	return 0;
+}
+
 static const char *waveform_type_to_string(enum waveform_type type)
 {
 	switch (type) {
@@ -2097,6 +2135,9 @@ void lua_api_register_all(struct lua_runtime *runtime, struct lua_api_context *c
 
 	lua_pushcfunction(runtime->L, lua_api_set_note_voice);
 	lua_setfield(runtime->L, -2, "setNoteVoice");
+
+	lua_pushcfunction(runtime->L, lua_api_set_note_instrument);
+	lua_setfield(runtime->L, -2, "setNoteInstrument");
 
 	lua_pushcfunction(runtime->L, lua_api_get_app_state);
 	lua_setfield(runtime->L, -2, "getAppState");

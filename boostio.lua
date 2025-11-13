@@ -402,6 +402,11 @@ function boostio.setSelectedVoice(voice) end
 ---@param voice integer Voice index (0-7)
 function boostio.setNoteVoice(note_id, voice) end
 
+---Set the instrument parameters of an existing note
+---@param note_id integer ID of the note to modify
+---@param instrument_index integer Instrument index (0-based)
+function boostio.setNoteInstrument(note_id, instrument_index) end
+
 ---Check if a key is currently pressed down
 ---@param key string Key name (e.g., "ctrl", "shift", "alt", "a", "space")
 ---@return boolean is_down True if the key is currently pressed

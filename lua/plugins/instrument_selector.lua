@@ -80,9 +80,21 @@ function instrument_selector.render()
 			if boostio.isPointInRect(mx, my, x, y, button_width, button_height) then
 				boostio.setSelectedInstrument(i)
 
-				if toast then
-					local inst = boostio.getInstrument(i)
-					toast.info("Selected instrument: " .. inst.name)
+				local selection = boostio.getSelection()
+				if selection and #selection > 0 then
+					for _, note_id in ipairs(selection) do
+						boostio.setNoteInstrument(note_id, i)
+					end
+
+					if toast then
+						local inst = boostio.getInstrument(i)
+						toast.info("Set " .. #selection .. " note(s) to " .. inst.name)
+					end
+				else
+					if toast then
+						local inst = boostio.getInstrument(i)
+						toast.info("Selected instrument: " .. inst.name)
+					end
 				end
 
 				click_handled = true
