@@ -552,7 +552,7 @@ local function handle_click_on_empty_space(x, y, vp, state, mouse_state, note_op
 
 	ms = math.max(0, ms)
 
-	if piano_key < 0 or piano_key > 87 then
+	if piano_key < options.piano_key_min or piano_key > options.piano_key_max then
 		return
 	end
 
