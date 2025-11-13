@@ -3,7 +3,6 @@
 
 #include "app/app_state.h"
 #include "app/lua_service.h"
-#include "app/ui_components/button.h"
 #include "core/audio/audio.h"
 #include "core/graphics/graphics.h"
 #include "core/input/input_handler.h"
@@ -20,8 +19,6 @@ struct app_controller
 	struct platform_paths *paths;
 	struct input_handler *input_handler;
 	bool running;
-
-	struct button test_button;
 };
 
 bool app_controller_init(
