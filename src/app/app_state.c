@@ -321,6 +321,11 @@ void app_state_sync_notes_to_sequencer(
 		return;
 	}
 
+	uint32_t playhead_ms = 0;
+	if (sequencer->sample_rate > 0) {
+		playhead_ms = (uint32_t)((sequencer->playhead_samples * 1000) / sequencer->sample_rate);
+	}
+
 	sequencer_clear_notes(sequencer);
 
 	for (uint32_t i = 0; i < state->note_count; i++) {
@@ -342,5 +347,13 @@ void app_state_sync_notes_to_sequencer(
 		};
 
 		sequencer_add_note(sequencer, ui_note->ms, params);
+	}
+
+	for (uint32_t i = 0; i < sequencer->note_count; i++) {
+		if (sequencer->notes[i].time_ms < playhead_ms) {
+			sequencer->notes[i].triggered = true;
+		} else {
+			sequencer->notes[i].triggered = false;
+		}
 	}
 }
