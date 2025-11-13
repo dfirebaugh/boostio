@@ -43,7 +43,12 @@ PRIVATE
     src/core/graphics/primitive_buffer.c
     src/core/input/input_mapper.c
     src/core/input/input_handler.c
+    src/core/audio/audio.c
+    src/core/audio/synth.c
+    src/core/audio/sequencer.c
+    src/core/audio/song_loader.c
     external/glad_generated/src/gl.c
+    external/cJSON/cJSON.c
 )
 
 target_compile_features(${EXECUTABLE_NAME} PUBLIC c_std_11)
@@ -76,6 +81,7 @@ target_include_directories(${EXECUTABLE_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/msdf-atlas-gen
     ${CMAKE_CURRENT_SOURCE_DIR}/external/glad_generated/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/external/cJSON
     ${LUA_INCLUDE_DIR}
 )
 

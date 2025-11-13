@@ -4,6 +4,13 @@
 ---@class boostio
 boostio = {}
 
+---Waveform types for audio synthesis
+boostio.WAVEFORM_SINE = 0
+boostio.WAVEFORM_SQUARE = 1
+boostio.WAVEFORM_TRIANGLE = 2
+boostio.WAVEFORM_SAWTOOTH = 3
+boostio.WAVEFORM_NES_NOISE = 4
+
 ---Draw a filled rectangle
 ---@param x number X position
 ---@param y number Y position
@@ -140,12 +147,20 @@ function boostio.setBpm(bpm) end
 ---@param position_ms number Position in milliseconds
 function boostio.setPlayhead(position_ms) end
 
+---@class NoteParams
+---@field waveform number? Waveform type (default: WAVEFORM_SINE)
+---@field duty_cycle number? Square wave duty cycle 0-255 (default: 128 = 50%)
+---@field decay number? Decay rate -32768 to 32767, positive=fade out, negative=fade in (default: 0)
+---@field amplitude_dbfs number? Amplitude in dBFS -128 to 0 (default: -3)
+---@field nes_noise_period number? NES noise period index 0-15 (default: 15)
+---@field nes_noise_mode_flag boolean? NES noise mode: true=tonal, false=white noise (default: false)
+
 ---Add a note to the sequencer
 ---@param start_ms number Note start time in milliseconds
----@param pitch number MIDI pitch (0-127)
+---@param pitch number MIDI pitch (0-127, where 60 is middle C, 69 is A4 at 440Hz)
 ---@param duration_ms number Note duration in milliseconds
----@param voice number? Voice index (default: 0)
-function boostio.addNote(start_ms, pitch, duration_ms, voice) end
+---@param params number|NoteParams? Either waveform type or table with advanced parameters
+function boostio.addNote(start_ms, pitch, duration_ms, params) end
 
 ---Quit the application
 function boostio.quit() end

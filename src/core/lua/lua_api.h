@@ -4,6 +4,7 @@
 #include "core/lua/lua_runtime.h"
 
 struct Graphics;
+struct Audio;
 struct lua_command_registry;
 struct app_state;
 struct app_controller;
@@ -11,6 +12,7 @@ struct app_controller;
 struct lua_api_context
 {
 	struct Graphics *graphics;
+	struct Audio *audio;
 	struct lua_command_registry *command_registry;
 	struct app_state *app_state;
 	struct app_controller *app_controller;

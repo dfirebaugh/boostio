@@ -6,15 +6,16 @@
 #include <stdio.h>
 
 bool app_controller_init(
-		struct app_controller *controller, struct Graphics *graphics, struct platform_paths *paths
+		struct app_controller *controller, struct Graphics *graphics, struct Audio *audio, struct platform_paths *paths
 )
 {
-	if (controller == NULL || graphics == NULL)
+	if (controller == NULL || graphics == NULL || audio == NULL)
 	{
 		return false;
 	}
 
 	controller->graphics = graphics;
+	controller->audio = audio;
 	controller->paths = paths;
 	controller->running = true;
 
@@ -57,7 +58,7 @@ bool app_controller_init_lua(struct app_controller *controller, const char *conf
 
 	if (!lua_service_init(
 				&controller->lua_service, &controller->state, controller->graphics,
-				controller->paths
+				controller->audio, controller->paths
 		))
 	{
 		fprintf(stderr, "Failed to initialize Lua service\n");

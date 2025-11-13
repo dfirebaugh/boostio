@@ -4,6 +4,7 @@
 #include "app/app_state.h"
 #include "app/lua_service.h"
 #include "app/ui_components/button.h"
+#include "core/audio/audio.h"
 #include "core/graphics/graphics.h"
 #include "core/input/input_handler.h"
 #include "core/platform/platform.h"
@@ -15,6 +16,7 @@ struct app_controller
 	struct app_state state;
 	struct lua_service lua_service;
 	struct Graphics *graphics;
+	struct Audio *audio;
 	struct platform_paths *paths;
 	struct input_handler *input_handler;
 	bool running;
@@ -23,7 +25,7 @@ struct app_controller
 };
 
 bool app_controller_init(
-		struct app_controller *controller, struct Graphics *graphics, struct platform_paths *paths
+		struct app_controller *controller, struct Graphics *graphics, struct Audio *audio, struct platform_paths *paths
 );
 
 void app_controller_deinit(struct app_controller *controller);

@@ -2,6 +2,9 @@
 #include <stdio.h>
 
 #include "app/app_controller.h"
+#include "core/audio/audio.h"
+#include "core/audio/sequencer.h"
+#include "core/audio/song_loader.h"
 #include "core/graphics/graphics.h"
 #include "core/graphics/msdf_atlas.h"
 #include "core/graphics/window.h"
@@ -45,6 +48,17 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	struct Audio *audio = audio_create();
+	if (!audio)
+	{
+		fprintf(stderr, "Failed to create audio system\n");
+		graphics_destroy(graphics);
+		window_destroy(window);
+		return 1;
+	}
+
+	audio_start(audio);
+
 	char atlas_png_path[512];
 	char atlas_json_path[512];
 	snprintf(atlas_png_path, sizeof(atlas_png_path), "%s/noto-atlas.png", paths.data_dir);
@@ -61,6 +75,7 @@ int main(int argc, char *argv[])
 	if (!graphics_load_font(graphics, atlas_json_path, atlas_png_path))
 	{
 		fprintf(stderr, "Failed to load font atlas from %s\n", atlas_json_path);
+		audio_destroy(audio);
 		graphics_destroy(graphics);
 		window_destroy(window);
 		platform_paths_free(&paths);
@@ -68,9 +83,10 @@ int main(int argc, char *argv[])
 	}
 
 	struct app_controller controller;
-	if (!app_controller_init(&controller, graphics, &paths))
+	if (!app_controller_init(&controller, graphics, audio, &paths))
 	{
 		fprintf(stderr, "Failed to initialize app controller\n");
+		audio_destroy(audio);
 		graphics_destroy(graphics);
 		window_destroy(window);
 		platform_paths_free(&paths);
@@ -83,6 +99,20 @@ int main(int argc, char *argv[])
 	if (!app_controller_init_lua(&controller, config_path))
 	{
 		fprintf(stderr, "Warning: Failed to initialize Lua system from %s\n", config_path);
+	}
+
+	if (argc > 1)
+	{
+		const char *song_path = argv[1];
+		printf("Loading song from: %s\n", song_path);
+		if (song_loader_load_from_file(audio, song_path))
+		{
+			printf("Song loaded successfully\n");
+		}
+		else
+		{
+			fprintf(stderr, "Failed to load song from %s\n", song_path);
+		}
 	}
 
 	while (app_controller_is_running(&controller))
@@ -98,6 +128,7 @@ int main(int argc, char *argv[])
 		}
 
 		app_controller_update(&controller, 0.016f);
+		audio_update(audio);
 		app_controller_render(&controller);
 
 		graphics_present(graphics);
@@ -106,6 +137,7 @@ int main(int argc, char *argv[])
 	}
 
 	app_controller_deinit(&controller);
+	audio_destroy(audio);
 	graphics_destroy(graphics);
 	window_destroy(window);
 	platform_paths_free(&paths);

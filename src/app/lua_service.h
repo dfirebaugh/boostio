@@ -25,7 +25,7 @@ struct lua_service
 
 bool lua_service_init(
 		struct lua_service *service, struct app_state *state, struct Graphics *graphics,
-		struct platform_paths *paths
+		struct Audio *audio, struct platform_paths *paths
 );
 
 void lua_service_deinit(struct lua_service *service);

@@ -15,15 +15,6 @@ config = {
 		piano_key_height = 20,
 	},
 
-	audio = {
-		default_waveform = "square",
-		default_duration_ms = 200,
-		default_amplitude_dbfs = -6,
-		voices = 8,
-		sample_rate = 44100,
-		buffer_size = 512,
-	},
-
 	playback = {
 		default_bpm = 120,
 		loop_enabled = false,
@@ -59,6 +50,16 @@ config = {
 			},
 			{
 				name = "test_commands",
+				enabled = true,
+				priority = 50,
+			},
+			{
+				name = "audio_test",
+				enabled = true,
+				priority = 50,
+			},
+			{
+				name = "advanced_audio_test",
 				enabled = true,
 				priority = 50,
 			},

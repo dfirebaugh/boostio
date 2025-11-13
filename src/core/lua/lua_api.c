@@ -1,6 +1,9 @@
 #include "core/lua/lua_api.h"
 #include "app/app_state.h"
 #include "app/lua_command_registry.h"
+#include "core/audio/audio.h"
+#include "core/audio/sequencer.h"
+#include "core/audio/synth.h"
 #include "core/graphics/color.h"
 #include "core/graphics/graphics.h"
 #include "core/input/input_types.h"
@@ -428,13 +431,20 @@ static int lua_api_register_keybinding(lua_State *L)
 
 static int lua_api_set_bpm(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
+	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
 	{
-		return luaL_error(L, "App state not available");
+		return luaL_error(L, "App state or audio not available");
 	}
 
 	uint32_t bpm = (uint32_t)luaL_checknumber(L, 1);
 	global_context->app_state->bpm = bpm;
+
+	struct Sequencer* sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL)
+	{
+		sequencer_set_bpm(sequencer, bpm);
+	}
+
 	printf("BPM set to %u\n", bpm);
 
 	return 0;
@@ -442,13 +452,20 @@ static int lua_api_set_bpm(lua_State *L)
 
 static int lua_api_set_playhead(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
+	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
 	{
-		return luaL_error(L, "App state not available");
+		return luaL_error(L, "App state or audio not available");
 	}
 
 	uint32_t position_ms = (uint32_t)luaL_checknumber(L, 1);
 	global_context->app_state->playhead_ms = position_ms;
+
+	struct Sequencer* sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL)
+	{
+		sequencer_set_playhead(sequencer, position_ms);
+	}
+
 	printf("Playhead set to %u ms\n", position_ms);
 
 	return 0;
@@ -456,13 +473,76 @@ static int lua_api_set_playhead(lua_State *L)
 
 static int lua_api_add_note(lua_State *L)
 {
+	if (global_context == NULL || global_context->audio == NULL)
+	{
+		return luaL_error(L, "Audio not available");
+	}
+
 	uint32_t start_ms = (uint32_t)luaL_checknumber(L, 1);
 	uint8_t pitch = (uint8_t)luaL_checknumber(L, 2);
 	uint32_t duration_ms = (uint32_t)luaL_checknumber(L, 3);
-	uint8_t voice = (uint8_t)luaL_optnumber(L, 4, 0);
 
-	printf("Note added: pitch=%d at %ums for %ums voice=%d\n", pitch, start_ms, duration_ms,
-		   voice);
+	struct NoteParams params = {
+		.frequency = note_to_frequency(pitch),
+		.duration_ms = (float)duration_ms,
+		.waveform = WAVEFORM_SINE,
+		.duty_cycle = 128,
+		.decay = 0,
+		.amplitude_dbfs = -3,
+		.nes_noise_period = 15,
+		.nes_noise_mode_flag = false,
+		.voice_index = -1
+	};
+
+	if (lua_istable(L, 4)) {
+		lua_getfield(L, 4, "waveform");
+		if (!lua_isnil(L, -1)) {
+			params.waveform = (enum WaveformType)lua_tointeger(L, -1);
+		}
+		lua_pop(L, 1);
+
+		lua_getfield(L, 4, "duty_cycle");
+		if (!lua_isnil(L, -1)) {
+			params.duty_cycle = (uint8_t)lua_tointeger(L, -1);
+		}
+		lua_pop(L, 1);
+
+		lua_getfield(L, 4, "decay");
+		if (!lua_isnil(L, -1)) {
+			params.decay = (int16_t)lua_tointeger(L, -1);
+		}
+		lua_pop(L, 1);
+
+		lua_getfield(L, 4, "amplitude_dbfs");
+		if (!lua_isnil(L, -1)) {
+			params.amplitude_dbfs = (int8_t)lua_tointeger(L, -1);
+		}
+		lua_pop(L, 1);
+
+		lua_getfield(L, 4, "nes_noise_period");
+		if (!lua_isnil(L, -1)) {
+			params.nes_noise_period = (uint8_t)lua_tointeger(L, -1);
+		}
+		lua_pop(L, 1);
+
+		lua_getfield(L, 4, "nes_noise_mode_flag");
+		if (!lua_isnil(L, -1)) {
+			params.nes_noise_mode_flag = lua_toboolean(L, -1);
+		}
+		lua_pop(L, 1);
+	} else if (!lua_isnone(L, 4)) {
+		params.waveform = (enum WaveformType)lua_tointeger(L, 4);
+	}
+
+	struct Sequencer* sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL)
+	{
+		sequencer_add_note(sequencer, start_ms, params);
+	}
+
+	printf("Note added: pitch=%d (%.2f Hz) at %ums for %ums waveform=%d\n",
+		   pitch, params.frequency, start_ms, duration_ms, params.waveform);
+
 	return 0;
 }
 
@@ -511,37 +591,76 @@ static int lua_api_redo(lua_State *L)
 
 static int lua_api_toggle_play(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-		return luaL_error(L, "App state not available");
+	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
+		return luaL_error(L, "App state or audio not available");
+
 	global_context->app_state->playing = !global_context->app_state->playing;
+
+	struct Sequencer* sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL)
+	{
+		if (global_context->app_state->playing)
+		{
+			sequencer_play(sequencer);
+		}
+		else
+		{
+			sequencer_pause(sequencer);
+		}
+	}
+
 	printf("Playback %s\n", global_context->app_state->playing ? "started" : "stopped");
 	return 0;
 }
 
 static int lua_api_play(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-		return luaL_error(L, "App state not available");
+	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
+		return luaL_error(L, "App state or audio not available");
+
 	global_context->app_state->playing = true;
+
+	struct Sequencer* sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL)
+	{
+		sequencer_play(sequencer);
+	}
+
 	printf("Playback started\n");
 	return 0;
 }
 
 static int lua_api_pause(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-		return luaL_error(L, "App state not available");
+	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
+		return luaL_error(L, "App state or audio not available");
+
 	global_context->app_state->playing = false;
+
+	struct Sequencer* sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL)
+	{
+		sequencer_pause(sequencer);
+	}
+
 	printf("Playback paused\n");
 	return 0;
 }
 
 static int lua_api_stop(lua_State *L)
 {
-	if (global_context == NULL || global_context->app_state == NULL)
-		return luaL_error(L, "App state not available");
+	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
+		return luaL_error(L, "App state or audio not available");
+
 	global_context->app_state->playing = false;
 	global_context->app_state->playhead_ms = 0;
+
+	struct Sequencer* sequencer = audio_get_sequencer(global_context->audio);
+	if (sequencer != NULL)
+	{
+		sequencer_stop(sequencer);
+	}
+
 	printf("Playback stopped\n");
 	return 0;
 }
@@ -684,6 +803,21 @@ void lua_api_register_all(struct lua_runtime *runtime, struct lua_api_context *c
 
 	lua_pushcfunction(runtime->L, lua_api_transpose_down);
 	lua_setfield(runtime->L, -2, "transposeDown");
+
+	lua_pushinteger(runtime->L, WAVEFORM_SINE);
+	lua_setfield(runtime->L, -2, "WAVEFORM_SINE");
+
+	lua_pushinteger(runtime->L, WAVEFORM_SQUARE);
+	lua_setfield(runtime->L, -2, "WAVEFORM_SQUARE");
+
+	lua_pushinteger(runtime->L, WAVEFORM_TRIANGLE);
+	lua_setfield(runtime->L, -2, "WAVEFORM_TRIANGLE");
+
+	lua_pushinteger(runtime->L, WAVEFORM_SAWTOOTH);
+	lua_setfield(runtime->L, -2, "WAVEFORM_SAWTOOTH");
+
+	lua_pushinteger(runtime->L, WAVEFORM_NES_NOISE);
+	lua_setfield(runtime->L, -2, "WAVEFORM_NES_NOISE");
 
 	lua_setglobal(runtime->L, "boostio");
 }

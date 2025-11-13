@@ -9,7 +9,7 @@
 
 bool lua_service_init(
 		struct lua_service *service, struct app_state *state, struct Graphics *graphics,
-		struct platform_paths *paths
+		struct Audio *audio, struct platform_paths *paths
 )
 {
 	if (service == NULL)
@@ -36,6 +36,7 @@ bool lua_service_init(
 	}
 
 	service->api_context.graphics = graphics;
+	service->api_context.audio = audio;
 	service->api_context.command_registry = &service->command_registry;
 	service->api_context.app_state = state;
 

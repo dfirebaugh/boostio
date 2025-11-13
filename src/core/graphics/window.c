@@ -21,7 +21,7 @@ struct Window *window_create(const struct WindowConfig *config)
 		return NULL;
 	}
 
-	if (!SDL_Init(SDL_INIT_VIDEO))
+	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
 	{
 		fprintf(stderr, "SDL_Init failed: %s\n", SDL_GetError());
 		return NULL;
