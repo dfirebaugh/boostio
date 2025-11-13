@@ -54,6 +54,7 @@ struct NoteParams
 	int8_t voice_index;
 	bool restart_phase;
 	uint16_t nes_noise_lfsr_init;
+	uint8_t piano_key;
 };
 
 void synth_init(struct Synth *synth, uint32_t sample_rate);

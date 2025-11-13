@@ -4,6 +4,41 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include "core/audio/scale.h"
+#include "core/theme/theme.h"
+
+struct Sequencer;
+
+#define UI_MAX_NOTES 1024
+#define UI_MAX_SELECTION 256
+
+struct viewport
+{
+	float time_offset;
+	int32_t note_offset;
+	float pixels_per_ms;
+	float piano_key_height;
+	float grid_x;
+	float grid_y;
+	float grid_width;
+	float grid_height;
+};
+
+struct ui_note
+{
+	uint32_t id;
+	uint32_t ms;
+	uint16_t duration_ms;
+	uint8_t voice;
+	uint8_t piano_key;
+};
+
+struct selection
+{
+	uint32_t selected_ids[UI_MAX_SELECTION];
+	uint32_t count;
+};
+
 struct app_state
 {
 	int window_width;
@@ -20,8 +55,21 @@ struct app_state
 
 	uint8_t selected_voice;
 
+	enum scale_type selected_scale;
+	enum root_note selected_root;
+	bool show_scale_highlights;
+	bool fold_mode;
+
 	bool show_help;
 	bool show_fps;
+
+	struct theme theme;
+
+	struct viewport viewport;
+	struct ui_note notes[UI_MAX_NOTES];
+	uint32_t note_count;
+	struct selection selection;
+	uint32_t next_note_id;
 };
 
 void app_state_init(struct app_state *state);
@@ -31,5 +79,17 @@ void app_state_update_dimensions(struct app_state *state, int width, int height)
 void app_state_update_mouse(struct app_state *state, float x, float y);
 
 void app_state_set_bpm(struct app_state *state, uint32_t bpm);
+
+void app_state_scroll_horizontal(struct app_state *state, float delta_ms);
+
+void app_state_scroll_vertical(struct app_state *state, int delta_keys);
+
+void app_state_zoom_horizontal(struct app_state *state, float factor);
+
+void app_state_zoom_vertical(struct app_state *state, float factor);
+
+void app_state_sync_notes_from_sequencer(
+		struct app_state *state, const struct Sequencer *sequencer
+);
 
 #endif

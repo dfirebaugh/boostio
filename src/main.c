@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "app/app_controller.h"
+#include "app/app_state.h"
 #include "core/audio/audio.h"
 #include "core/audio/sequencer.h"
 #include "core/audio/song_loader.h"
@@ -108,6 +109,9 @@ int main(int argc, char *argv[])
 		if (song_loader_load_from_file(audio, song_path))
 		{
 			printf("Song loaded successfully\n");
+			struct Sequencer *sequencer = audio_get_sequencer(audio);
+			app_state_sync_notes_from_sequencer(&controller.state, sequencer);
+			printf("Synced %d notes to UI\n", controller.state.note_count);
 		}
 		else
 		{

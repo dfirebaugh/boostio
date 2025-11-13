@@ -12,11 +12,11 @@ struct Note
 	bool triggered;
 };
 
-#define MAX_NOTES 256
+#define SEQUENCER_MAX_NOTES 256
 
 struct Sequencer
 {
-	struct Note notes[MAX_NOTES];
+	struct Note notes[SEQUENCER_MAX_NOTES];
 	uint32_t note_count;
 	uint32_t playhead_ms;
 	uint32_t bpm;

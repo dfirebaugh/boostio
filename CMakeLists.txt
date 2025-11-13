@@ -33,6 +33,7 @@ PRIVATE
     src/app/lua_command_registry.c
     src/app/lua_service.c
     src/app/ui_components/button.c
+    src/app/ui/piano_roll.c
     src/core/platform/platform.c
     src/core/lua/lua_runtime.c
     src/core/lua/lua_api.c
@@ -47,6 +48,8 @@ PRIVATE
     src/core/audio/synth.c
     src/core/audio/sequencer.c
     src/core/audio/song_loader.c
+    src/core/audio/scale.c
+    src/core/theme/theme.c
     external/glad_generated/src/gl.c
     external/cJSON/cJSON.c
 )

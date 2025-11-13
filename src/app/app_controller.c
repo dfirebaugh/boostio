@@ -1,4 +1,7 @@
 #include "app/app_controller.h"
+#include "app/ui/piano_roll.h"
+#include "core/audio/audio.h"
+#include "core/audio/sequencer.h"
 #include "core/graphics/color.h"
 #include "core/graphics/window.h"
 
@@ -28,12 +31,6 @@ bool app_controller_init(
 		fprintf(stderr, "Failed to create input handler\n");
 		return false;
 	}
-
-	controller->test_button.text = "click me";
-	controller->test_button.x = 350;
-	controller->test_button.y = 350;
-	controller->test_button.width = 80;
-	controller->test_button.height = 50;
 
 	return true;
 }
@@ -111,6 +108,77 @@ void app_controller_update(struct app_controller *controller, float delta_time)
 		controller->running = false;
 	}
 
+	struct Window *window = graphics_get_window(controller->graphics);
+	int current_width, current_height;
+	window_get_size(window, &current_width, &current_height);
+
+	if (current_width != controller->state.window_width || current_height != controller->state.window_height)
+	{
+		app_state_update_dimensions(&controller->state, current_width, current_height);
+	}
+
+	if (window->input.mouse_wheel_y != 0.0f)
+	{
+		bool shift_down = window_is_scancode_down(window, SDL_SCANCODE_LSHIFT) || window_is_scancode_down(window, SDL_SCANCODE_RSHIFT);
+		bool ctrl_down = window_is_scancode_down(window, SDL_SCANCODE_LCTRL) || window_is_scancode_down(window, SDL_SCANCODE_RCTRL);
+
+		if (ctrl_down && shift_down)
+		{
+			float zoom_factor = 1.0f + (window->input.mouse_wheel_y * 0.1f);
+			app_state_zoom_horizontal(&controller->state, zoom_factor);
+		}
+		else if (shift_down)
+		{
+			app_state_scroll_horizontal(&controller->state, -window->input.mouse_wheel_y * 100.0f);
+		}
+		else if (ctrl_down)
+		{
+			float zoom_factor = 1.0f + (window->input.mouse_wheel_y * 0.1f);
+			app_state_zoom_vertical(&controller->state, zoom_factor);
+		}
+		else
+		{
+			app_state_scroll_vertical(&controller->state, -(int)window->input.mouse_wheel_y * 3);
+		}
+	}
+
+	if (window->input.mouse_wheel_x != 0.0f)
+	{
+		if (window_is_scancode_down(window, SDL_SCANCODE_LCTRL) || window_is_scancode_down(window, SDL_SCANCODE_RCTRL))
+		{
+			float zoom_factor = 1.0f + (window->input.mouse_wheel_x * 0.1f);
+			app_state_zoom_horizontal(&controller->state, zoom_factor);
+		}
+		else
+		{
+			app_state_scroll_horizontal(&controller->state, -window->input.mouse_wheel_x * 100.0f);
+		}
+	}
+
+	if (window_is_scancode_down(window, SDL_SCANCODE_LEFT))
+	{
+		app_state_scroll_horizontal(&controller->state, -500.0f * delta_time);
+	}
+	if (window_is_scancode_down(window, SDL_SCANCODE_RIGHT))
+	{
+		app_state_scroll_horizontal(&controller->state, 500.0f * delta_time);
+	}
+	if (window_is_scancode_down(window, SDL_SCANCODE_UP))
+	{
+		app_state_scroll_vertical(&controller->state, -1);
+	}
+	if (window_is_scancode_down(window, SDL_SCANCODE_DOWN))
+	{
+		app_state_scroll_vertical(&controller->state, 1);
+	}
+
+	struct Sequencer *sequencer = audio_get_sequencer(controller->audio);
+	if (sequencer)
+	{
+		controller->state.playing = sequencer->playing;
+		controller->state.playhead_ms = sequencer->playhead_ms;
+	}
+
 	struct input_event events[64];
 	size_t event_count = input_handler_poll_events(controller->input_handler, events, 64);
 
@@ -130,8 +198,8 @@ void app_controller_render(struct app_controller *controller)
 	struct Color bg_color = color_rgb(30, 30, 46);
 	graphics_clear(controller->graphics, bg_color);
 
-	/* test button */
-	button_render(controller->graphics, &controller->test_button);
+	piano_roll_render(controller->graphics, &controller->state);
+
 	lua_service_call_render_callbacks(&controller->lua_service);
 }
 

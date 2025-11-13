@@ -118,6 +118,11 @@ function boostio.drawText(text, x, y, size, r, g, b, a) end
 ---@return number width Width of the text in pixels
 function boostio.measureText(text, size) end
 
+---Get the current window dimensions
+---@return number width Window width in pixels
+---@return number height Window height in pixels
+function boostio.getWindowSize() end
+
 ---Get a configuration value
 ---@param key string Configuration key (e.g., "window.width")
 ---@return any value The configuration value, or nil if not found
@@ -203,5 +208,29 @@ function boostio.transposeUp() end
 
 ---Transpose selected notes down
 function boostio.transposeDown() end
+
+---Toggle scale highlighting on/off
+---@return boolean enabled New state of scale highlighting
+function boostio.toggleScaleHighlight() end
+
+---Cycle to the next scale type
+---@return string scale_name Name of the new scale (e.g., "major", "minor")
+function boostio.cycleScaleType() end
+
+---Cycle to the next root note
+---@return string root_name Name of the new root note (e.g., "C", "D#")
+function boostio.cycleScaleRoot() end
+
+---Get current scale information
+---@return table info Table with fields: scale (string), root (string), highlight (boolean)
+function boostio.getScaleInfo() end
+
+---Toggle fold mode on/off (hides notes not in the selected scale)
+---@return boolean enabled New state of fold mode
+function boostio.toggleFold() end
+
+---Get comprehensive app state information
+---@return table state Table with fields: bpm, selected_voice, waveform, note_count, is_playing, playhead_ms, snap_enabled, snap_ms, selected_scale, selected_root
+function boostio.getAppState() end
 
 return boostio

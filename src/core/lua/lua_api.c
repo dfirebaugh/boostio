@@ -2,6 +2,7 @@
 #include "app/app_state.h"
 #include "app/lua_command_registry.h"
 #include "core/audio/audio.h"
+#include "core/audio/scale.h"
 #include "core/audio/sequencer.h"
 #include "core/audio/synth.h"
 #include "core/graphics/color.h"
@@ -491,7 +492,8 @@ static int lua_api_add_note(lua_State *L)
 		.amplitude_dbfs = -3,
 		.nes_noise_period = 15,
 		.nes_noise_mode_flag = false,
-		.voice_index = -1
+		.voice_index = -1,
+		.piano_key = pitch
 	};
 
 	if (lua_istable(L, 4)) {
@@ -706,6 +708,176 @@ static int lua_api_transpose_down(lua_State *L)
 	return 0;
 }
 
+static int lua_api_get_window_size(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	lua_pushinteger(L, global_context->app_state->window_width);
+	lua_pushinteger(L, global_context->app_state->window_height);
+
+	return 2;
+}
+
+static int lua_api_toggle_scale_highlight(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	global_context->app_state->show_scale_highlights =
+			!global_context->app_state->show_scale_highlights;
+	lua_pushboolean(L, global_context->app_state->show_scale_highlights);
+
+	return 1;
+}
+
+static int lua_api_cycle_scale_type(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	int current = (int)global_context->app_state->selected_scale;
+	int next = (current + 1) % SCALE_TYPE_COUNT;
+	global_context->app_state->selected_scale = (enum scale_type)next;
+
+	lua_pushstring(L, scale_type_to_string((enum scale_type)next));
+	return 1;
+}
+
+static int lua_api_cycle_scale_root(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	int current = (int)global_context->app_state->selected_root;
+	int next = (current + 1) % 12;
+	global_context->app_state->selected_root = (enum root_note)next;
+
+	lua_pushstring(L, root_note_to_string((enum root_note)next));
+	return 1;
+}
+
+static int lua_api_get_scale_info(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	lua_newtable(L);
+
+	lua_pushstring(L, scale_type_to_string(global_context->app_state->selected_scale));
+	lua_setfield(L, -2, "scale");
+
+	lua_pushstring(L, root_note_to_string(global_context->app_state->selected_root));
+	lua_setfield(L, -2, "root");
+
+	lua_pushboolean(L, global_context->app_state->show_scale_highlights);
+	lua_setfield(L, -2, "highlight");
+
+	return 1;
+}
+
+static int lua_api_toggle_fold(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	global_context->app_state->fold_mode = !global_context->app_state->fold_mode;
+
+	if (global_context->app_state->fold_mode)
+	{
+		global_context->app_state->viewport.note_offset = 0;
+	}
+
+	lua_pushboolean(L, global_context->app_state->fold_mode);
+
+	return 1;
+}
+
+static const char *waveform_type_to_string(enum WaveformType type)
+{
+	switch (type)
+	{
+	case WAVEFORM_SINE:
+		return "sine";
+	case WAVEFORM_SQUARE:
+		return "square";
+	case WAVEFORM_TRIANGLE:
+		return "triangle";
+	case WAVEFORM_SAWTOOTH:
+		return "sawtooth";
+	case WAVEFORM_NES_NOISE:
+		return "nes_noise";
+	default:
+		return "unknown";
+	}
+}
+
+static int lua_api_get_app_state(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL || global_context->audio == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	struct app_state *state = global_context->app_state;
+	struct Synth *synth = audio_get_synth(global_context->audio);
+
+	lua_newtable(L);
+
+	lua_pushinteger(L, state->bpm);
+	lua_setfield(L, -2, "bpm");
+
+	lua_pushinteger(L, state->selected_voice);
+	lua_setfield(L, -2, "selected_voice");
+
+	if (synth != NULL && state->selected_voice < MAX_VOICES)
+	{
+		enum WaveformType waveform = synth->voices[state->selected_voice].waveform;
+		lua_pushstring(L, waveform_type_to_string(waveform));
+		lua_setfield(L, -2, "waveform");
+	}
+	else
+	{
+		lua_pushstring(L, "square");
+		lua_setfield(L, -2, "waveform");
+	}
+
+	lua_pushinteger(L, state->note_count);
+	lua_setfield(L, -2, "note_count");
+
+	lua_pushboolean(L, state->playing);
+	lua_setfield(L, -2, "is_playing");
+
+	lua_pushinteger(L, state->playhead_ms);
+	lua_setfield(L, -2, "playhead_ms");
+
+	lua_pushboolean(L, state->snap_enabled);
+	lua_setfield(L, -2, "snap_enabled");
+
+	lua_pushinteger(L, 50);
+	lua_setfield(L, -2, "snap_ms");
+
+	lua_pushstring(L, scale_type_to_string(state->selected_scale));
+	lua_setfield(L, -2, "selected_scale");
+
+	lua_pushstring(L, root_note_to_string(state->selected_root));
+	lua_setfield(L, -2, "selected_root");
+
+	return 1;
+}
+
 void lua_api_register_all(struct lua_runtime *runtime, struct lua_api_context *ctx)
 {
 	if (runtime == NULL || runtime->L == NULL)
@@ -803,6 +975,27 @@ void lua_api_register_all(struct lua_runtime *runtime, struct lua_api_context *c
 
 	lua_pushcfunction(runtime->L, lua_api_transpose_down);
 	lua_setfield(runtime->L, -2, "transposeDown");
+
+	lua_pushcfunction(runtime->L, lua_api_get_window_size);
+	lua_setfield(runtime->L, -2, "getWindowSize");
+
+	lua_pushcfunction(runtime->L, lua_api_toggle_scale_highlight);
+	lua_setfield(runtime->L, -2, "toggleScaleHighlight");
+
+	lua_pushcfunction(runtime->L, lua_api_cycle_scale_type);
+	lua_setfield(runtime->L, -2, "cycleScaleType");
+
+	lua_pushcfunction(runtime->L, lua_api_cycle_scale_root);
+	lua_setfield(runtime->L, -2, "cycleScaleRoot");
+
+	lua_pushcfunction(runtime->L, lua_api_get_scale_info);
+	lua_setfield(runtime->L, -2, "getScaleInfo");
+
+	lua_pushcfunction(runtime->L, lua_api_toggle_fold);
+	lua_setfield(runtime->L, -2, "toggleFold");
+
+	lua_pushcfunction(runtime->L, lua_api_get_app_state);
+	lua_setfield(runtime->L, -2, "getAppState");
 
 	lua_pushinteger(runtime->L, WAVEFORM_SINE);
 	lua_setfield(runtime->L, -2, "WAVEFORM_SINE");

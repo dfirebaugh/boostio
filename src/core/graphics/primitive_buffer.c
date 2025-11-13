@@ -382,23 +382,37 @@ void primitive_buffer_add_line(
 		struct PrimitiveBuffer *buffer, float x1, float y1, float x2, float y2, struct Color color
 )
 {
-	float thickness = 1.0f;
-	float dx = x2 - x1;
-	float dy = y2 - y1;
-	float len = sqrtf(dx * dx + dy * dy);
-
-	if (len < 0.001f)
-	{
-		return;
-	}
-
-	float nx = -dy / len * thickness / 2.0f;
-	float ny = dx / len * thickness / 2.0f;
-
 	struct Color no_outline = {0, 0, 0, 0};
-	primitive_buffer_add_rect(
-			buffer, x1 + nx, y1 + ny, len, thickness, color, 0.0f, 0.0f, no_outline
-	);
+
+	if (fabsf(y2 - y1) < 0.5f)
+	{
+		float width = fabsf(x2 - x1);
+		float x = fminf(x1, x2);
+		primitive_buffer_add_rect(buffer, x, y1, width, 1.0f, color, 0.0f, 0.0f, no_outline);
+	}
+	else if (fabsf(x2 - x1) < 0.5f)
+	{
+		float height = fabsf(y2 - y1);
+		float y = fminf(y1, y2);
+		primitive_buffer_add_rect(buffer, x1, y, 1.0f, height, color, 0.0f, 0.0f, no_outline);
+	}
+	else
+	{
+		float dx = x2 - x1;
+		float dy = y2 - y1;
+		float len = sqrtf(dx * dx + dy * dy);
+
+		if (len < 0.001f)
+		{
+			return;
+		}
+
+		float thickness = 1.0f;
+		float nx = -dy / len * thickness / 2.0f;
+		float ny = dx / len * thickness / 2.0f;
+
+		primitive_buffer_add_rect(buffer, x1 + nx, y1 + ny, len, thickness, color, 0.0f, 0.0f, no_outline);
+	}
 }
 
 void primitive_buffer_render(struct PrimitiveBuffer *buffer, int window_width, int window_height)

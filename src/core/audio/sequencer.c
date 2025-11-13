@@ -11,7 +11,7 @@ void sequencer_init(struct Sequencer *sequencer)
 
 void sequencer_add_note(struct Sequencer *sequencer, uint32_t time_ms, struct NoteParams params)
 {
-	if (sequencer->note_count >= MAX_NOTES)
+	if (sequencer->note_count >= SEQUENCER_MAX_NOTES)
 	{
 		return;
 	}
@@ -22,8 +22,6 @@ void sequencer_add_note(struct Sequencer *sequencer, uint32_t time_ms, struct No
 	note->triggered = false;
 
 	sequencer->note_count++;
-	printf("Sequencer: added note %d at %ums (%.2f Hz)\n", sequencer->note_count, time_ms,
-		   params.frequency);
 }
 
 void sequencer_clear_notes(struct Sequencer *sequencer)
@@ -50,8 +48,6 @@ void sequencer_update(struct Sequencer *sequencer, struct Synth *synth, float de
 		{
 			synth_play_note(synth, note->params);
 			note->triggered = true;
-			printf("Sequencer: triggered note %d (%.2f Hz) at playhead=%ums\n", i + 1,
-				   note->params.frequency, sequencer->playhead_ms);
 		}
 
 		if (!note->triggered)
@@ -62,7 +58,6 @@ void sequencer_update(struct Sequencer *sequencer, struct Synth *synth, float de
 
 	if (sequencer->note_count > 0 && !has_untriggered_notes)
 	{
-		printf("Sequencer: all notes played, stopping and resetting\n");
 		sequencer->playing = false;
 		sequencer->playhead_ms = 0;
 

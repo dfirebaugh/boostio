@@ -106,7 +106,8 @@ bool song_loader_load_from_file(struct Audio *audio, const char *filepath)
 				.nes_noise_mode_flag = false,
 				.voice_index = -1,
 				.restart_phase = true,
-				.nes_noise_lfsr_init = 0xFFFF
+				.nes_noise_lfsr_init = 0xFFFF,
+				.piano_key = 60
 		};
 
 		cJSON *ms = cJSON_GetObjectItemCaseSensitive(note_item, "ms");
@@ -121,6 +122,7 @@ bool song_loader_load_from_file(struct Audio *audio, const char *filepath)
 		cJSON *nes_noise_mode = cJSON_GetObjectItemCaseSensitive(note_item, "nes_noise_mode");
 		cJSON *restart = cJSON_GetObjectItemCaseSensitive(note_item, "restart");
 		cJSON *nes_noise_lfsr = cJSON_GetObjectItemCaseSensitive(note_item, "nes_noise_lfsr");
+		cJSON *piano_key_json = cJSON_GetObjectItemCaseSensitive(note_item, "piano_key");
 
 		if (!cJSON_IsNumber(ms))
 		{
@@ -183,6 +185,11 @@ bool song_loader_load_from_file(struct Audio *audio, const char *filepath)
 		if (cJSON_IsNumber(nes_noise_lfsr))
 		{
 			params.nes_noise_lfsr_init = (uint16_t)nes_noise_lfsr->valueint;
+		}
+
+		if (cJSON_IsNumber(piano_key_json))
+		{
+			params.piano_key = (uint8_t)piano_key_json->valueint;
 		}
 
 		sequencer_add_note(sequencer, start_ms, params);
