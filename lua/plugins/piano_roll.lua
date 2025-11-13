@@ -14,7 +14,6 @@ local default_options = {
 	drag_threshold = 5,
 	double_click_threshold_ms = 500,
 	min_note_duration_ms = 10,
-	default_note_duration_ms = 500,
 	piano_key_min = 45,
 	piano_key_max = 99,
 }
@@ -627,10 +626,8 @@ local function handle_mouse_up(x, y, button, state)
 				ms = math.max(0, ms)
 
 				if piano_key >= 0 and piano_key <= 87 then
-					local default_duration = options.default_note_duration_ms
-					if state.snap_enabled and state.snap_ms > 0 then
-						default_duration = state.snap_ms
-					end
+					local ms_per_beat = 60000.0 / state.bpm
+					local default_duration = ms_per_beat
 
 					local new_note_id = boostio.addNote(ms, piano_key, default_duration)
 					if new_note_id then
