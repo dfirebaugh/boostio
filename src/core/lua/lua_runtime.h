@@ -6,8 +6,7 @@
 #include <lualib.h>
 #include <stdbool.h>
 
-struct lua_runtime
-{
+struct lua_runtime {
 	lua_State *L;
 };
 
@@ -22,11 +21,11 @@ bool lua_runtime_load_string(struct lua_runtime *runtime, const char *code);
 bool lua_runtime_call_function(struct lua_runtime *runtime, const char *function_name);
 
 void lua_runtime_register_function(
-		struct lua_runtime *runtime, const char *name, lua_CFunction func
+	struct lua_runtime *runtime, const char *name, lua_CFunction func
 );
 
 const char *lua_runtime_get_config_string(
-		struct lua_runtime *runtime, const char *path, const char *default_value
+	struct lua_runtime *runtime, const char *path, const char *default_value
 );
 
 int lua_runtime_get_config_int(struct lua_runtime *runtime, const char *path, int default_value);

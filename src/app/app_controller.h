@@ -10,8 +10,7 @@
 
 #include <stdbool.h>
 
-struct app_controller
-{
+struct app_controller {
 	struct app_state state;
 	struct lua_service lua_service;
 	struct Graphics *graphics;
@@ -22,7 +21,10 @@ struct app_controller
 };
 
 bool app_controller_init(
-		struct app_controller *controller, struct Graphics *graphics, struct Audio *audio, struct platform_paths *paths
+	struct app_controller *controller,
+	struct Graphics *graphics,
+	struct Audio *audio,
+	struct platform_paths *paths
 );
 
 void app_controller_deinit(struct app_controller *controller);

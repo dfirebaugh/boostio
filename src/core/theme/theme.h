@@ -3,23 +3,20 @@
 
 #include <stdint.h>
 
-struct rgb_color
-{
+struct rgb_color {
 	uint8_t r;
 	uint8_t g;
 	uint8_t b;
 };
 
-struct rgba_color
-{
+struct rgba_color {
 	uint8_t r;
 	uint8_t g;
 	uint8_t b;
 	uint8_t a;
 };
 
-struct theme
-{
+struct theme {
 	struct rgb_color background;
 	struct rgb_color grid_background;
 	struct rgb_color grid_line;

@@ -5,8 +5,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-struct Note
-{
+struct Note {
 	uint32_t time_ms;
 	struct NoteParams params;
 	bool triggered;
@@ -14,8 +13,7 @@ struct Note
 
 #define SEQUENCER_MAX_NOTES 256
 
-struct Sequencer
-{
+struct Sequencer {
 	struct Note notes[SEQUENCER_MAX_NOTES];
 	uint32_t note_count;
 	uint32_t playhead_ms;
@@ -27,8 +25,11 @@ void sequencer_init(struct Sequencer *sequencer);
 void sequencer_add_note(struct Sequencer *sequencer, uint32_t time_ms, struct NoteParams params);
 void sequencer_clear_notes(struct Sequencer *sequencer);
 void sequencer_update(
-		struct Sequencer *sequencer, struct Synth *synth, float delta_time_ms,
-		const bool *voice_solo, const bool *voice_muted
+	struct Sequencer *sequencer,
+	struct Synth *synth,
+	float delta_time_ms,
+	const bool *voice_solo,
+	const bool *voice_muted
 );
 void sequencer_set_playhead(struct Sequencer *sequencer, uint32_t playhead_ms);
 void sequencer_set_bpm(struct Sequencer *sequencer, uint32_t bpm);

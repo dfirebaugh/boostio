@@ -11,10 +11,7 @@ void path_get_directory(const char *path, char *output, size_t output_size);
 void path_get_basename(const char *path, char *output, size_t output_size);
 
 void path_build_with_extension(
-		const char *base_path,
-		const char *extension,
-		char *output,
-		size_t output_size
+	const char *base_path, const char *extension, char *output, size_t output_size
 );
 
 #endif

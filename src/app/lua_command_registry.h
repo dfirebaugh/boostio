@@ -8,14 +8,12 @@
 
 struct lua_runtime;
 
-struct lua_command_entry
-{
+struct lua_command_entry {
 	char *command_name;
 	int lua_callback_ref;
 };
 
-struct lua_keybinding_entry
-{
+struct lua_keybinding_entry {
 	enum key key;
 	bool shift;
 	bool ctrl;
@@ -23,8 +21,7 @@ struct lua_keybinding_entry
 	char *command_name;
 };
 
-struct lua_command_registry
-{
+struct lua_command_registry {
 	struct lua_runtime *runtime;
 	struct lua_command_entry *commands;
 	size_t command_count;
@@ -38,20 +35,24 @@ bool lua_command_registry_init(struct lua_command_registry *registry, struct lua
 void lua_command_registry_deinit(struct lua_command_registry *registry);
 
 bool lua_command_registry_register_lua_command(
-		struct lua_command_registry *registry, const char *command_name, int callback_ref
+	struct lua_command_registry *registry, const char *command_name, int callback_ref
 );
 
 bool lua_command_registry_register_keybinding(
-		struct lua_command_registry *registry, enum key key, bool shift, bool ctrl, bool alt,
-		const char *command_name
+	struct lua_command_registry *registry,
+	enum key key,
+	bool shift,
+	bool ctrl,
+	bool alt,
+	const char *command_name
 );
 
 bool lua_command_registry_execute_command(
-		struct lua_command_registry *registry, const char *command_name
+	struct lua_command_registry *registry, const char *command_name
 );
 
 const char *lua_command_registry_get_command_for_key(
-		struct lua_command_registry *registry, struct input_event_key_down *key_event
+	struct lua_command_registry *registry, struct input_event_key_down *key_event
 );
 
 #endif

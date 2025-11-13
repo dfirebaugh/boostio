@@ -4,8 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-enum WaveformType
-{
+enum WaveformType {
 	WAVEFORM_SINE,
 	WAVEFORM_SQUARE,
 	WAVEFORM_TRIANGLE,
@@ -13,8 +12,7 @@ enum WaveformType
 	WAVEFORM_NES_NOISE
 };
 
-struct Voice
-{
+struct Voice {
 	float frequency;
 	float amplitude;
 	float phase;
@@ -34,15 +32,13 @@ struct Voice
 
 #define MAX_VOICES 16
 
-struct Synth
-{
+struct Synth {
 	struct Voice voices[MAX_VOICES];
 	uint32_t sample_rate;
 	float master_volume;
 };
 
-struct NoteParams
-{
+struct NoteParams {
 	float frequency;
 	float duration_ms;
 	enum WaveformType waveform;

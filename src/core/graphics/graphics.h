@@ -16,27 +16,49 @@ void graphics_set_color(struct Graphics *graphics, struct Color color);
 
 void graphics_fill_rect(struct Graphics *graphics, int x, int y, int width, int height);
 void graphics_fill_rect_outlined(
-		struct Graphics *graphics, int x, int y, int width, int height, struct Color outline_color,
-		int outline_width
+	struct Graphics *graphics,
+	int x,
+	int y,
+	int width,
+	int height,
+	struct Color outline_color,
+	int outline_width
 );
 void graphics_draw_rect(struct Graphics *graphics, int x, int y, int width, int height);
 void graphics_draw_rect_outlined(
-		struct Graphics *graphics, int x, int y, int width, int height, struct Color outline_color,
-		int outline_width
+	struct Graphics *graphics,
+	int x,
+	int y,
+	int width,
+	int height,
+	struct Color outline_color,
+	int outline_width
 );
 void graphics_fill_rounded_rect(
-		struct Graphics *graphics, int x, int y, int width, int height, int radius
+	struct Graphics *graphics, int x, int y, int width, int height, int radius
 );
 void graphics_fill_rounded_rect_outlined(
-		struct Graphics *graphics, int x, int y, int width, int height, int radius,
-		struct Color outline_color, int outline_width
+	struct Graphics *graphics,
+	int x,
+	int y,
+	int width,
+	int height,
+	int radius,
+	struct Color outline_color,
+	int outline_width
 );
 void graphics_draw_rounded_rect(
-		struct Graphics *graphics, int x, int y, int width, int height, int radius
+	struct Graphics *graphics, int x, int y, int width, int height, int radius
 );
 void graphics_draw_rounded_rect_outlined(
-		struct Graphics *graphics, int x, int y, int width, int height, int radius,
-		struct Color outline_color, int outline_width
+	struct Graphics *graphics,
+	int x,
+	int y,
+	int width,
+	int height,
+	int radius,
+	struct Color outline_color,
+	int outline_width
 );
 void graphics_draw_line(struct Graphics *graphics, int x1, int y1, int x2, int y2);
 

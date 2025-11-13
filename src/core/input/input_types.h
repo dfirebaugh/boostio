@@ -4,8 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-enum key
-{
+enum key {
 	KEY_A,
 	KEY_B,
 	KEY_C,
@@ -86,16 +85,14 @@ enum key
 	KEY_COUNT
 };
 
-enum mouse_button
-{
+enum mouse_button {
 	MOUSE_BUTTON_LEFT,
 	MOUSE_BUTTON_RIGHT,
 	MOUSE_BUTTON_MIDDLE,
 	MOUSE_BUTTON_COUNT
 };
 
-enum input_event_type
-{
+enum input_event_type {
 	INPUT_EVENT_KEY_DOWN,
 	INPUT_EVENT_KEY_UP,
 	INPUT_EVENT_MOUSE_DOWN,
@@ -104,21 +101,18 @@ enum input_event_type
 	INPUT_EVENT_SCROLL
 };
 
-struct input_event_key_down
-{
+struct input_event_key_down {
 	enum key key;
 	bool shift;
 	bool ctrl;
 	bool alt;
 };
 
-struct input_event_key_up
-{
+struct input_event_key_up {
 	enum key key;
 };
 
-struct input_event_mouse_down
-{
+struct input_event_mouse_down {
 	float x, y;
 	enum mouse_button button;
 	bool shift;
@@ -126,30 +120,25 @@ struct input_event_mouse_down
 	bool alt;
 };
 
-struct input_event_mouse_up
-{
+struct input_event_mouse_up {
 	float x, y;
 	enum mouse_button button;
 };
 
-struct input_event_mouse_move
-{
+struct input_event_mouse_move {
 	float x, y;
 };
 
-struct input_event_scroll
-{
+struct input_event_scroll {
 	float dx, dy;
 	bool shift;
 	bool ctrl;
 	bool alt;
 };
 
-struct input_event
-{
+struct input_event {
 	enum input_event_type type;
-	union
-	{
+	union {
 		struct input_event_key_down key_down;
 		struct input_event_key_up key_up;
 		struct input_event_mouse_down mouse_down;

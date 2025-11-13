@@ -5,8 +5,7 @@
 #include <SDL3/SDL.h>
 #include <stdbool.h>
 
-struct InputState
-{
+struct InputState {
 	bool scancodes_down[512];
 	bool scancodes_pressed[512];
 	bool scancodes_released[512];
@@ -21,8 +20,7 @@ struct InputState
 	float mouse_wheel_y;
 };
 
-struct WindowConfig
-{
+struct WindowConfig {
 	int width;
 	int height;
 	const char *title;
@@ -30,8 +28,7 @@ struct WindowConfig
 	bool vsync;
 };
 
-struct Window
-{
+struct Window {
 	SDL_Window *window;
 	SDL_GLContext gl_context;
 	int width;

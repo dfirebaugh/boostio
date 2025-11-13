@@ -13,7 +13,7 @@ void shader_set_vec2(const struct Shader *shader, const char *name, float x, flo
 void shader_set_int(const struct Shader *shader, const char *name, int value);
 
 void ortho_projection(
-		float left, float right, float bottom, float top, float near, float far, float *out
+	float left, float right, float bottom, float top, float near, float far, float *out
 );
 
 #endif

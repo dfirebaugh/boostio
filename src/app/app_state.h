@@ -14,8 +14,7 @@ struct Sequencer;
 #define UI_MAX_SELECTION 256
 #define MAX_INSTRUMENTS 16
 
-struct instrument
-{
+struct instrument {
 	char name[32];
 	enum WaveformType waveform;
 	uint8_t duty_cycle;
@@ -29,8 +28,7 @@ struct instrument
 	uint16_t nes_noise_lfsr;
 };
 
-struct viewport
-{
+struct viewport {
 	float time_offset;
 	int32_t note_offset;
 	float pixels_per_ms;
@@ -41,8 +39,7 @@ struct viewport
 	float grid_height;
 };
 
-struct ui_note
-{
+struct ui_note {
 	uint32_t id;
 	uint32_t ms;
 	uint16_t duration_ms;
@@ -50,14 +47,12 @@ struct ui_note
 	uint8_t piano_key;
 };
 
-struct selection
-{
+struct selection {
 	uint32_t selected_ids[UI_MAX_SELECTION];
 	uint32_t count;
 };
 
-struct app_state
-{
+struct app_state {
 	int window_width;
 	int window_height;
 
@@ -120,7 +115,7 @@ void app_state_zoom_horizontal_at_mouse(struct app_state *state, float factor, f
 void app_state_zoom_vertical_at_mouse(struct app_state *state, float factor, float mouse_y);
 
 void app_state_sync_notes_from_sequencer(
-		struct app_state *state, const struct Sequencer *sequencer
+	struct app_state *state, const struct Sequencer *sequencer
 );
 
 #endif

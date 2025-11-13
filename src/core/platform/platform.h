@@ -4,8 +4,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-struct platform_paths
-{
+struct platform_paths {
 	char *binary_dir;
 	char *config_dir;
 	char *data_dir;

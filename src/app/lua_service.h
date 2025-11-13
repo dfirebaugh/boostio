@@ -12,8 +12,7 @@ struct app_state;
 struct command;
 struct input_event;
 
-struct lua_service
-{
+struct lua_service {
 	struct lua_runtime runtime;
 	struct lua_api_context api_context;
 	struct lua_command_registry command_registry;
@@ -24,8 +23,11 @@ struct lua_service
 };
 
 bool lua_service_init(
-		struct lua_service *service, struct app_state *state, struct Graphics *graphics,
-		struct Audio *audio, struct platform_paths *paths
+	struct lua_service *service,
+	struct app_state *state,
+	struct Graphics *graphics,
+	struct Audio *audio,
+	struct platform_paths *paths
 );
 
 void lua_service_deinit(struct lua_service *service);
@@ -40,14 +42,11 @@ void lua_service_call_render_callbacks(struct lua_service *service);
 
 void lua_service_apply_config_to_state(struct lua_service *service, struct app_state *state);
 
-const char *lua_service_get_command_for_event(
-		struct lua_service *service, struct input_event *event
-);
+const char *
+lua_service_get_command_for_event(struct lua_service *service, struct input_event *event);
 
 bool lua_service_execute_lua_command(struct lua_service *service, const char *command_name);
 
-void lua_service_set_app_controller(
-		struct lua_service *service, struct app_controller *controller
-);
+void lua_service_set_app_controller(struct lua_service *service, struct app_controller *controller);
 
 #endif

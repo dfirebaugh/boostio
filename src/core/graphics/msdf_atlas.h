@@ -22,8 +22,7 @@ float msdf_atlas_get_font_size(const struct MSDFAtlas *atlas);
 
 bool msdf_atlas_generate(const char *font_path, const char *png_path, const char *json_path);
 
-struct MSDFGlyph
-{
+struct MSDFGlyph {
 	uint32_t codepoint;
 	float x, y;
 	float width, height;

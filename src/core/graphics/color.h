@@ -3,8 +3,7 @@
 
 #include <stdint.h>
 
-struct Color
-{
+struct Color {
 	uint8_t r;
 	uint8_t g;
 	uint8_t b;
@@ -25,8 +24,10 @@ static inline struct Color color_rgb(uint8_t r, uint8_t g, uint8_t b)
 static inline struct Color color_from_floats(float r, float g, float b, float a)
 {
 	return color_rgba(
-			(uint8_t)(r * 255.0f), (uint8_t)(g * 255.0f), (uint8_t)(b * 255.0f),
-			(uint8_t)(a * 255.0f)
+		(uint8_t)(r * 255.0f),
+		(uint8_t)(g * 255.0f),
+		(uint8_t)(b * 255.0f),
+		(uint8_t)(a * 255.0f)
 	);
 }
 
