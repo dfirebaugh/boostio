@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
 		}
 
 		app_controller_update(&controller, 0.016f);
-		audio_update(audio);
+		audio_update(audio, controller.state.voice_solo, controller.state.voice_muted);
 		app_controller_render(&controller);
 
 		graphics_present(graphics);

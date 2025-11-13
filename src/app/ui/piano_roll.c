@@ -391,9 +391,36 @@ void piano_roll_render_notes(struct Graphics *graphics, const struct app_state *
 	const struct viewport *vp = &state->viewport;
 	const struct theme *theme = &state->theme;
 
+	bool has_solo = false;
+	for (int i = 0; i < 8; i++)
+	{
+		if (state->voice_solo[i])
+		{
+			has_solo = true;
+			break;
+		}
+	}
+
 	for (uint32_t i = 0; i < state->note_count; i++)
 	{
 		const struct ui_note *note = &state->notes[i];
+		uint8_t voice = note->voice % 8;
+
+		if (state->voice_hidden[voice])
+		{
+			continue;
+		}
+
+		bool is_audible = true;
+		if (has_solo)
+		{
+			is_audible = state->voice_solo[voice];
+		}
+		else
+		{
+			is_audible = !state->voice_muted[voice];
+		}
+
 		struct note_rect rect;
 		piano_roll_get_note_rect(vp, note, &rect, state->fold_mode, state->selected_scale, state->selected_root);
 
@@ -407,7 +434,7 @@ void piano_roll_render_notes(struct Graphics *graphics, const struct app_state *
 			continue;
 		}
 
-		struct rgb_color voice_color = theme->voice_colors[note->voice % 8];
+		struct rgb_color voice_color = theme->voice_colors[voice];
 		struct Color note_color = {voice_color.r, voice_color.g, voice_color.b, 255};
 
 		bool is_selected = false;
@@ -420,7 +447,14 @@ void piano_roll_render_notes(struct Graphics *graphics, const struct app_state *
 			}
 		}
 
-		if (is_selected)
+		if (!is_audible)
+		{
+			note_color.r = (uint8_t)(note_color.r * 0.3f);
+			note_color.g = (uint8_t)(note_color.g * 0.3f);
+			note_color.b = (uint8_t)(note_color.b * 0.3f);
+			note_color.a = 128;
+		}
+		else if (is_selected)
 		{
 			note_color.r = (uint8_t)fminf(255, note_color.r * 1.3f);
 			note_color.g = (uint8_t)fminf(255, note_color.g * 1.3f);
@@ -436,8 +470,11 @@ void piano_roll_render_notes(struct Graphics *graphics, const struct app_state *
 			graphics_draw_rounded_rect(graphics, (int)rect.x, (int)rect.y, (int)rect.width, (int)rect.height, 3);
 		}
 
-		graphics_set_color(graphics, color_rgba(theme->note_shadow.r, theme->note_shadow.g, theme->note_shadow.b, theme->note_shadow.a));
-		graphics_fill_rect(graphics, (int)rect.x + 2, (int)(rect.y + rect.height - 4), (int)(rect.width - 4), 3);
+		if (is_audible)
+		{
+			graphics_set_color(graphics, color_rgba(theme->note_shadow.r, theme->note_shadow.g, theme->note_shadow.b, theme->note_shadow.a));
+			graphics_fill_rect(graphics, (int)rect.x + 2, (int)(rect.y + rect.height - 4), (int)(rect.width - 4), 3);
+		}
 	}
 }
 

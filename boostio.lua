@@ -250,7 +250,22 @@ function boostio.getScaleInfo() end
 function boostio.toggleFold() end
 
 ---Get comprehensive app state information
----@return table state Table with fields: bpm, selected_voice, waveform, note_count, is_playing, playhead_ms, snap_enabled, snap_ms, selected_scale, selected_root
+---@return table state Table with fields: bpm, selected_voice, waveform, note_count, is_playing, playhead_ms, snap_enabled, snap_ms, selected_scale, selected_root, voice_hidden, voice_solo, voice_muted
 function boostio.getAppState() end
+
+---Set whether a voice is hidden (not displayed visually)
+---@param voice integer Voice index (0-7)
+---@param hidden boolean Whether the voice should be hidden
+function boostio.setVoiceHidden(voice, hidden) end
+
+---Set whether a voice is solo'd (mutes all other non-solo voices)
+---@param voice integer Voice index (0-7)
+---@param solo boolean Whether the voice should be solo'd
+function boostio.setVoiceSolo(voice, solo) end
+
+---Set whether a voice is muted
+---@param voice integer Voice index (0-7)
+---@param muted boolean Whether the voice should be muted
+function boostio.setVoiceMuted(voice, muted) end
 
 return boostio

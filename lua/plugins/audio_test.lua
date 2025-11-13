@@ -3,7 +3,7 @@ local audio_test = {}
 local function play_scale()
 	print("Playing C major scale...")
 
-	local notes = {60, 62, 64, 65, 67, 69, 71, 72}
+	local notes = { 60, 62, 64, 65, 67, 69, 71, 72 }
 	local time_ms = 0
 
 	for i, pitch in ipairs(notes) do

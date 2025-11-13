@@ -867,6 +867,66 @@ static int lua_api_toggle_fold(lua_State *L)
 	return 1;
 }
 
+static int lua_api_set_voice_hidden(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	int voice = (int)luaL_checkinteger(L, 1);
+	bool hidden = lua_toboolean(L, 2);
+
+	if (voice < 0 || voice >= 8)
+	{
+		return luaL_error(L, "Voice must be 0-7");
+	}
+
+	global_context->app_state->voice_hidden[voice] = hidden;
+
+	return 0;
+}
+
+static int lua_api_set_voice_solo(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	int voice = (int)luaL_checkinteger(L, 1);
+	bool solo = lua_toboolean(L, 2);
+
+	if (voice < 0 || voice >= 8)
+	{
+		return luaL_error(L, "Voice must be 0-7");
+	}
+
+	global_context->app_state->voice_solo[voice] = solo;
+
+	return 0;
+}
+
+static int lua_api_set_voice_muted(lua_State *L)
+{
+	if (global_context == NULL || global_context->app_state == NULL)
+	{
+		return luaL_error(L, "API context not available");
+	}
+
+	int voice = (int)luaL_checkinteger(L, 1);
+	bool muted = lua_toboolean(L, 2);
+
+	if (voice < 0 || voice >= 8)
+	{
+		return luaL_error(L, "Voice must be 0-7");
+	}
+
+	global_context->app_state->voice_muted[voice] = muted;
+
+	return 0;
+}
+
 static const char *waveform_type_to_string(enum WaveformType type)
 {
 	switch (type)
@@ -936,6 +996,30 @@ static int lua_api_get_app_state(lua_State *L)
 
 	lua_pushstring(L, root_note_to_string(state->selected_root));
 	lua_setfield(L, -2, "selected_root");
+
+	lua_newtable(L);
+	for (int i = 0; i < 8; i++)
+	{
+		lua_pushboolean(L, state->voice_hidden[i]);
+		lua_rawseti(L, -2, i + 1);
+	}
+	lua_setfield(L, -2, "voice_hidden");
+
+	lua_newtable(L);
+	for (int i = 0; i < 8; i++)
+	{
+		lua_pushboolean(L, state->voice_solo[i]);
+		lua_rawseti(L, -2, i + 1);
+	}
+	lua_setfield(L, -2, "voice_solo");
+
+	lua_newtable(L);
+	for (int i = 0; i < 8; i++)
+	{
+		lua_pushboolean(L, state->voice_muted[i]);
+		lua_rawseti(L, -2, i + 1);
+	}
+	lua_setfield(L, -2, "voice_muted");
 
 	return 1;
 }
@@ -1055,6 +1139,15 @@ void lua_api_register_all(struct lua_runtime *runtime, struct lua_api_context *c
 
 	lua_pushcfunction(runtime->L, lua_api_toggle_fold);
 	lua_setfield(runtime->L, -2, "toggleFold");
+
+	lua_pushcfunction(runtime->L, lua_api_set_voice_hidden);
+	lua_setfield(runtime->L, -2, "setVoiceHidden");
+
+	lua_pushcfunction(runtime->L, lua_api_set_voice_solo);
+	lua_setfield(runtime->L, -2, "setVoiceSolo");
+
+	lua_pushcfunction(runtime->L, lua_api_set_voice_muted);
+	lua_setfield(runtime->L, -2, "setVoiceMuted");
 
 	lua_pushcfunction(runtime->L, lua_api_get_app_state);
 	lua_setfield(runtime->L, -2, "getAppState");

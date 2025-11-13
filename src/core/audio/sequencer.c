@@ -29,7 +29,10 @@ void sequencer_clear_notes(struct Sequencer *sequencer)
 	sequencer->note_count = 0;
 }
 
-void sequencer_update(struct Sequencer *sequencer, struct Synth *synth, float delta_time_ms)
+void sequencer_update(
+		struct Sequencer *sequencer, struct Synth *synth, float delta_time_ms,
+		const bool *voice_solo, const bool *voice_muted
+)
 {
 	if (!sequencer->playing)
 	{
@@ -40,13 +43,45 @@ void sequencer_update(struct Sequencer *sequencer, struct Synth *synth, float de
 
 	bool has_untriggered_notes = false;
 
+	bool has_solo = false;
+	if (voice_solo != NULL)
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			if (voice_solo[i])
+			{
+				has_solo = true;
+				break;
+			}
+		}
+	}
+
 	for (uint32_t i = 0; i < sequencer->note_count; i++)
 	{
 		struct Note *note = &sequencer->notes[i];
 
 		if (!note->triggered && sequencer->playhead_ms >= note->time_ms)
 		{
-			synth_play_note(synth, note->params);
+			bool should_play = true;
+
+			if (voice_solo != NULL && voice_muted != NULL && note->params.voice_index >= 0 && note->params.voice_index < 8)
+			{
+				int voice = note->params.voice_index;
+				if (has_solo)
+				{
+					should_play = voice_solo[voice];
+				}
+				else
+				{
+					should_play = !voice_muted[voice];
+				}
+			}
+
+			if (should_play)
+			{
+				synth_play_note(synth, note->params);
+			}
+
 			note->triggered = true;
 		}
 

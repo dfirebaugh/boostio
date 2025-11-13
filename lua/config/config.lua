@@ -121,6 +121,11 @@ config = {
 				enabled = true,
 				priority = 90,
 			},
+			{
+				name = "voice_controls",
+				enabled = true,
+				priority = 85,
+			},
 			-- {
 			-- 	name = "test",
 			-- 	enabled = false,

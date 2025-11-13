@@ -26,7 +26,10 @@ struct Sequencer
 void sequencer_init(struct Sequencer *sequencer);
 void sequencer_add_note(struct Sequencer *sequencer, uint32_t time_ms, struct NoteParams params);
 void sequencer_clear_notes(struct Sequencer *sequencer);
-void sequencer_update(struct Sequencer *sequencer, struct Synth *synth, float delta_time_ms);
+void sequencer_update(
+		struct Sequencer *sequencer, struct Synth *synth, float delta_time_ms,
+		const bool *voice_solo, const bool *voice_muted
+);
 void sequencer_set_playhead(struct Sequencer *sequencer, uint32_t playhead_ms);
 void sequencer_set_bpm(struct Sequencer *sequencer, uint32_t bpm);
 void sequencer_play(struct Sequencer *sequencer);

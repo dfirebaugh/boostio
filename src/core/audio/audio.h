@@ -16,7 +16,7 @@ bool audio_is_initialized(const struct Audio *audio);
 void audio_start(struct Audio *audio);
 void audio_stop(struct Audio *audio);
 
-void audio_update(struct Audio *audio);
+void audio_update(struct Audio *audio, const bool *voice_solo, const bool *voice_muted);
 
 struct Synth *audio_get_synth(struct Audio *audio);
 struct Sequencer *audio_get_sequencer(struct Audio *audio);

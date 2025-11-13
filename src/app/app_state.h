@@ -60,6 +60,10 @@ struct app_state
 	bool show_scale_highlights;
 	bool fold_mode;
 
+	bool voice_hidden[8];
+	bool voice_solo[8];
+	bool voice_muted[8];
+
 	bool show_help;
 	bool show_fps;
 

@@ -116,7 +116,7 @@ void audio_stop(struct Audio *audio)
 	SDL_PauseAudioDevice(audio->device_id);
 }
 
-void audio_update(struct Audio *audio)
+void audio_update(struct Audio *audio, const bool *voice_solo, const bool *voice_muted)
 {
 	if (!audio || !audio->initialized)
 	{
@@ -127,7 +127,7 @@ void audio_update(struct Audio *audio)
 	float delta_time_ms = (float)(current_time - audio->last_update_time);
 	audio->last_update_time = current_time;
 
-	sequencer_update(&audio->sequencer, &audio->synth, delta_time_ms);
+	sequencer_update(&audio->sequencer, &audio->synth, delta_time_ms, voice_solo, voice_muted);
 
 	const uint32_t buffer_size = 2048;
 	const uint32_t min_queued_bytes = buffer_size * sizeof(float) * 2;
