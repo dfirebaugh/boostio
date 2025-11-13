@@ -113,7 +113,16 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	const double target_frame_time = 1.0 / 60.0;
+	uint64_t frequency = SDL_GetPerformanceFrequency();
+	uint64_t frame_start = SDL_GetPerformanceCounter();
+	double delta_time = target_frame_time;
+
 	while (app_controller_is_running(&controller)) {
+		uint64_t frame_end = SDL_GetPerformanceCounter();
+		delta_time = (double)(frame_end - frame_start) / (double)frequency;
+		frame_start = frame_end;
+
 		if (!graphics_poll_events(graphics)) {
 			app_controller_stop(&controller);
 		}
@@ -122,11 +131,19 @@ int main(int argc, char *argv[])
 			app_controller_stop(&controller);
 		}
 
-		app_controller_update(&controller, 0.016f);
+		app_controller_update(&controller, (float)delta_time);
 		audio_update(audio, controller.state.voice_solo, controller.state.voice_muted);
 		app_controller_render(&controller);
 
 		graphics_present(graphics);
+
+		uint64_t frame_work_end = SDL_GetPerformanceCounter();
+		double frame_work_time = (double)(frame_work_end - frame_start) / (double)frequency;
+
+		if (frame_work_time < target_frame_time) {
+			double delay_time = target_frame_time - frame_work_time;
+			SDL_Delay((uint32_t)(delay_time * 1000.0));
+		}
 	}
 
 	app_controller_deinit(&controller);
