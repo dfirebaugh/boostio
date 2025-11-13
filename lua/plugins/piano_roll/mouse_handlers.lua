@@ -104,9 +104,6 @@ local function handle_note_click(note_id, is_left_edge, is_right_edge, mouse_sta
 end
 
 local function start_box_select(x, y, mouse_state, ctrl_held, shift_held)
-	if not ctrl_held and not shift_held then
-		boostio.clearSelection()
-	end
 	mouse_state.drag_mode = "box_select"
 	mouse_state.selection_box.active = true
 	mouse_state.selection_box.start_x = x
@@ -363,7 +360,9 @@ end
 local function handle_box_select_drag(x, y, mouse_state, state, note_ops, utils, options)
 	mouse_state.selection_box.end_x = x
 	mouse_state.selection_box.end_y = y
+end
 
+local function finalize_box_select(mouse_state, state, note_ops, utils, options)
 	local box = mouse_state.selection_box
 	local min_x = math.min(box.start_x, box.end_x)
 	local max_x = math.max(box.start_x, box.end_x)
@@ -457,7 +456,12 @@ local function finalize_resize_right(mouse_state, state, note_ops)
 	end
 end
 
-local function finalize_drag(mouse_state, state, note_ops)
+local function finalize_drag(mouse_state, state, note_ops, utils, options)
+	if mouse_state.drag_mode == "box_select" then
+		finalize_box_select(mouse_state, state, note_ops, utils, options)
+		return
+	end
+
 	if not mouse_state.drag_started then
 		return
 	end
@@ -585,7 +589,7 @@ function mouse_handlers.handle_mouse_up(x, y, button, state, mouse_state, utils,
 		return
 	end
 
-	finalize_drag(mouse_state, state, note_ops)
+	finalize_drag(mouse_state, state, note_ops, utils, options)
 
 	if mouse_state.down and not mouse_state.drag_started then
 		local vp = state.viewport
