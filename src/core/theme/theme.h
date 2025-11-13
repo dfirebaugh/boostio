@@ -2,6 +2,7 @@
 #define BOOSTIO_THEME_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 struct rgb_color {
 	uint8_t r;
