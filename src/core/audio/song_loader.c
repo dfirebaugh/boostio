@@ -1,8 +1,10 @@
 #include "song_loader.h"
 #include "audio.h"
 #include "cJSON.h"
+#include "scale.h"
 #include "sequencer.h"
 #include "synth.h"
+#include "app/app_state.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,7 +64,7 @@ static char *read_file(const char *filepath)
 	return content;
 }
 
-bool song_loader_load_from_file(struct Audio *audio, const char *filepath)
+bool song_loader_load_from_file(struct Audio *audio, struct app_state *state, const char *filepath)
 {
 	char *json_content = read_file(filepath);
 	if (!json_content) {
@@ -87,8 +89,38 @@ bool song_loader_load_from_file(struct Audio *audio, const char *filepath)
 
 	cJSON *bpm_item = cJSON_GetObjectItemCaseSensitive(root, "bpm");
 	if (cJSON_IsNumber(bpm_item)) {
-		sequencer_set_bpm(sequencer, (uint32_t)bpm_item->valueint);
-		printf("Loaded song with BPM: %d\n", bpm_item->valueint);
+		uint32_t bpm = (uint32_t)bpm_item->valueint;
+		sequencer_set_bpm(sequencer, bpm);
+		if (state) {
+			state->bpm = bpm;
+		}
+		printf("Loaded song with BPM: %d\n", bpm);
+	}
+
+	cJSON *scale_item = cJSON_GetObjectItemCaseSensitive(root, "selected_scale");
+	if (cJSON_IsString(scale_item) && state) {
+		enum scale_type scale = scale_type_from_string(scale_item->valuestring);
+		state->selected_scale = scale;
+		printf("Loaded scale: %s\n", scale_item->valuestring);
+	}
+
+	cJSON *root_item = cJSON_GetObjectItemCaseSensitive(root, "selected_root");
+	if (cJSON_IsString(root_item) && state) {
+		enum root_note root_note = root_note_from_string(root_item->valuestring);
+		state->selected_root = root_note;
+		printf("Loaded root note: %s\n", root_item->valuestring);
+	}
+
+	cJSON *fold_mode_item = cJSON_GetObjectItemCaseSensitive(root, "fold_mode");
+	if (cJSON_IsBool(fold_mode_item) && state) {
+		state->fold_mode = cJSON_IsTrue(fold_mode_item);
+		printf("Loaded fold_mode: %s\n", state->fold_mode ? "true" : "false");
+	}
+
+	cJSON *show_scale_highlights_item = cJSON_GetObjectItemCaseSensitive(root, "show_scale_highlights");
+	if (cJSON_IsBool(show_scale_highlights_item) && state) {
+		state->show_scale_highlights = cJSON_IsTrue(show_scale_highlights_item);
+		printf("Loaded show_scale_highlights: %s\n", state->show_scale_highlights ? "true" : "false");
 	}
 
 	cJSON *notes_array = cJSON_GetObjectItemCaseSensitive(root, "notes");

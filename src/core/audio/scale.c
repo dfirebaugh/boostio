@@ -1,5 +1,6 @@
 #include "scale.h"
 #include <stddef.h>
+#include <string.h>
 
 static const uint8_t scale_chromatic[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11};
 static const uint8_t scale_major[] = {0, 2, 4, 5, 7, 9, 11};
@@ -87,6 +88,36 @@ const char *root_note_to_string(enum root_note root)
 		return "unknown";
 	}
 	return root_note_names[root];
+}
+
+enum scale_type scale_type_from_string(const char *str)
+{
+	if (str == NULL) {
+		return SCALE_PENTATONIC_MINOR;
+	}
+
+	for (int i = 0; i < SCALE_TYPE_COUNT; i++) {
+		if (strcmp(str, scale_type_names[i]) == 0) {
+			return (enum scale_type)i;
+		}
+	}
+
+	return SCALE_PENTATONIC_MINOR;
+}
+
+enum root_note root_note_from_string(const char *str)
+{
+	if (str == NULL) {
+		return ROOT_C;
+	}
+
+	for (int i = ROOT_C; i <= ROOT_B; i++) {
+		if (strcmp(str, root_note_names[i]) == 0) {
+			return (enum root_note)i;
+		}
+	}
+
+	return ROOT_C;
 }
 
 bool scale_is_note_in_scale(uint8_t piano_key, enum scale_type type, enum root_note root)

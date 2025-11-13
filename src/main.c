@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 	if (argc > 1) {
 		const char *song_path = argv[1];
 		printf("Loading song from: %s\n", song_path);
-		if (song_loader_load_from_file(audio, song_path)) {
+		if (song_loader_load_from_file(audio, &controller.state, song_path)) {
 			printf("Song loaded successfully\n");
 
 			strncpy(controller.state.current_file_path, song_path, 511);

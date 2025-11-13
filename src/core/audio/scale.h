@@ -47,6 +47,9 @@ const struct scale_info *scale_get_info(enum scale_type type);
 const char *scale_type_to_string(enum scale_type type);
 const char *root_note_to_string(enum root_note root);
 
+enum scale_type scale_type_from_string(const char *str);
+enum root_note root_note_from_string(const char *str);
+
 bool scale_is_note_in_scale(uint8_t piano_key, enum scale_type type, enum root_note root);
 
 bool scale_is_root_note(uint8_t piano_key, enum root_note root);

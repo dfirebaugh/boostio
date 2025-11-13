@@ -70,6 +70,7 @@ bool song_saver_save_to_file(
 	cJSON_AddStringToObject(root, "selected_root", root_str);
 
 	cJSON_AddBoolToObject(root, "fold_mode", state->fold_mode);
+	cJSON_AddBoolToObject(root, "show_scale_highlights", state->show_scale_highlights);
 
 	cJSON *notes_array = cJSON_CreateArray();
 	if (!notes_array) {

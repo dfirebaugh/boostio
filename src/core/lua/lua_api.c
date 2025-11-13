@@ -746,7 +746,7 @@ static int lua_api_load(lua_State *L)
 	const char *filepath = luaL_optstring(L, 1, "song.json");
 
 	struct Audio *audio = global_context->audio;
-	bool success = song_loader_load_from_file(audio, filepath);
+	bool success = song_loader_load_from_file(audio, global_context->app_state, filepath);
 
 	if (success && global_context->app_state) {
 		strncpy(global_context->app_state->current_file_path, filepath, 511);
