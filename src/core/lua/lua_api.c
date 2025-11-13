@@ -627,6 +627,23 @@ static int lua_api_add_note(lua_State *L)
 		ui_note->restart_phase = params.restart_phase;
 		state->note_count++;
 
+		struct command cmd;
+		cmd.type = CMD_ADD_NOTE;
+		cmd.data.add_note.note.id = ui_note->id;
+		cmd.data.add_note.note.ms = ui_note->ms;
+		cmd.data.add_note.note.duration_ms = ui_note->duration_ms;
+		cmd.data.add_note.note.voice = ui_note->voice;
+		cmd.data.add_note.note.piano_key = ui_note->piano_key;
+		cmd.data.add_note.note.waveform = ui_note->waveform;
+		cmd.data.add_note.note.duty_cycle = ui_note->duty_cycle;
+		cmd.data.add_note.note.decay = ui_note->decay;
+		cmd.data.add_note.note.amplitude_dbfs = ui_note->amplitude_dbfs;
+		cmd.data.add_note.note.nes_noise_period = ui_note->nes_noise_period;
+		cmd.data.add_note.note.nes_noise_mode_flag = ui_note->nes_noise_mode_flag;
+		cmd.data.add_note.note.nes_noise_lfsr_init = ui_note->nes_noise_lfsr_init;
+		cmd.data.add_note.note.restart_phase = ui_note->restart_phase;
+		command_history_push(&state->history, cmd);
+
 		struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 		if (sequencer != NULL) {
 			app_state_sync_notes_to_sequencer(state, sequencer, global_context->audio);
@@ -760,18 +777,30 @@ static int lua_api_load(lua_State *L)
 
 static int lua_api_undo(lua_State *L)
 {
-	if (global_context == NULL)
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL) {
 		return luaL_error(L, "API context not available");
-	printf("Undo requested\n");
-	return 0;
+	}
+
+	struct app_state *state = global_context->app_state;
+	bool success = command_history_undo(&state->history, state, global_context->audio);
+
+	lua_pushboolean(L, success);
+	return 1;
 }
 
 static int lua_api_redo(lua_State *L)
 {
-	if (global_context == NULL)
+	if (global_context == NULL || global_context->app_state == NULL ||
+	    global_context->audio == NULL) {
 		return luaL_error(L, "API context not available");
-	printf("Redo requested\n");
-	return 0;
+	}
+
+	struct app_state *state = global_context->app_state;
+	bool success = command_history_redo(&state->history, state, global_context->audio);
+
+	lua_pushboolean(L, success);
+	return 1;
 }
 
 static int lua_api_toggle_play(lua_State *L)
@@ -1133,6 +1162,13 @@ static int lua_api_set_note_voice(lua_State *L)
 
 	for (uint32_t i = 0; i < state->note_count; i++) {
 		if (state->notes[i].id == note_id) {
+			struct command cmd;
+			cmd.type = CMD_SET_NOTE_VOICE;
+			cmd.data.set_note_voice.note_id = note_id;
+			cmd.data.set_note_voice.old_voice = state->notes[i].voice;
+			cmd.data.set_note_voice.new_voice = (uint8_t)voice;
+			command_history_push(&state->history, cmd);
+
 			state->notes[i].voice = (uint8_t)voice;
 			break;
 		}
@@ -1166,6 +1202,21 @@ static int lua_api_set_note_instrument(lua_State *L)
 
 	for (uint32_t i = 0; i < state->note_count; i++) {
 		if (state->notes[i].id == note_id) {
+			struct command cmd;
+			cmd.type = CMD_SET_NOTE_INSTRUMENT;
+			cmd.data.set_note_instrument.note_id = note_id;
+			cmd.data.set_note_instrument.old_waveform = state->notes[i].waveform;
+			cmd.data.set_note_instrument.old_duty_cycle = state->notes[i].duty_cycle;
+			cmd.data.set_note_instrument.old_decay = state->notes[i].decay;
+			cmd.data.set_note_instrument.old_amplitude_dbfs =
+				state->notes[i].amplitude_dbfs;
+			cmd.data.set_note_instrument.old_nes_noise_mode_flag =
+				state->notes[i].nes_noise_mode_flag;
+			cmd.data.set_note_instrument.old_nes_noise_lfsr_init =
+				state->notes[i].nes_noise_lfsr_init;
+			cmd.data.set_note_instrument.new_instrument_index = (uint8_t)instrument_index;
+			command_history_push(&state->history, cmd);
+
 			state->notes[i].waveform = instr->waveform;
 			state->notes[i].duty_cycle = instr->duty_cycle;
 			state->notes[i].decay = instr->decay;
@@ -1675,6 +1726,7 @@ static int lua_api_move_note(lua_State *L)
 
 	struct app_state *state = global_context->app_state;
 
+	bool found = false;
 	for (uint32_t i = 0; i < state->note_count; i++) {
 		if (state->notes[i].id == note_id) {
 			int32_t new_ms = (int32_t)state->notes[i].ms + delta_ms;
@@ -1688,8 +1740,19 @@ static int lua_api_move_note(lua_State *L)
 			if (new_key > 127)
 				new_key = 127;
 			state->notes[i].piano_key = (uint8_t)new_key;
+
+			found = true;
 			break;
 		}
+	}
+
+	if (found) {
+		struct command cmd;
+		cmd.type = CMD_MOVE_NOTE;
+		cmd.data.move_note.note_id = note_id;
+		cmd.data.move_note.delta_ms = delta_ms;
+		cmd.data.move_note.delta_piano_key = delta_piano_key;
+		command_history_push(&state->history, cmd);
 	}
 
 	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
@@ -1713,6 +1776,8 @@ static int lua_api_resize_note(lua_State *L)
 
 	struct app_state *state = global_context->app_state;
 
+	bool found = false;
+	int32_t actual_delta_ms = 0;
 	for (uint32_t i = 0; i < state->note_count; i++) {
 		if (state->notes[i].id == note_id) {
 			if (from_left) {
@@ -1725,6 +1790,7 @@ static int lua_api_resize_note(lua_State *L)
 				if (new_duration < 10)
 					new_duration = 10;
 
+				actual_delta_ms = (int32_t)state->notes[i].ms - new_ms;
 				state->notes[i].ms = (uint32_t)new_ms;
 				state->notes[i].duration_ms = (uint16_t)new_duration;
 			} else {
@@ -1734,8 +1800,20 @@ static int lua_api_resize_note(lua_State *L)
 					new_duration = 10;
 				state->notes[i].duration_ms = (uint16_t)new_duration;
 			}
+
+			found = true;
 			break;
 		}
+	}
+
+	if (found) {
+		struct command cmd;
+		cmd.type = CMD_RESIZE_NOTE;
+		cmd.data.resize_note.note_id = note_id;
+		cmd.data.resize_note.delta_duration_ms = delta_duration_ms;
+		cmd.data.resize_note.from_left = from_left;
+		cmd.data.resize_note.delta_ms = actual_delta_ms;
+		command_history_push(&state->history, cmd);
 	}
 
 	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
@@ -1758,6 +1836,24 @@ static int lua_api_delete_note(lua_State *L)
 
 	for (uint32_t i = 0; i < state->note_count; i++) {
 		if (state->notes[i].id == note_id) {
+			struct command cmd;
+			cmd.type = CMD_DELETE_NOTE;
+			cmd.data.delete_note.note.id = state->notes[i].id;
+			cmd.data.delete_note.note.ms = state->notes[i].ms;
+			cmd.data.delete_note.note.duration_ms = state->notes[i].duration_ms;
+			cmd.data.delete_note.note.voice = state->notes[i].voice;
+			cmd.data.delete_note.note.piano_key = state->notes[i].piano_key;
+			cmd.data.delete_note.note.waveform = state->notes[i].waveform;
+			cmd.data.delete_note.note.duty_cycle = state->notes[i].duty_cycle;
+			cmd.data.delete_note.note.decay = state->notes[i].decay;
+			cmd.data.delete_note.note.amplitude_dbfs = state->notes[i].amplitude_dbfs;
+			cmd.data.delete_note.note.nes_noise_period = state->notes[i].nes_noise_period;
+			cmd.data.delete_note.note.nes_noise_mode_flag = state->notes[i].nes_noise_mode_flag;
+			cmd.data.delete_note.note.nes_noise_lfsr_init = state->notes[i].nes_noise_lfsr_init;
+			cmd.data.delete_note.note.restart_phase = state->notes[i].restart_phase;
+			cmd.data.delete_note.index = i;
+			command_history_push(&state->history, cmd);
+
 			for (uint32_t j = i; j < state->note_count - 1; j++) {
 				state->notes[j] = state->notes[j + 1];
 			}

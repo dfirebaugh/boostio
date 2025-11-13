@@ -7,6 +7,7 @@
 #include "core/audio/scale.h"
 #include "core/audio/synth.h"
 #include "core/theme/theme.h"
+#include "core/undo/command_history.h"
 
 struct sequencer;
 struct audio;
@@ -99,6 +100,8 @@ struct app_state {
 	uint32_t note_count;
 	struct selection selection;
 	uint32_t next_note_id;
+
+	struct command_history history;
 
 	char current_file_path[512];
 };

@@ -52,6 +52,7 @@ PRIVATE
     src/core/audio/c_exporter.c
     src/core/audio/wav_exporter.c
     src/core/audio/scale.c
+    src/core/undo/command_history.c
     src/core/theme/theme.c
     external/glad_generated/src/gl.c
     external/cJSON/cJSON.c

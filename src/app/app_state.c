@@ -11,6 +11,8 @@ void app_state_init(struct app_state *state)
 
 	memset(state, 0, sizeof(struct app_state));
 
+	command_history_init(&state->history);
+
 	state->window_width = 800;
 	state->window_height = 600;
 	state->bpm = 120;
