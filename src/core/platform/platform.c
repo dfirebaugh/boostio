@@ -2,14 +2,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #if defined(_WIN32)
 #define PLATFORM_WINDOWS
 #include <windows.h>
+#include <direct.h>
 #elif defined(__APPLE__)
 #define PLATFORM_MACOS
+#include <sys/stat.h>
+#include <errno.h>
 #elif defined(__linux__)
 #define PLATFORM_LINUX
+#include <sys/stat.h>
+#include <errno.h>
 #endif
 
 static char *get_env_or_default(const char *env_name, const char *default_value)
@@ -138,4 +144,61 @@ void platform_paths_free(struct platform_paths *paths)
 	paths->binary_dir = NULL;
 	paths->config_dir = NULL;
 	paths->data_dir = NULL;
+}
+
+static bool create_single_directory(const char *path)
+{
+#if defined(PLATFORM_WINDOWS)
+	if (_mkdir(path) == 0)
+	{
+		return true;
+	}
+	return (errno == EEXIST);
+#else
+	if (mkdir(path, 0755) == 0)
+	{
+		return true;
+	}
+	return (errno == EEXIST);
+#endif
+}
+
+bool platform_ensure_directory(const char *path)
+{
+	if (path == NULL || path[0] == '\0')
+	{
+		return false;
+	}
+
+	size_t len = strlen(path);
+	char *path_copy = malloc(len + 1);
+	if (path_copy == NULL)
+	{
+		return false;
+	}
+	strcpy(path_copy, path);
+
+	for (size_t i = 1; i <= len; i++)
+	{
+		if (path_copy[i] == '/' || path_copy[i] == '\\' || path_copy[i] == '\0')
+		{
+			char original = path_copy[i];
+			path_copy[i] = '\0';
+
+			if (!create_single_directory(path_copy))
+			{
+				struct stat st;
+				if (stat(path_copy, &st) != 0 || !S_ISDIR(st.st_mode))
+				{
+					free(path_copy);
+					return false;
+				}
+			}
+
+			path_copy[i] = original;
+		}
+	}
+
+	free(path_copy);
+	return true;
 }

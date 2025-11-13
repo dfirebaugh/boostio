@@ -11,6 +11,21 @@ int main(int argc, char *argv[])
 {
 	struct platform_paths paths;
 	platform_paths_init(&paths);
+
+	if (!platform_ensure_directory(paths.data_dir))
+	{
+		fprintf(stderr, "Failed to create data directory: %s\n", paths.data_dir);
+		platform_paths_free(&paths);
+		return 1;
+	}
+
+	if (!platform_ensure_directory(paths.config_dir))
+	{
+		fprintf(stderr, "Failed to create config directory: %s\n", paths.config_dir);
+		platform_paths_free(&paths);
+		return 1;
+	}
+
 	struct WindowConfig config = {
 			.width = 800, .height = 600, .title = "Boostio", .resizable = true, .vsync = true
 	};
