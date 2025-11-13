@@ -19,6 +19,14 @@ boostio.registerKeybinding("backspace", "delete_selected")
 boostio.registerKeybinding("space", "toggle_play")
 boostio.registerKeybinding("escape", "stop")
 
+boostio.registerKeybinding("[", "decrease_bpm")
+boostio.registerKeybinding("[", "decrease_bpm_5", { ctrl = true })
+boostio.registerKeybinding("[", "decrease_bpm_10", { shift = true })
+
+boostio.registerKeybinding("]", "increase_bpm")
+boostio.registerKeybinding("]", "increase_bpm_5", { ctrl = true })
+boostio.registerKeybinding("]", "increase_bpm_10", { shift = true })
+
 boostio.registerKeybinding("g", "toggle_snap")
 boostio.registerKeybinding("f", "toggle_fold")
 boostio.registerKeybinding("h", "toggle_scale_highlighting")

@@ -437,6 +437,10 @@ static enum key parse_key_string(const char *key_str)
 		return KEY_DELETE;
 	if (strcmp(key_str, "backspace") == 0)
 		return KEY_BACKSPACE;
+	if (strcmp(key_str, "[") == 0)
+		return KEY_LEFT_BRACKET;
+	if (strcmp(key_str, "]") == 0)
+		return KEY_RIGHT_BRACKET;
 
 	return KEY_COUNT;
 }

@@ -178,7 +178,7 @@ function boostio.registerCommand(name, callback) end
 ---@field alt boolean? Alt key modifier (default: false)
 
 ---Register a keybinding
----@param key string Key name: "a"-"z", "0"-"9", "space", "escape", "enter", "tab", "f1"-"f12", "up", "down", "left", "right", "minus", "equals"
+---@param key string Key name: "a"-"z", "0"-"9", "space", "escape", "enter", "tab", "f1"-"f12", "up", "down", "left", "right", "minus", "equals", "[", "]"
 ---@param command_name string Name of the command to execute
 ---@param modifiers KeybindingModifiers? Optional modifier keys (shift, ctrl, alt)
 function boostio.registerKeybinding(key, command_name, modifiers) end
