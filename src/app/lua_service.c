@@ -248,6 +248,39 @@ bool lua_service_load_plugins(struct lua_service *service)
 	return true;
 }
 
+void lua_service_call_update_callbacks(struct lua_service *service)
+{
+	if (service == NULL || !service->initialized) {
+		return;
+	}
+
+	lua_State *L = service->runtime.L;
+	if (L == NULL) {
+		return;
+	}
+
+	for (int i = 0; i < service->plugin_count; i++) {
+		const char *plugin_name = service->loaded_plugins[i];
+
+		lua_getglobal(L, plugin_name);
+		if (lua_type(L, -1) == LUA_TTABLE) {
+			lua_getfield(L, -1, "update");
+			if (lua_type(L, -1) == LUA_TFUNCTION) {
+				if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+					fprintf(stderr,
+						"Lua update error in %s: %s\n",
+						plugin_name,
+						lua_tostring(L, -1));
+					lua_pop(L, 1);
+				}
+			} else {
+				lua_pop(L, 1);
+			}
+		}
+		lua_pop(L, 1);
+	}
+}
+
 void lua_service_call_render_callbacks(struct lua_service *service)
 {
 	if (service == NULL || !service->initialized) {

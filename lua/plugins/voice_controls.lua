@@ -50,6 +50,10 @@ local function toggle_all_other_voices(clicked_voice)
 		end
 	end
 
+	if voice_validation then
+		voice_validation.invalidate()
+	end
+
 	if toast then
 		if hide_others then
 			toast.info("Hidden all other voices")
@@ -104,6 +108,9 @@ local function toggle_single_voice(voice, row, row_type, voice_state)
 
 	if row == 0 then
 		boostio.setVoiceHidden(voice, new_value)
+		if voice_validation then
+			voice_validation.invalidate()
+		end
 	elseif row == 1 then
 		boostio.setVoiceSolo(voice, new_value)
 	elseif row == 2 then
@@ -184,6 +191,10 @@ function voice_controls.on_key_down(key, shift, ctrl, alt)
 		if selection_success and selection and #selection > 0 then
 			for _, note_id in ipairs(selection) do
 				pcall(boostio.setNoteVoice, note_id, voice)
+			end
+
+			if voice_validation then
+				voice_validation.invalidate()
 			end
 
 			if toast and toast.info then

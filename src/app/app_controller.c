@@ -186,6 +186,8 @@ void app_controller_update(struct app_controller *controller, float delta_time)
 	for (size_t i = 0; i < event_count; i++) {
 		handle_input_event(controller, &events[i]);
 	}
+
+	lua_service_call_update_callbacks(&controller->lua_service);
 }
 
 void app_controller_render(struct app_controller *controller)

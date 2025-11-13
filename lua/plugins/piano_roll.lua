@@ -680,6 +680,10 @@ local function handle_mouse_up(x, y, button, state)
 		end
 	end
 
+	if voice_validation then
+		voice_validation.invalidate()
+	end
+
 	mouse_state.down = false
 	mouse_state.drag_mode = "none"
 	mouse_state.drag_started = false

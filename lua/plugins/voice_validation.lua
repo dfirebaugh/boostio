@@ -4,6 +4,7 @@ voice_validation.enabled = true
 
 local validation_errors = {}
 local hover_error = nil
+local needs_validation = true
 
 local function is_voice_visible(voice)
 	if voice_controls and voice_controls.isVoiceVisible then
@@ -13,6 +14,10 @@ local function is_voice_visible(voice)
 end
 
 local function detect_voice_overlaps(notes)
+	if #notes == 0 then
+		return {}
+	end
+
 	local errors = {}
 
 	local notes_by_voice = {}
@@ -29,22 +34,23 @@ local function detect_voice_overlaps(notes)
 
 	for voice = 1, 8 do
 		local voice_notes = notes_by_voice[voice]
+		local voice_note_count = #voice_notes
 
-		if #voice_notes > 1 then
+		if voice_note_count > 1 then
 			table.sort(voice_notes, function(a, b)
 				return a.ms < b.ms
 			end)
 
 			local processed = {}
-			for i = 1, #voice_notes do
+			for i = 1, voice_note_count do
 				if not processed[i] then
 					local note = voice_notes[i]
 					local note_end = note.ms + note.duration_ms
-					local conflict_notes = {note.id}
-					local conflict_indices = {i}
+					local conflict_notes = { note.id }
+					local conflict_indices = { i }
 					local conflict_end = note_end
 
-					for j = i + 1, #voice_notes do
+					for j = i + 1, voice_note_count do
 						local check_note = voice_notes[j]
 						local check_end = check_note.ms + check_note.duration_ms
 
@@ -91,38 +97,11 @@ local function render_validation_highlights(state, theme)
 		local width = end_x - start_x
 
 		if start_x < vp.grid_x + vp.grid_width and end_x > vp.grid_x then
-			boostio.drawRectangle(
-				start_x,
-				vp.grid_y,
-				width,
-				vp.grid_height,
-				0.8,
-				0.2,
-				0.2,
-				0.15
-			)
+			boostio.drawRectangle(start_x, vp.grid_y, width, vp.grid_height, 0.8, 0.2, 0.2, 0.15)
 
-			boostio.drawLine(
-				start_x,
-				vp.grid_y,
-				start_x,
-				vp.grid_y + vp.grid_height,
-				1.0,
-				0.3,
-				0.3,
-				0.5
-			)
+			boostio.drawLine(start_x, vp.grid_y, start_x, vp.grid_y + vp.grid_height, 1.0, 0.3, 0.3, 0.5)
 
-			boostio.drawLine(
-				end_x,
-				vp.grid_y,
-				end_x,
-				vp.grid_y + vp.grid_height,
-				1.0,
-				0.3,
-				0.3,
-				0.5
-			)
+			boostio.drawLine(end_x, vp.grid_y, end_x, vp.grid_y + vp.grid_height, 1.0, 0.3, 0.3, 0.5)
 		end
 	end
 end
@@ -173,14 +152,9 @@ local function render_error_indicators(state, theme)
 				1.0
 			)
 
-			local is_hover = boostio.isPointInRect(
-				mouse_x,
-				mouse_y,
-				indicator_x,
-				indicator_y,
-				indicator_size,
-				indicator_size
-			)
+			local is_hover =
+			    boostio.isPointInRect(mouse_x, mouse_y, indicator_x, indicator_y, indicator_size,
+				    indicator_size)
 
 			if is_hover then
 				hover_error = error
@@ -203,17 +177,8 @@ local function render_error_indicators(state, theme)
 		end
 
 		local bg_color = boostio.hexToRgb(theme.palette.surface0)
-		boostio.drawRoundedRectangle(
-			tooltip_x + 2,
-			tooltip_y + 2,
-			tooltip_width,
-			tooltip_height,
-			8,
-			0.0,
-			0.0,
-			0.0,
-			0.3
-		)
+		boostio.drawRoundedRectangle(tooltip_x + 2, tooltip_y + 2, tooltip_width, tooltip_height, 8, 0.0, 0.0,
+			0.0, 0.3)
 
 		boostio.drawRoundedRectangle(
 			tooltip_x,
@@ -228,29 +193,12 @@ local function render_error_indicators(state, theme)
 		)
 
 		local error_color = boostio.hexToRgb(theme.palette.red)
-		boostio.drawRectangle(
-			tooltip_x,
-			tooltip_y,
-			tooltip_width,
-			4,
-			error_color.r,
-			error_color.g,
-			error_color.b,
-			1.0
-		)
+		boostio.drawRectangle(tooltip_x, tooltip_y, tooltip_width, 4, error_color.r, error_color.g, error_color
+		.b, 1.0)
 
 		local text_color = boostio.hexToRgb(theme.palette.text)
 		local title = string.format("Voice %d: Overlapping Notes", hover_error.voice)
-		boostio.drawText(
-			title,
-			tooltip_x + 12,
-			tooltip_y + 22,
-			13,
-			text_color.r,
-			text_color.g,
-			text_color.b,
-			1.0
-		)
+		boostio.drawText(title, tooltip_x + 12, tooltip_y + 22, 13, text_color.r, text_color.g, text_color.b, 1.0)
 
 		local message = "Only one note per voice can play at a time."
 		boostio.drawText(
@@ -266,11 +214,23 @@ local function render_error_indicators(state, theme)
 	end
 end
 
+function voice_validation.invalidate()
+	needs_validation = true
+end
+
+function voice_validation.update()
+	if not needs_validation then
+		return
+	end
+
+	local state = boostio.getAppState()
+	validation_errors = detect_voice_overlaps(state.notes)
+	needs_validation = false
+end
+
 function voice_validation.render()
 	local state = boostio.getAppState()
 	local theme = config.theme
-
-	validation_errors = detect_voice_overlaps(state.notes)
 
 	render_validation_highlights(state, theme)
 	render_error_indicators(state, theme)

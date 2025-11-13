@@ -38,6 +38,8 @@ bool lua_service_load_plugins(struct lua_service *service);
 
 bool lua_service_load_plugin(struct lua_service *service, const char *plugin_path);
 
+void lua_service_call_update_callbacks(struct lua_service *service);
+
 void lua_service_call_render_callbacks(struct lua_service *service);
 
 bool lua_service_dispatch_key_event(
