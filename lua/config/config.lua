@@ -155,31 +155,6 @@ config = {
 				enabled = true,
 				priority = 80,
 			},
-			-- {
-			-- 	name = "test",
-			-- 	enabled = false,
-			-- 	priority = 50,
-			-- },
-			-- {
-			-- 	name = "draw_test",
-			-- 	enabled = true,
-			-- 	priority = 50,
-			-- },
-			-- {
-			-- 	name = "test_commands",
-			-- 	enabled = true,
-			-- 	priority = 50,
-			-- },
-			-- {
-			-- 	name = "audio_test",
-			-- 	enabled = true,
-			-- 	priority = 50,
-			-- },
-			-- {
-			-- 	name = "advanced_audio_test",
-			-- 	enabled = true,
-			-- 	priority = 50,
-			-- },
 		},
 	},
 }
