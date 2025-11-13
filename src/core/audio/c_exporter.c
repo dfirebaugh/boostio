@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const char *waveform_to_audio_out_type(enum WaveformType waveform)
+static const char *waveform_to_audio_out_type(enum waveform_type waveform)
 {
 	switch (waveform) {
 	case WAVEFORM_SINE:
@@ -160,12 +160,12 @@ static const char *get_duty_cycle_macro(uint8_t duty)
 	}
 }
 
-static uint32_t calculate_song_length_ms(const struct Sequencer *sequencer)
+static uint32_t calculate_song_length_ms(const struct sequencer *sequencer)
 {
 	uint32_t max_end_time = 0;
 
 	for (uint32_t i = 0; i < sequencer->note_count; i++) {
-		const struct Note *note = &sequencer->notes[i];
+		const struct note *note = &sequencer->notes[i];
 		uint32_t end_time = note->time_ms + (uint32_t)note->params.duration_ms;
 
 		if (end_time > max_end_time) {
@@ -203,7 +203,7 @@ static void extract_section_name(const char *filepath, char *name, size_t name_s
 	name[len] = '\0';
 }
 
-bool c_exporter_export_to_file(const struct Sequencer *sequencer, const char *filepath)
+bool c_exporter_export_to_file(const struct sequencer *sequencer, const char *filepath)
 {
 	if (!sequencer || !filepath) {
 		fprintf(stderr, "Invalid parameters for C export\n");
@@ -231,8 +231,8 @@ bool c_exporter_export_to_file(const struct Sequencer *sequencer, const char *fi
 	fprintf(file, "static const struct audio_out_note %s_NOTES[] = {\n", section_name);
 
 	for (uint32_t i = 0; i < sequencer->note_count; i++) {
-		const struct Note *note = &sequencer->notes[i];
-		const struct NoteParams *params = &note->params;
+		const struct note *note = &sequencer->notes[i];
+		const struct note_params *params = &note->params;
 
 		fprintf(file, "\t{\n");
 		fprintf(file, "\t\t.v = %d,\n", params->voice_index);

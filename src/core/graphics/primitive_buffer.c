@@ -94,7 +94,7 @@ struct primitive_vertex {
 	float outline_color[4];
 };
 
-struct PrimitiveBuffer {
+struct primitive_buffer {
 	unsigned int shader_program;
 	unsigned int vao;
 	unsigned int vbo;
@@ -104,15 +104,15 @@ struct PrimitiveBuffer {
 	int vertex_capacity;
 };
 
-struct PrimitiveBuffer *primitive_buffer_create(void)
+struct primitive_buffer *primitive_buffer_create(void)
 {
-	struct PrimitiveBuffer *buffer =
-		(struct PrimitiveBuffer *)malloc(sizeof(struct PrimitiveBuffer));
+	struct primitive_buffer *buffer =
+		(struct primitive_buffer *)malloc(sizeof(struct primitive_buffer));
 	if (!buffer) {
 		return NULL;
 	}
 
-	memset(buffer, 0, sizeof(struct PrimitiveBuffer));
+	memset(buffer, 0, sizeof(struct primitive_buffer));
 
 	unsigned int vertex_shader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertex_shader, 1, &primitive_vertex_shader, NULL);
@@ -184,7 +184,7 @@ struct PrimitiveBuffer *primitive_buffer_create(void)
 	return buffer;
 }
 
-void primitive_buffer_destroy(struct PrimitiveBuffer *buffer)
+void primitive_buffer_destroy(struct primitive_buffer *buffer)
 {
 	if (!buffer) {
 		return;
@@ -209,7 +209,7 @@ void primitive_buffer_destroy(struct PrimitiveBuffer *buffer)
 	free(buffer);
 }
 
-void primitive_buffer_begin(struct PrimitiveBuffer *buffer)
+void primitive_buffer_begin(struct primitive_buffer *buffer)
 {
 	if (!buffer) {
 		return;
@@ -219,15 +219,15 @@ void primitive_buffer_begin(struct PrimitiveBuffer *buffer)
 }
 
 void primitive_buffer_add_rect(
-	struct PrimitiveBuffer *buffer,
+	struct primitive_buffer *buffer,
 	float x,
 	float y,
 	float width,
 	float height,
-	struct Color color,
+	struct color color,
 	float radius,
 	float outline_width,
-	struct Color outline_color
+	struct color outline_color
 )
 {
 	if (!buffer) {
@@ -374,10 +374,10 @@ void primitive_buffer_add_rect(
 }
 
 void primitive_buffer_add_line(
-	struct PrimitiveBuffer *buffer, float x1, float y1, float x2, float y2, struct Color color
+	struct primitive_buffer *buffer, float x1, float y1, float x2, float y2, struct color color
 )
 {
-	struct Color no_outline = {0, 0, 0, 0};
+	struct color no_outline = {0, 0, 0, 0};
 
 	if (fabsf(y2 - y1) < 0.5f) {
 		float width = fabsf(x2 - x1);
@@ -410,7 +410,7 @@ void primitive_buffer_add_line(
 	}
 }
 
-void primitive_buffer_render(struct PrimitiveBuffer *buffer, int window_width, int window_height)
+void primitive_buffer_render(struct primitive_buffer *buffer, int window_width, int window_height)
 {
 	if (!buffer || buffer->vertex_count == 0) {
 		return;

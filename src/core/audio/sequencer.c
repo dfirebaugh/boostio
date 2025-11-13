@@ -2,20 +2,20 @@
 #include <stdio.h>
 #include <string.h>
 
-void sequencer_init(struct Sequencer *sequencer)
+void sequencer_init(struct sequencer *sequencer)
 {
-	memset(sequencer, 0, sizeof(struct Sequencer));
+	memset(sequencer, 0, sizeof(struct sequencer));
 	sequencer->bpm = 120;
 	sequencer->playing = false;
 }
 
-void sequencer_add_note(struct Sequencer *sequencer, uint32_t time_ms, struct NoteParams params)
+void sequencer_add_note(struct sequencer *sequencer, uint32_t time_ms, struct note_params params)
 {
 	if (sequencer->note_count >= SEQUENCER_MAX_NOTES) {
 		return;
 	}
 
-	struct Note *note = &sequencer->notes[sequencer->note_count];
+	struct note *note = &sequencer->notes[sequencer->note_count];
 	note->time_ms = time_ms;
 	note->params = params;
 	note->triggered = false;
@@ -23,14 +23,14 @@ void sequencer_add_note(struct Sequencer *sequencer, uint32_t time_ms, struct No
 	sequencer->note_count++;
 }
 
-void sequencer_clear_notes(struct Sequencer *sequencer)
+void sequencer_clear_notes(struct sequencer *sequencer)
 {
 	sequencer->note_count = 0;
 }
 
 void sequencer_update(
-	struct Sequencer *sequencer,
-	struct Synth *synth,
+	struct sequencer *sequencer,
+	struct synth *synth,
 	uint32_t samples,
 	const bool *voice_solo,
 	const bool *voice_muted
@@ -57,7 +57,7 @@ void sequencer_update(
 	}
 
 	for (uint32_t i = 0; i < sequencer->note_count; i++) {
-		struct Note *note = &sequencer->notes[i];
+		struct note *note = &sequencer->notes[i];
 
 		if (!note->triggered && playhead_ms >= note->time_ms) {
 			bool should_play = true;
@@ -94,7 +94,7 @@ void sequencer_update(
 	}
 }
 
-void sequencer_set_playhead(struct Sequencer *sequencer, uint32_t playhead_ms)
+void sequencer_set_playhead(struct sequencer *sequencer, uint32_t playhead_ms)
 {
 	if (sequencer->sample_rate == 0) {
 		return;
@@ -111,22 +111,22 @@ void sequencer_set_playhead(struct Sequencer *sequencer, uint32_t playhead_ms)
 	}
 }
 
-void sequencer_set_bpm(struct Sequencer *sequencer, uint32_t bpm)
+void sequencer_set_bpm(struct sequencer *sequencer, uint32_t bpm)
 {
 	sequencer->bpm = bpm;
 }
 
-void sequencer_play(struct Sequencer *sequencer)
+void sequencer_play(struct sequencer *sequencer)
 {
 	sequencer->playing = true;
 }
 
-void sequencer_pause(struct Sequencer *sequencer)
+void sequencer_pause(struct sequencer *sequencer)
 {
 	sequencer->playing = false;
 }
 
-void sequencer_stop(struct Sequencer *sequencer)
+void sequencer_stop(struct sequencer *sequencer)
 {
 	sequencer->playing = false;
 	sequencer_set_playhead(sequencer, 0);

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void reset_frame_input(struct InputState *input)
+static void reset_frame_input(struct input_state *input)
 {
 	memset(input->scancodes_pressed, 0, sizeof(input->scancodes_pressed));
 	memset(input->scancodes_released, 0, sizeof(input->scancodes_released));
@@ -13,7 +13,7 @@ static void reset_frame_input(struct InputState *input)
 	input->mouse_wheel_y = 0.0f;
 }
 
-struct Window *window_create(const struct WindowConfig *config)
+struct window *window_create(const struct window_config *config)
 {
 	if (!config) {
 		fprintf(stderr, "Window config is NULL\n");
@@ -31,13 +31,13 @@ struct Window *window_create(const struct WindowConfig *config)
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
-	struct Window *window = (struct Window *)malloc(sizeof(struct Window));
+	struct window *window = (struct window *)malloc(sizeof(struct window));
 	if (!window) {
 		fprintf(stderr, "Failed to allocate window\n");
 		return NULL;
 	}
 
-	memset(window, 0, sizeof(struct Window));
+	memset(window, 0, sizeof(struct window));
 
 	window->width = config->width;
 	window->height = config->height;
@@ -69,7 +69,7 @@ struct Window *window_create(const struct WindowConfig *config)
 	return window;
 }
 
-void window_destroy(struct Window *window)
+void window_destroy(struct window *window)
 {
 	if (!window) {
 		return;
@@ -87,7 +87,7 @@ void window_destroy(struct Window *window)
 	SDL_Quit();
 }
 
-bool window_poll_events(struct Window *window)
+bool window_poll_events(struct window *window)
 {
 	if (!window) {
 		return false;
@@ -162,7 +162,7 @@ bool window_poll_events(struct Window *window)
 	return !window->should_close;
 }
 
-void window_swap_buffers(struct Window *window)
+void window_swap_buffers(struct window *window)
 {
 	if (!window || !window->window) {
 		return;
@@ -170,7 +170,7 @@ void window_swap_buffers(struct Window *window)
 	SDL_GL_SwapWindow(window->window);
 }
 
-void window_get_size(const struct Window *window, int *width, int *height)
+void window_get_size(const struct window *window, int *width, int *height)
 {
 	if (window && width && height) {
 		*width = window->width;
@@ -178,7 +178,7 @@ void window_get_size(const struct Window *window, int *width, int *height)
 	}
 }
 
-void window_get_mouse_position(const struct Window *window, int *x, int *y)
+void window_get_mouse_position(const struct window *window, int *x, int *y)
 {
 	if (window && x && y) {
 		*x = window->input.mouse_x;
@@ -186,7 +186,7 @@ void window_get_mouse_position(const struct Window *window, int *x, int *y)
 	}
 }
 
-bool window_is_scancode_down(const struct Window *window, SDL_Scancode scancode)
+bool window_is_scancode_down(const struct window *window, SDL_Scancode scancode)
 {
 	if (window && scancode < 512) {
 		return window->input.scancodes_down[scancode];
@@ -194,7 +194,7 @@ bool window_is_scancode_down(const struct Window *window, SDL_Scancode scancode)
 	return false;
 }
 
-bool window_is_scancode_pressed(const struct Window *window, SDL_Scancode scancode)
+bool window_is_scancode_pressed(const struct window *window, SDL_Scancode scancode)
 {
 	if (window && scancode < 512) {
 		return window->input.scancodes_pressed[scancode];
@@ -202,7 +202,7 @@ bool window_is_scancode_pressed(const struct Window *window, SDL_Scancode scanco
 	return false;
 }
 
-bool window_is_mouse_button_down(const struct Window *window, int button)
+bool window_is_mouse_button_down(const struct window *window, int button)
 {
 	if (window && button >= 0 && button < 8) {
 		return window->input.mouse_buttons[button];
@@ -210,7 +210,7 @@ bool window_is_mouse_button_down(const struct Window *window, int button)
 	return false;
 }
 
-bool window_is_mouse_button_pressed(const struct Window *window, int button)
+bool window_is_mouse_button_pressed(const struct window *window, int button)
 {
 	if (window && button >= 0 && button < 8) {
 		return window->input.mouse_pressed[button];

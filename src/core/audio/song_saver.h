@@ -5,10 +5,10 @@
 #include <stdint.h>
 
 struct app_state;
-struct Sequencer;
+struct sequencer;
 
 bool song_saver_save_to_file(
-	const struct app_state *state, const struct Sequencer *sequencer, const char *filepath
+	const struct app_state *state, const struct sequencer *sequencer, const char *filepath
 );
 
 #endif

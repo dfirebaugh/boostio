@@ -9,24 +9,24 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-struct KerningPair {
+struct kerning_pair {
 	uint32_t left;
 	uint32_t right;
 	float advance;
 };
 
-struct MSDFAtlas {
+struct msdf_atlas {
 	unsigned int texture_id;
 	int width;
 	int height;
 	float pixel_range;
 	float font_size;
 
-	struct MSDFGlyph *glyphs;
+	struct msdf_glyph *glyphs;
 	int glyph_count;
 	int glyph_capacity;
 
-	struct KerningPair *kerning;
+	struct kerning_pair *kerning;
 	int kerning_count;
 	int kerning_capacity;
 };
@@ -155,7 +155,7 @@ static char *read_file(const char *path, size_t *size)
 	return string;
 }
 
-struct MSDFAtlas *msdf_atlas_load(const char *json_path, const char *png_path)
+struct msdf_atlas *msdf_atlas_load(const char *json_path, const char *png_path)
 {
 	size_t json_size;
 	char *json_content = read_file(json_path, &json_size);
@@ -172,19 +172,19 @@ struct MSDFAtlas *msdf_atlas_load(const char *json_path, const char *png_path)
 		return NULL;
 	}
 
-	struct MSDFAtlas *atlas = (struct MSDFAtlas *)malloc(sizeof(struct MSDFAtlas));
+	struct msdf_atlas *atlas = (struct msdf_atlas *)malloc(sizeof(struct msdf_atlas));
 	if (!atlas) {
 		cJSON_Delete(root);
 		return NULL;
 	}
 
-	memset(atlas, 0, sizeof(struct MSDFAtlas));
+	memset(atlas, 0, sizeof(struct msdf_atlas));
 	atlas->glyph_capacity = 256;
 	atlas->glyphs =
-		(struct MSDFGlyph *)malloc(sizeof(struct MSDFGlyph) * atlas->glyph_capacity);
+		(struct msdf_glyph *)malloc(sizeof(struct msdf_glyph) * atlas->glyph_capacity);
 	atlas->kerning_capacity = 256;
 	atlas->kerning =
-		(struct KerningPair *)malloc(sizeof(struct KerningPair) * atlas->kerning_capacity);
+		(struct kerning_pair *)malloc(sizeof(struct kerning_pair) * atlas->kerning_capacity);
 
 	cJSON *atlas_obj = cJSON_GetObjectItem(root, "atlas");
 	if (atlas_obj) {
@@ -214,14 +214,14 @@ struct MSDFAtlas *msdf_atlas_load(const char *json_path, const char *png_path)
 
 			if (atlas->glyph_count >= atlas->glyph_capacity) {
 				atlas->glyph_capacity *= 2;
-				atlas->glyphs = (struct MSDFGlyph *)realloc(
+				atlas->glyphs = (struct msdf_glyph *)realloc(
 					atlas->glyphs,
-					sizeof(struct MSDFGlyph) * atlas->glyph_capacity
+					sizeof(struct msdf_glyph) * atlas->glyph_capacity
 				);
 			}
 
-			struct MSDFGlyph *glyph = &atlas->glyphs[atlas->glyph_count];
-			memset(glyph, 0, sizeof(struct MSDFGlyph));
+			struct msdf_glyph *glyph = &atlas->glyphs[atlas->glyph_count];
+			memset(glyph, 0, sizeof(struct msdf_glyph));
 			glyph->codepoint = (uint32_t)unicode->valueint;
 
 			cJSON *advance = cJSON_GetObjectItem(glyph_obj, "advance");
@@ -279,9 +279,9 @@ struct MSDFAtlas *msdf_atlas_load(const char *json_path, const char *png_path)
 			if (u1 && u2 && adv) {
 				if (atlas->kerning_count >= atlas->kerning_capacity) {
 					atlas->kerning_capacity *= 2;
-					atlas->kerning = (struct KerningPair *)realloc(
+					atlas->kerning = (struct kerning_pair *)realloc(
 						atlas->kerning,
-						sizeof(struct KerningPair) * atlas->kerning_capacity
+						sizeof(struct kerning_pair) * atlas->kerning_capacity
 					);
 				}
 
@@ -329,7 +329,7 @@ struct MSDFAtlas *msdf_atlas_load(const char *json_path, const char *png_path)
 	return atlas;
 }
 
-void msdf_atlas_destroy(struct MSDFAtlas *atlas)
+void msdf_atlas_destroy(struct msdf_atlas *atlas)
 {
 	if (!atlas) {
 		return;
@@ -350,7 +350,7 @@ void msdf_atlas_destroy(struct MSDFAtlas *atlas)
 	free(atlas);
 }
 
-const struct MSDFGlyph *msdf_atlas_get_glyph(const struct MSDFAtlas *atlas, uint32_t codepoint)
+const struct msdf_glyph *msdf_atlas_get_glyph(const struct msdf_atlas *atlas, uint32_t codepoint)
 {
 	if (!atlas || !atlas->glyphs) {
 		return NULL;
@@ -365,7 +365,7 @@ const struct MSDFGlyph *msdf_atlas_get_glyph(const struct MSDFAtlas *atlas, uint
 	return NULL;
 }
 
-float msdf_atlas_get_kerning(const struct MSDFAtlas *atlas, uint32_t left, uint32_t right)
+float msdf_atlas_get_kerning(const struct msdf_atlas *atlas, uint32_t left, uint32_t right)
 {
 	if (!atlas || !atlas->kerning) {
 		return 0.0f;
@@ -380,32 +380,32 @@ float msdf_atlas_get_kerning(const struct MSDFAtlas *atlas, uint32_t left, uint3
 	return 0.0f;
 }
 
-unsigned int msdf_atlas_get_texture_id(const struct MSDFAtlas *atlas)
+unsigned int msdf_atlas_get_texture_id(const struct msdf_atlas *atlas)
 {
 	return atlas ? atlas->texture_id : 0;
 }
 
-int msdf_atlas_get_width(const struct MSDFAtlas *atlas)
+int msdf_atlas_get_width(const struct msdf_atlas *atlas)
 {
 	return atlas ? atlas->width : 0;
 }
 
-int msdf_atlas_get_height(const struct MSDFAtlas *atlas)
+int msdf_atlas_get_height(const struct msdf_atlas *atlas)
 {
 	return atlas ? atlas->height : 0;
 }
 
-float msdf_atlas_get_pixel_range(const struct MSDFAtlas *atlas)
+float msdf_atlas_get_pixel_range(const struct msdf_atlas *atlas)
 {
 	return atlas ? atlas->pixel_range : 0.0f;
 }
 
-float msdf_atlas_get_font_size(const struct MSDFAtlas *atlas)
+float msdf_atlas_get_font_size(const struct msdf_atlas *atlas)
 {
 	return atlas ? atlas->font_size : 0.0f;
 }
 
-float msdf_atlas_measure_text(const struct MSDFAtlas *atlas, const char *text, float size)
+float msdf_atlas_measure_text(const struct msdf_atlas *atlas, const char *text, float size)
 {
 	if (!atlas || !text) {
 		return 0.0f;
@@ -421,7 +421,7 @@ float msdf_atlas_measure_text(const struct MSDFAtlas *atlas, const char *text, f
 			width += msdf_atlas_get_kerning(atlas, prev_char, char_code) * size;
 		}
 
-		const struct MSDFGlyph *glyph = msdf_atlas_get_glyph(atlas, char_code);
+		const struct msdf_glyph *glyph = msdf_atlas_get_glyph(atlas, char_code);
 		if (glyph) {
 			width += glyph->advance * size;
 		}
@@ -453,7 +453,7 @@ bool msdf_atlas_generate(const char *font_path, const char *png_path, const char
 		return true;
 	}
 
-	MSDFAtlasGen *gen = atlas_generator_create();
+	struct msdf_atlas_gen *gen = atlas_generator_create();
 	if (!gen) {
 		fprintf(stderr, "Failed to create atlas generator\n");
 		return false;

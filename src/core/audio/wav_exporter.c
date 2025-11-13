@@ -23,11 +23,11 @@ struct render_voice {
 	float amplitude;
 	uint32_t start_time_ms;
 	uint16_t lfsr;
-	struct NoteParams params;
+	struct note_params params;
 	uint32_t start_ms;
 };
 
-static void trigger_note(struct render_voice *voice, const struct Note *note)
+static void trigger_note(struct render_voice *voice, const struct note *note)
 {
 	voice->active = true;
 	voice->params = note->params;
@@ -184,12 +184,12 @@ static void write_wav_header(FILE *file, uint32_t data_size)
 	fwrite(&data_size, 4, 1, file);
 }
 
-static uint32_t calculate_duration_ms(const struct Sequencer *sequencer)
+static uint32_t calculate_duration_ms(const struct sequencer *sequencer)
 {
 	uint32_t max_end = 0;
 
 	for (uint32_t i = 0; i < sequencer->note_count; i++) {
-		const struct Note *note = &sequencer->notes[i];
+		const struct note *note = &sequencer->notes[i];
 		uint32_t end_time = note->time_ms + (uint32_t)note->params.duration_ms;
 		if (end_time > max_end) {
 			max_end = end_time;
@@ -199,7 +199,7 @@ static uint32_t calculate_duration_ms(const struct Sequencer *sequencer)
 	return (max_end > 0) ? max_end : 1000;
 }
 
-bool wav_exporter_export_to_file(const struct Sequencer *sequencer, const char *filepath)
+bool wav_exporter_export_to_file(const struct sequencer *sequencer, const char *filepath)
 {
 	if (!sequencer || !filepath) {
 		fprintf(stderr, "Invalid parameters for WAV export\n");
@@ -231,7 +231,7 @@ bool wav_exporter_export_to_file(const struct Sequencer *sequencer, const char *
 		uint32_t current_time_ms = (uint32_t)((current_sample * 1000) / SAMPLE_RATE);
 
 		while (next_note_index < sequencer->note_count) {
-			const struct Note *note = &sequencer->notes[next_note_index];
+			const struct note *note = &sequencer->notes[next_note_index];
 			if (note->time_ms <= current_time_ms) {
 				int8_t voice_idx = note->params.voice_index;
 				if (voice_idx >= 0 && voice_idx < WAV_MAX_VOICES) {

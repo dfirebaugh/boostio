@@ -5,16 +5,16 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-struct Note {
+struct note {
 	uint32_t time_ms;
-	struct NoteParams params;
+	struct note_params params;
 	bool triggered;
 };
 
 #define SEQUENCER_MAX_NOTES 256
 
-struct Sequencer {
-	struct Note notes[SEQUENCER_MAX_NOTES];
+struct sequencer {
+	struct note notes[SEQUENCER_MAX_NOTES];
 	uint32_t note_count;
 	uint64_t playhead_samples;
 	uint32_t sample_rate;
@@ -22,20 +22,20 @@ struct Sequencer {
 	bool playing;
 };
 
-void sequencer_init(struct Sequencer *sequencer);
-void sequencer_add_note(struct Sequencer *sequencer, uint32_t time_ms, struct NoteParams params);
-void sequencer_clear_notes(struct Sequencer *sequencer);
+void sequencer_init(struct sequencer *sequencer);
+void sequencer_add_note(struct sequencer *sequencer, uint32_t time_ms, struct note_params params);
+void sequencer_clear_notes(struct sequencer *sequencer);
 void sequencer_update(
-	struct Sequencer *sequencer,
-	struct Synth *synth,
+	struct sequencer *sequencer,
+	struct synth *synth,
 	uint32_t samples,
 	const bool *voice_solo,
 	const bool *voice_muted
 );
-void sequencer_set_playhead(struct Sequencer *sequencer, uint32_t playhead_ms);
-void sequencer_set_bpm(struct Sequencer *sequencer, uint32_t bpm);
-void sequencer_play(struct Sequencer *sequencer);
-void sequencer_pause(struct Sequencer *sequencer);
-void sequencer_stop(struct Sequencer *sequencer);
+void sequencer_set_playhead(struct sequencer *sequencer, uint32_t playhead_ms);
+void sequencer_set_bpm(struct sequencer *sequencer, uint32_t bpm);
+void sequencer_play(struct sequencer *sequencer);
+void sequencer_pause(struct sequencer *sequencer);
+void sequencer_stop(struct sequencer *sequencer);
 
 #endif

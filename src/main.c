@@ -29,24 +29,24 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	struct WindowConfig config = {
+	struct window_config config = {
 		.width = 800, .height = 600, .title = "Boostio", .resizable = true, .vsync = true
 	};
 
-	struct Window *window = window_create(&config);
+	struct window *window = window_create(&config);
 	if (!window) {
 		fprintf(stderr, "Failed to create window\n");
 		return 1;
 	}
 
-	struct Graphics *graphics = graphics_create(window);
+	struct graphics *graphics = graphics_create(window);
 	if (!graphics) {
 		fprintf(stderr, "Failed to create graphics context\n");
 		window_destroy(window);
 		return 1;
 	}
 
-	struct Audio *audio = audio_create();
+	struct audio *audio = audio_create();
 	if (!audio) {
 		fprintf(stderr, "Failed to create audio system\n");
 		graphics_destroy(graphics);
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 			controller.state.current_file_path[511] = '\0';
 			printf("Set current file path: %s\n", song_path);
 
-			struct Sequencer *sequencer = audio_get_sequencer(audio);
+			struct sequencer *sequencer = audio_get_sequencer(audio);
 			app_state_sync_notes_from_sequencer(&controller.state, sequencer);
 			printf("Synced %d notes to UI\n", controller.state.note_count);
 		} else {

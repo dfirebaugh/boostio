@@ -8,8 +8,8 @@
 #include "core/audio/synth.h"
 #include "core/theme/theme.h"
 
-struct Sequencer;
-struct Audio;
+struct sequencer;
+struct audio;
 
 #define UI_MAX_NOTES 1024
 #define UI_MAX_SELECTION 256
@@ -17,7 +17,7 @@ struct Audio;
 
 struct instrument {
 	char name[32];
-	enum WaveformType waveform;
+	enum waveform_type waveform;
 	uint8_t duty_cycle;
 	int8_t amplitude_dbfs;
 	int16_t decay;
@@ -46,7 +46,7 @@ struct ui_note {
 	uint16_t duration_ms;
 	uint8_t voice;
 	uint8_t piano_key;
-	enum WaveformType waveform;
+	enum waveform_type waveform;
 	uint8_t duty_cycle;
 	int16_t decay;
 	int8_t amplitude_dbfs;
@@ -124,11 +124,11 @@ void app_state_zoom_horizontal_at_mouse(struct app_state *state, float factor, f
 void app_state_zoom_vertical_at_mouse(struct app_state *state, float factor, float mouse_y);
 
 void app_state_sync_notes_from_sequencer(
-	struct app_state *state, const struct Sequencer *sequencer
+	struct app_state *state, const struct sequencer *sequencer
 );
 
 void app_state_sync_notes_to_sequencer(
-	const struct app_state *state, struct Sequencer *sequencer, struct Audio *audio
+	const struct app_state *state, struct sequencer *sequencer, struct audio *audio
 );
 
 #endif

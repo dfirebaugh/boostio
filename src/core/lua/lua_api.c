@@ -36,7 +36,7 @@ static int lua_api_draw_rectangle(lua_State *L)
 	float b = (float)luaL_checknumber(L, 7);
 	float a = (float)luaL_optnumber(L, 8, 1.0);
 
-	struct Color color = color_from_floats(r, g, b, a);
+	struct color color = color_from_floats(r, g, b, a);
 	graphics_set_color(global_context->graphics, color);
 	graphics_fill_rect(global_context->graphics, x, y, width, height);
 
@@ -58,7 +58,7 @@ static int lua_api_draw_text(lua_State *L)
 	float b = (float)luaL_checknumber(L, 7);
 	float a = (float)luaL_optnumber(L, 8, 1.0);
 
-	struct Color color = color_from_floats(r, g, b, a);
+	struct color color = color_from_floats(r, g, b, a);
 	graphics_set_color(global_context->graphics, color);
 	graphics_draw_text(global_context->graphics, text, x, y, size);
 
@@ -81,7 +81,7 @@ static int lua_api_draw_rounded_rectangle(lua_State *L)
 	float b = (float)luaL_checknumber(L, 8);
 	float a = (float)luaL_optnumber(L, 9, 1.0);
 
-	struct Color color = color_from_floats(r, g, b, a);
+	struct color color = color_from_floats(r, g, b, a);
 	graphics_set_color(global_context->graphics, color);
 	graphics_fill_rounded_rect(global_context->graphics, x, y, width, height, radius);
 
@@ -108,8 +108,8 @@ static int lua_api_draw_rectangle_outlined(lua_State *L)
 	float oa = (float)luaL_optnumber(L, 12, 1.0);
 	int outline_width = (int)luaL_checknumber(L, 13);
 
-	struct Color color = color_from_floats(r, g, b, a);
-	struct Color outline_color = color_from_floats(or, og, ob, oa);
+	struct color color = color_from_floats(r, g, b, a);
+	struct color outline_color = color_from_floats(or, og, ob, oa);
 	graphics_set_color(global_context->graphics, color);
 	graphics_fill_rect_outlined(
 		global_context->graphics, x, y, width, height, outline_color, outline_width
@@ -133,7 +133,7 @@ static int lua_api_stroke_rectangle(lua_State *L)
 	float b = (float)luaL_checknumber(L, 7);
 	float a = (float)luaL_optnumber(L, 8, 1.0);
 
-	struct Color color = color_from_floats(r, g, b, a);
+	struct color color = color_from_floats(r, g, b, a);
 	graphics_set_color(global_context->graphics, color);
 	graphics_draw_rect(global_context->graphics, x, y, width, height);
 
@@ -161,8 +161,8 @@ static int lua_api_draw_rounded_rectangle_outlined(lua_State *L)
 	float oa = (float)luaL_optnumber(L, 13, 1.0);
 	int outline_width = (int)luaL_checknumber(L, 14);
 
-	struct Color color = color_from_floats(r, g, b, a);
-	struct Color outline_color = color_from_floats(or, og, ob, oa);
+	struct color color = color_from_floats(r, g, b, a);
+	struct color outline_color = color_from_floats(or, og, ob, oa);
 	graphics_set_color(global_context->graphics, color);
 	graphics_fill_rounded_rect_outlined(
 		global_context->graphics, x, y, width, height, radius, outline_color, outline_width
@@ -187,7 +187,7 @@ static int lua_api_stroke_rounded_rectangle(lua_State *L)
 	float b = (float)luaL_checknumber(L, 8);
 	float a = (float)luaL_optnumber(L, 9, 1.0);
 
-	struct Color color = color_from_floats(r, g, b, a);
+	struct color color = color_from_floats(r, g, b, a);
 	graphics_set_color(global_context->graphics, color);
 	graphics_draw_rounded_rect(global_context->graphics, x, y, width, height, radius);
 
@@ -209,7 +209,7 @@ static int lua_api_draw_line(lua_State *L)
 	float b = (float)luaL_checknumber(L, 7);
 	float a = (float)luaL_optnumber(L, 8, 1.0);
 
-	struct Color color = color_from_floats(r, g, b, a);
+	struct color color = color_from_floats(r, g, b, a);
 	graphics_set_color(global_context->graphics, color);
 	graphics_draw_line(global_context->graphics, x1, y1, x2, y2);
 
@@ -498,7 +498,7 @@ static int lua_api_set_bpm(lua_State *L)
 	uint32_t bpm = (uint32_t)luaL_checknumber(L, 1);
 	global_context->app_state->bpm = bpm;
 
-	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 	if (sequencer != NULL) {
 		sequencer_set_bpm(sequencer, bpm);
 	}
@@ -518,7 +518,7 @@ static int lua_api_set_playhead(lua_State *L)
 	uint32_t position_ms = (uint32_t)luaL_checknumber(L, 1);
 	global_context->app_state->playhead_ms = position_ms;
 
-	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 	if (sequencer != NULL) {
 		sequencer_set_playhead(sequencer, position_ms);
 	}
@@ -548,7 +548,7 @@ static int lua_api_add_note(lua_State *L)
 
 	struct instrument *instr = &state->instruments[state->selected_instrument];
 
-	struct NoteParams params = {
+	struct note_params params = {
 		.frequency = note_to_frequency(pitch),
 		.duration_ms = (float)duration_ms,
 		.waveform = instr->waveform,
@@ -573,7 +573,7 @@ static int lua_api_add_note(lua_State *L)
 
 		lua_getfield(L, 4, "waveform");
 		if (!lua_isnil(L, -1)) {
-			params.waveform = (enum WaveformType)lua_tointeger(L, -1);
+			params.waveform = (enum waveform_type)lua_tointeger(L, -1);
 		}
 		lua_pop(L, 1);
 
@@ -607,7 +607,7 @@ static int lua_api_add_note(lua_State *L)
 		}
 		lua_pop(L, 1);
 	} else if (!lua_isnone(L, 4)) {
-		params.waveform = (enum WaveformType)lua_tointeger(L, 4);
+		params.waveform = (enum waveform_type)lua_tointeger(L, 4);
 	}
 
 	if (state->note_count < UI_MAX_NOTES) {
@@ -627,7 +627,7 @@ static int lua_api_add_note(lua_State *L)
 		ui_note->restart_phase = params.restart_phase;
 		state->note_count++;
 
-		struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+		struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 		if (sequencer != NULL) {
 			app_state_sync_notes_to_sequencer(state, sequencer, global_context->audio);
 		}
@@ -672,7 +672,7 @@ static int lua_api_save(lua_State *L)
 		base_path[511] = '\0';
 	}
 
-	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 	if (sequencer == NULL)
 		return luaL_error(L, "Sequencer not available");
 
@@ -710,7 +710,7 @@ static int lua_api_save_c(lua_State *L)
 
 	const char *filepath = luaL_optstring(L, 1, "song.c");
 
-	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 	if (sequencer == NULL)
 		return luaL_error(L, "Sequencer not available");
 
@@ -727,7 +727,7 @@ static int lua_api_save_wav(lua_State *L)
 
 	const char *filepath = luaL_optstring(L, 1, "song.wav");
 
-	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 	if (sequencer == NULL)
 		return luaL_error(L, "Sequencer not available");
 
@@ -745,7 +745,7 @@ static int lua_api_load(lua_State *L)
 
 	const char *filepath = luaL_optstring(L, 1, "song.json");
 
-	struct Audio *audio = global_context->audio;
+	struct audio *audio = global_context->audio;
 	bool success = song_loader_load_from_file(audio, global_context->app_state, filepath);
 
 	if (success && global_context->app_state) {
@@ -782,7 +782,7 @@ static int lua_api_toggle_play(lua_State *L)
 
 	global_context->app_state->playing = !global_context->app_state->playing;
 
-	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 	if (sequencer != NULL) {
 		if (global_context->app_state->playing) {
 			sequencer_play(sequencer);
@@ -802,7 +802,7 @@ static int lua_api_play(lua_State *L)
 
 	global_context->app_state->playing = true;
 
-	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 	if (sequencer != NULL) {
 		sequencer_play(sequencer);
 	}
@@ -818,7 +818,7 @@ static int lua_api_pause(lua_State *L)
 
 	global_context->app_state->playing = false;
 
-	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 	if (sequencer != NULL) {
 		sequencer_pause(sequencer);
 	}
@@ -835,7 +835,7 @@ static int lua_api_stop(lua_State *L)
 	global_context->app_state->playing = false;
 	global_context->app_state->playhead_ms = 0;
 
-	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 	if (sequencer != NULL) {
 		sequencer_stop(sequencer);
 	}
@@ -975,7 +975,7 @@ static int lua_api_get_mouse_position(lua_State *L)
 		return luaL_error(L, "API context not available");
 	}
 
-	struct Window *window = graphics_get_window(global_context->graphics);
+	struct window *window = graphics_get_window(global_context->graphics);
 	if (window == NULL) {
 		return luaL_error(L, "Window not available");
 	}
@@ -997,7 +997,7 @@ static int lua_api_is_mouse_button_down(lua_State *L)
 
 	int button = (int)luaL_checkinteger(L, 1);
 
-	struct Window *window = graphics_get_window(global_context->graphics);
+	struct window *window = graphics_get_window(global_context->graphics);
 	if (window == NULL) {
 		return luaL_error(L, "Window not available");
 	}
@@ -1016,7 +1016,7 @@ static int lua_api_is_mouse_button_pressed(lua_State *L)
 
 	int button = (int)luaL_checkinteger(L, 1);
 
-	struct Window *window = graphics_get_window(global_context->graphics);
+	struct window *window = graphics_get_window(global_context->graphics);
 	if (window == NULL) {
 		return luaL_error(L, "Window not available");
 	}
@@ -1138,7 +1138,7 @@ static int lua_api_set_note_voice(lua_State *L)
 		}
 	}
 
-	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 	if (sequencer != NULL) {
 		app_state_sync_notes_to_sequencer(state, sequencer, global_context->audio);
 	}
@@ -1146,7 +1146,7 @@ static int lua_api_set_note_voice(lua_State *L)
 	return 0;
 }
 
-static const char *waveform_type_to_string(enum WaveformType type)
+static const char *waveform_type_to_string(enum waveform_type type)
 {
 	switch (type) {
 	case WAVEFORM_SINE:
@@ -1172,7 +1172,7 @@ static int lua_api_get_app_state(lua_State *L)
 	}
 
 	struct app_state *state = global_context->app_state;
-	struct Synth *synth = audio_get_synth(global_context->audio);
+	struct synth *synth = audio_get_synth(global_context->audio);
 
 	lua_newtable(L);
 
@@ -1186,7 +1186,7 @@ static int lua_api_get_app_state(lua_State *L)
 	lua_setfield(L, -2, "selected_instrument");
 
 	if (synth != NULL && state->selected_voice < MAX_VOICES) {
-		enum WaveformType waveform = synth->voices[state->selected_voice].waveform;
+		enum waveform_type waveform = synth->voices[state->selected_voice].waveform;
 		lua_pushstring(L, waveform_type_to_string(waveform));
 		lua_setfield(L, -2, "waveform");
 	} else {
@@ -1654,7 +1654,7 @@ static int lua_api_move_note(lua_State *L)
 		}
 	}
 
-	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 	if (sequencer != NULL) {
 		app_state_sync_notes_to_sequencer(state, sequencer, global_context->audio);
 	}
@@ -1700,7 +1700,7 @@ static int lua_api_resize_note(lua_State *L)
 		}
 	}
 
-	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 	if (sequencer != NULL) {
 		app_state_sync_notes_to_sequencer(state, sequencer, global_context->audio);
 	}
@@ -1740,7 +1740,7 @@ static int lua_api_delete_note(lua_State *L)
 		}
 	}
 
-	struct Sequencer *sequencer = audio_get_sequencer(global_context->audio);
+	struct sequencer *sequencer = audio_get_sequencer(global_context->audio);
 	if (sequencer != NULL) {
 		app_state_sync_notes_to_sequencer(state, sequencer, global_context->audio);
 	}
@@ -1757,7 +1757,7 @@ static int lua_api_play_preview_note(lua_State *L)
 
 	uint8_t piano_key = (uint8_t)luaL_checkinteger(L, 1);
 	struct app_state *state = global_context->app_state;
-	struct Synth *synth = audio_get_synth(global_context->audio);
+	struct synth *synth = audio_get_synth(global_context->audio);
 
 	if (synth == NULL) {
 		return luaL_error(L, "Synth not available");
@@ -1769,7 +1769,7 @@ static int lua_api_play_preview_note(lua_State *L)
 
 	struct instrument *inst = &state->instruments[state->selected_instrument];
 
-	struct NoteParams params = {
+	struct note_params params = {
 		.frequency = note_to_frequency(piano_key),
 		.duration_ms = (float)inst->default_duration_ms,
 		.waveform = inst->waveform,
@@ -1907,7 +1907,7 @@ static int lua_api_is_key_down(lua_State *L)
 		return 1;
 	}
 
-	struct Window *window = graphics_get_window(global_context->graphics);
+	struct window *window = graphics_get_window(global_context->graphics);
 	if (window == NULL) {
 		lua_pushboolean(L, false);
 		return 1;

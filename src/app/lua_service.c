@@ -1,6 +1,9 @@
 #include "app/lua_service.h"
 #include "app/app_state.h"
+#include "core/audio/audio.h"
+#include "core/graphics/graphics.h"
 #include "core/input/input_types.h"
+#include "core/platform/platform.h"
 
 #include <dirent.h>
 #include <stdio.h>
@@ -10,8 +13,8 @@
 bool lua_service_init(
 	struct lua_service *service,
 	struct app_state *state,
-	struct Graphics *graphics,
-	struct Audio *audio,
+	struct graphics *graphics,
+	struct audio *audio,
 	struct platform_paths *paths
 )
 {

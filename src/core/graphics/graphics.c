@@ -54,38 +54,38 @@ static const char *msdf_fragment_shader =
 	"    FragColor = vec4(Color.rgb, Color.a * opacity);\n"
 	"}\n";
 
-struct Graphics {
-	struct Window *window;
+struct graphics {
+	struct window *window;
 	SDL_GLContext gl_context;
-	struct Color current_color;
-	struct MSDFAtlas *font_atlas;
+	struct color current_color;
+	struct msdf_atlas *font_atlas;
 
-	struct Shader *msdf_shader;
+	struct shader *msdf_shader;
 	unsigned int text_vao;
 	unsigned int text_vbo;
 	unsigned int text_ebo;
 
-	struct PrimitiveBuffer *primitive_buffer;
+	struct primitive_buffer *primitive_buffer;
 
 	uint64_t last_fps_update_time;
 	uint32_t frame_count;
 	float current_fps;
 };
 
-struct Graphics *graphics_create(struct Window *window)
+struct graphics *graphics_create(struct window *window)
 {
 	if (!window) {
 		fprintf(stderr, "Window is NULL\n");
 		return NULL;
 	}
 
-	struct Graphics *graphics = (struct Graphics *)malloc(sizeof(struct Graphics));
+	struct graphics *graphics = (struct graphics *)malloc(sizeof(struct graphics));
 	if (!graphics) {
 		fprintf(stderr, "Failed to allocate graphics context\n");
 		return NULL;
 	}
 
-	memset(graphics, 0, sizeof(struct Graphics));
+	memset(graphics, 0, sizeof(struct graphics));
 	graphics->window = window;
 	graphics->current_color = COLOR_WHITE;
 	graphics->last_fps_update_time = SDL_GetPerformanceCounter();
@@ -137,7 +137,7 @@ struct Graphics *graphics_create(struct Window *window)
 	return graphics;
 }
 
-void graphics_destroy(struct Graphics *graphics)
+void graphics_destroy(struct graphics *graphics)
 {
 	if (!graphics) {
 		return;
@@ -174,7 +174,7 @@ void graphics_destroy(struct Graphics *graphics)
 	free(graphics);
 }
 
-void graphics_clear(struct Graphics *graphics, struct Color color)
+void graphics_clear(struct graphics *graphics, struct color color)
 {
 	if (!graphics) {
 		return;
@@ -188,7 +188,7 @@ void graphics_clear(struct Graphics *graphics, struct Color color)
 	}
 }
 
-void graphics_set_color(struct Graphics *graphics, struct Color color)
+void graphics_set_color(struct graphics *graphics, struct color color)
 {
 	if (!graphics) {
 		return;
@@ -197,14 +197,14 @@ void graphics_set_color(struct Graphics *graphics, struct Color color)
 	graphics->current_color = color;
 }
 
-void graphics_fill_rect(struct Graphics *graphics, int x, int y, int width, int height)
+void graphics_fill_rect(struct graphics *graphics, int x, int y, int width, int height)
 {
 	if (!graphics) {
 		return;
 	}
 
 	if (graphics->primitive_buffer) {
-		struct Color no_outline = {0, 0, 0, 0};
+		struct color no_outline = {0, 0, 0, 0};
 		primitive_buffer_add_rect(
 			graphics->primitive_buffer,
 			(float)x,
@@ -220,12 +220,12 @@ void graphics_fill_rect(struct Graphics *graphics, int x, int y, int width, int 
 }
 
 void graphics_fill_rect_outlined(
-	struct Graphics *graphics,
+	struct graphics *graphics,
 	int x,
 	int y,
 	int width,
 	int height,
-	struct Color outline_color,
+	struct color outline_color,
 	int outline_width
 )
 {
@@ -248,14 +248,14 @@ void graphics_fill_rect_outlined(
 	}
 }
 
-void graphics_draw_rect(struct Graphics *graphics, int x, int y, int width, int height)
+void graphics_draw_rect(struct graphics *graphics, int x, int y, int width, int height)
 {
 	if (!graphics) {
 		return;
 	}
 
 	if (graphics->primitive_buffer) {
-		struct Color transparent = {0, 0, 0, 0};
+		struct color transparent = {0, 0, 0, 0};
 		primitive_buffer_add_rect(
 			graphics->primitive_buffer,
 			(float)x,
@@ -271,12 +271,12 @@ void graphics_draw_rect(struct Graphics *graphics, int x, int y, int width, int 
 }
 
 void graphics_draw_rect_outlined(
-	struct Graphics *graphics,
+	struct graphics *graphics,
 	int x,
 	int y,
 	int width,
 	int height,
-	struct Color outline_color,
+	struct color outline_color,
 	int outline_width
 )
 {
@@ -285,7 +285,7 @@ void graphics_draw_rect_outlined(
 	}
 
 	if (graphics->primitive_buffer) {
-		struct Color transparent = {0, 0, 0, 0};
+		struct color transparent = {0, 0, 0, 0};
 		primitive_buffer_add_rect(
 			graphics->primitive_buffer,
 			(float)x,
@@ -301,7 +301,7 @@ void graphics_draw_rect_outlined(
 }
 
 void graphics_fill_rounded_rect(
-	struct Graphics *graphics, int x, int y, int width, int height, int radius
+	struct graphics *graphics, int x, int y, int width, int height, int radius
 )
 {
 	if (!graphics) {
@@ -309,7 +309,7 @@ void graphics_fill_rounded_rect(
 	}
 
 	if (graphics->primitive_buffer) {
-		struct Color no_outline = {0, 0, 0, 0};
+		struct color no_outline = {0, 0, 0, 0};
 		primitive_buffer_add_rect(
 			graphics->primitive_buffer,
 			(float)x,
@@ -325,13 +325,13 @@ void graphics_fill_rounded_rect(
 }
 
 void graphics_fill_rounded_rect_outlined(
-	struct Graphics *graphics,
+	struct graphics *graphics,
 	int x,
 	int y,
 	int width,
 	int height,
 	int radius,
-	struct Color outline_color,
+	struct color outline_color,
 	int outline_width
 )
 {
@@ -355,7 +355,7 @@ void graphics_fill_rounded_rect_outlined(
 }
 
 void graphics_draw_rounded_rect(
-	struct Graphics *graphics, int x, int y, int width, int height, int radius
+	struct graphics *graphics, int x, int y, int width, int height, int radius
 )
 {
 	if (!graphics) {
@@ -363,7 +363,7 @@ void graphics_draw_rounded_rect(
 	}
 
 	if (graphics->primitive_buffer) {
-		struct Color transparent = {0, 0, 0, 0};
+		struct color transparent = {0, 0, 0, 0};
 		primitive_buffer_add_rect(
 			graphics->primitive_buffer,
 			(float)x,
@@ -379,13 +379,13 @@ void graphics_draw_rounded_rect(
 }
 
 void graphics_draw_rounded_rect_outlined(
-	struct Graphics *graphics,
+	struct graphics *graphics,
 	int x,
 	int y,
 	int width,
 	int height,
 	int radius,
-	struct Color outline_color,
+	struct color outline_color,
 	int outline_width
 )
 {
@@ -394,7 +394,7 @@ void graphics_draw_rounded_rect_outlined(
 	}
 
 	if (graphics->primitive_buffer) {
-		struct Color transparent = {0, 0, 0, 0};
+		struct color transparent = {0, 0, 0, 0};
 		primitive_buffer_add_rect(
 			graphics->primitive_buffer,
 			(float)x,
@@ -409,7 +409,7 @@ void graphics_draw_rounded_rect_outlined(
 	}
 }
 
-void graphics_draw_line(struct Graphics *graphics, int x1, int y1, int x2, int y2)
+void graphics_draw_line(struct graphics *graphics, int x1, int y1, int x2, int y2)
 {
 	if (!graphics) {
 		return;
@@ -427,7 +427,7 @@ void graphics_draw_line(struct Graphics *graphics, int x1, int y1, int x2, int y
 	}
 }
 
-void graphics_present(struct Graphics *graphics)
+void graphics_present(struct graphics *graphics)
 {
 	if (!graphics) {
 		return;
@@ -454,7 +454,7 @@ void graphics_present(struct Graphics *graphics)
 	}
 }
 
-bool graphics_should_close(const struct Graphics *graphics)
+bool graphics_should_close(const struct graphics *graphics)
 {
 	if (!graphics || !graphics->window) {
 		return true;
@@ -463,7 +463,7 @@ bool graphics_should_close(const struct Graphics *graphics)
 	return graphics->window->should_close;
 }
 
-bool graphics_load_font(struct Graphics *graphics, const char *json_path, const char *png_path)
+bool graphics_load_font(struct graphics *graphics, const char *json_path, const char *png_path)
 {
 	if (!graphics) {
 		return false;
@@ -477,7 +477,7 @@ bool graphics_load_font(struct Graphics *graphics, const char *json_path, const 
 	return graphics->font_atlas != NULL;
 }
 
-void graphics_draw_text(struct Graphics *graphics, const char *text, int x, int y, int size)
+void graphics_draw_text(struct graphics *graphics, const char *text, int x, int y, int size)
 {
 	if (!graphics || !text) {
 		return;
@@ -544,7 +544,7 @@ void graphics_draw_text(struct Graphics *graphics, const char *text, int x, int 
 			cursor_x += kerning * (float)size;
 		}
 
-		const struct MSDFGlyph *glyph =
+		const struct msdf_glyph *glyph =
 			msdf_atlas_get_glyph(graphics->font_atlas, char_code);
 		if (!glyph) {
 			prev_char = char_code;
@@ -665,7 +665,7 @@ void graphics_draw_text(struct Graphics *graphics, const char *text, int x, int 
 	free(indices);
 }
 
-float graphics_measure_text(struct Graphics *graphics, const char *text, int size)
+float graphics_measure_text(struct graphics *graphics, const char *text, int size)
 {
 	if (!graphics || !text) {
 		return 0.0f;
@@ -678,7 +678,7 @@ float graphics_measure_text(struct Graphics *graphics, const char *text, int siz
 	return msdf_atlas_measure_text(graphics->font_atlas, text, (float)size);
 }
 
-bool graphics_poll_events(struct Graphics *graphics)
+bool graphics_poll_events(struct graphics *graphics)
 {
 	if (!graphics || !graphics->window) {
 		return false;
@@ -687,7 +687,7 @@ bool graphics_poll_events(struct Graphics *graphics)
 	return window_poll_events(graphics->window);
 }
 
-struct Window *graphics_get_window(struct Graphics *graphics)
+struct window *graphics_get_window(struct graphics *graphics)
 {
 	if (graphics == NULL) {
 		return NULL;
@@ -696,7 +696,7 @@ struct Window *graphics_get_window(struct Graphics *graphics)
 	return graphics->window;
 }
 
-float graphics_get_fps(const struct Graphics *graphics)
+float graphics_get_fps(const struct graphics *graphics)
 {
 	if (graphics == NULL) {
 		return 0.0f;

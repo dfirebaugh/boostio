@@ -273,7 +273,7 @@ void app_state_zoom_vertical_at_mouse(struct app_state *state, float factor, flo
 	}
 }
 
-void app_state_sync_notes_from_sequencer(struct app_state *state, const struct Sequencer *sequencer)
+void app_state_sync_notes_from_sequencer(struct app_state *state, const struct sequencer *sequencer)
 {
 	if (state == NULL || sequencer == NULL) {
 		return;
@@ -287,7 +287,7 @@ void app_state_sync_notes_from_sequencer(struct app_state *state, const struct S
 	}
 
 	for (uint32_t i = 0; i < count; i++) {
-		const struct Note *seq_note = &sequencer->notes[i];
+		const struct note *seq_note = &sequencer->notes[i];
 		struct ui_note *ui_note = &state->notes[i];
 
 		ui_note->id = state->next_note_id++;
@@ -311,7 +311,7 @@ void app_state_sync_notes_from_sequencer(struct app_state *state, const struct S
 }
 
 void app_state_sync_notes_to_sequencer(
-	const struct app_state *state, struct Sequencer *sequencer, struct Audio *audio
+	const struct app_state *state, struct sequencer *sequencer, struct audio *audio
 )
 {
 	if (state == NULL || sequencer == NULL || audio == NULL) {
@@ -323,7 +323,7 @@ void app_state_sync_notes_to_sequencer(
 	for (uint32_t i = 0; i < state->note_count; i++) {
 		const struct ui_note *ui_note = &state->notes[i];
 
-		struct NoteParams params = {
+		struct note_params params = {
 			.frequency = note_to_frequency(ui_note->piano_key),
 			.duration_ms = (float)ui_note->duration_ms,
 			.waveform = ui_note->waveform,

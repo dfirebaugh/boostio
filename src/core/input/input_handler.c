@@ -1,10 +1,11 @@
 #include "input_handler.h"
 #include "input_mapper.h"
+#include "core/graphics/window.h"
 #include <SDL3/SDL.h>
 #include <stdlib.h>
 #include <string.h>
 
-struct input_handler *input_handler_create(struct Window *window)
+struct input_handler *input_handler_create(struct window *window)
 {
 	if (window == NULL) {
 		return NULL;
@@ -45,7 +46,7 @@ size_t input_handler_poll_events(
 	}
 
 	size_t event_count = 0;
-	struct Window *window = handler->window;
+	struct window *window = handler->window;
 
 	handler->shift_held = window_is_scancode_down(window, SDL_SCANCODE_LSHIFT) ||
 			      window_is_scancode_down(window, SDL_SCANCODE_RSHIFT);

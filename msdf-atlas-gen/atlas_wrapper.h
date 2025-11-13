@@ -5,13 +5,13 @@
 extern "C" {
 #endif
 
-typedef struct MSDFAtlasGen MSDFAtlasGen;
+struct msdf_atlas_gen;
 
-MSDFAtlasGen* atlas_generator_create(void);
-void atlas_generator_destroy(MSDFAtlasGen* gen);
+struct msdf_atlas_gen* atlas_generator_create(void);
+void atlas_generator_destroy(struct msdf_atlas_gen* gen);
 
 int atlas_generator_generate_mtsdf(
-		MSDFAtlasGen* gen,
+		struct msdf_atlas_gen* gen,
 		const char* font_path,
 		const char* png_path,
 		const char* json_path,
@@ -19,7 +19,7 @@ int atlas_generator_generate_mtsdf(
 		double pixel_range
 	);
 
-const char* atlas_generator_get_error(MSDFAtlasGen* gen);
+const char* atlas_generator_get_error(struct msdf_atlas_gen* gen);
 
 #ifdef __cplusplus
 }

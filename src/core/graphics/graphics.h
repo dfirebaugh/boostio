@@ -3,74 +3,74 @@
 
 #include <stdbool.h>
 
-struct Window;
-struct Color;
-struct Graphics;
-struct MSDFAtlas;
+struct window;
+struct color;
+struct graphics;
+struct msdf_atlas;
 
-struct Graphics *graphics_create(struct Window *window);
-void graphics_destroy(struct Graphics *graphics);
+struct graphics *graphics_create(struct window *window);
+void graphics_destroy(struct graphics *graphics);
 
-void graphics_clear(struct Graphics *graphics, struct Color color);
-void graphics_set_color(struct Graphics *graphics, struct Color color);
+void graphics_clear(struct graphics *graphics, struct color color);
+void graphics_set_color(struct graphics *graphics, struct color color);
 
-void graphics_fill_rect(struct Graphics *graphics, int x, int y, int width, int height);
+void graphics_fill_rect(struct graphics *graphics, int x, int y, int width, int height);
 void graphics_fill_rect_outlined(
-	struct Graphics *graphics,
+	struct graphics *graphics,
 	int x,
 	int y,
 	int width,
 	int height,
-	struct Color outline_color,
+	struct color outline_color,
 	int outline_width
 );
-void graphics_draw_rect(struct Graphics *graphics, int x, int y, int width, int height);
+void graphics_draw_rect(struct graphics *graphics, int x, int y, int width, int height);
 void graphics_draw_rect_outlined(
-	struct Graphics *graphics,
+	struct graphics *graphics,
 	int x,
 	int y,
 	int width,
 	int height,
-	struct Color outline_color,
+	struct color outline_color,
 	int outline_width
 );
 void graphics_fill_rounded_rect(
-	struct Graphics *graphics, int x, int y, int width, int height, int radius
+	struct graphics *graphics, int x, int y, int width, int height, int radius
 );
 void graphics_fill_rounded_rect_outlined(
-	struct Graphics *graphics,
+	struct graphics *graphics,
 	int x,
 	int y,
 	int width,
 	int height,
 	int radius,
-	struct Color outline_color,
+	struct color outline_color,
 	int outline_width
 );
 void graphics_draw_rounded_rect(
-	struct Graphics *graphics, int x, int y, int width, int height, int radius
+	struct graphics *graphics, int x, int y, int width, int height, int radius
 );
 void graphics_draw_rounded_rect_outlined(
-	struct Graphics *graphics,
+	struct graphics *graphics,
 	int x,
 	int y,
 	int width,
 	int height,
 	int radius,
-	struct Color outline_color,
+	struct color outline_color,
 	int outline_width
 );
-void graphics_draw_line(struct Graphics *graphics, int x1, int y1, int x2, int y2);
+void graphics_draw_line(struct graphics *graphics, int x1, int y1, int x2, int y2);
 
-void graphics_present(struct Graphics *graphics);
+void graphics_present(struct graphics *graphics);
 
-bool graphics_load_font(struct Graphics *graphics, const char *json_path, const char *png_path);
-void graphics_draw_text(struct Graphics *graphics, const char *text, int x, int y, int size);
-float graphics_measure_text(struct Graphics *graphics, const char *text, int size);
+bool graphics_load_font(struct graphics *graphics, const char *json_path, const char *png_path);
+void graphics_draw_text(struct graphics *graphics, const char *text, int x, int y, int size);
+float graphics_measure_text(struct graphics *graphics, const char *text, int size);
 
-bool graphics_should_close(const struct Graphics *graphics);
-bool graphics_poll_events(struct Graphics *graphics);
-struct Window *graphics_get_window(struct Graphics *graphics);
-float graphics_get_fps(const struct Graphics *graphics);
+bool graphics_should_close(const struct graphics *graphics);
+bool graphics_poll_events(struct graphics *graphics);
+struct window *graphics_get_window(struct graphics *graphics);
+float graphics_get_fps(const struct graphics *graphics);
 
 #endif

@@ -3,25 +3,25 @@
 
 #include <stdint.h>
 
-struct Color {
+struct color {
 	uint8_t r;
 	uint8_t g;
 	uint8_t b;
 	uint8_t a;
 };
 
-static inline struct Color color_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+static inline struct color color_rgba(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
-	struct Color c = {r, g, b, a};
+	struct color c = {r, g, b, a};
 	return c;
 }
 
-static inline struct Color color_rgb(uint8_t r, uint8_t g, uint8_t b)
+static inline struct color color_rgb(uint8_t r, uint8_t g, uint8_t b)
 {
 	return color_rgba(r, g, b, 255);
 }
 
-static inline struct Color color_from_floats(float r, float g, float b, float a)
+static inline struct color color_from_floats(float r, float g, float b, float a)
 {
 	return color_rgba(
 		(uint8_t)(r * 255.0f),

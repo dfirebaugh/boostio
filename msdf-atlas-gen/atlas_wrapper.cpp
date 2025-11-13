@@ -116,16 +116,16 @@ struct AtlasGeneratorImpl {
 
 extern "C" {
 
-	MSDFAtlasGen* atlas_generator_create(void) {
-		return reinterpret_cast<MSDFAtlasGen*>(new AtlasGeneratorImpl());
+	struct msdf_atlas_gen* atlas_generator_create(void) {
+		return reinterpret_cast<struct msdf_atlas_gen*>(new AtlasGeneratorImpl());
 	}
 
-	void atlas_generator_destroy(MSDFAtlasGen* gen) {
+	void atlas_generator_destroy(struct msdf_atlas_gen* gen) {
 		delete reinterpret_cast<AtlasGeneratorImpl*>(gen);
 	}
 
 	int atlas_generator_generate_mtsdf(
-			MSDFAtlasGen* gen,
+			struct msdf_atlas_gen* gen,
 			const char* font_path,
 			const char* png_path,
 			const char* json_path,
@@ -210,7 +210,7 @@ extern "C" {
 		return 0;
 	}
 
-	const char* atlas_generator_get_error(MSDFAtlasGen* gen) {
+	const char* atlas_generator_get_error(struct msdf_atlas_gen* gen) {
 		if (!gen) return "Invalid generator";
 		AtlasGeneratorImpl* impl = reinterpret_cast<AtlasGeneratorImpl*>(gen);
 		return impl->error_message.c_str();

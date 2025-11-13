@@ -9,42 +9,42 @@ void theme_init_default(struct theme *theme)
 	if (theme == NULL)
 		return;
 
-	theme->background = (struct rgb_color){42, 46, 64};
-	theme->grid_background = (struct rgb_color){28, 30, 46};
-	theme->grid_line = (struct rgb_color){65, 69, 89};
-	theme->grid_beat_line = (struct rgb_color){81, 87, 109};
+	theme->background = color_rgb(42, 46, 64);
+	theme->grid_background = color_rgb(28, 30, 46);
+	theme->grid_line = color_rgb(65, 69, 89);
+	theme->grid_beat_line = color_rgb(81, 87, 109);
 
-	theme->piano_key_white = (struct rgb_color){230, 233, 239};
-	theme->piano_key_black = (struct rgb_color){41, 44, 60};
-	theme->piano_key_white_text = (struct rgb_color){76, 79, 105};
-	theme->piano_key_black_text = (struct rgb_color){198, 208, 245};
-	theme->piano_key_separator = (struct rgb_color){81, 87, 109};
+	theme->piano_key_white = color_rgb(230, 233, 239);
+	theme->piano_key_black = color_rgb(41, 44, 60);
+	theme->piano_key_white_text = color_rgb(76, 79, 105);
+	theme->piano_key_black_text = color_rgb(198, 208, 245);
+	theme->piano_key_separator = color_rgb(81, 87, 109);
 
-	theme->scale_root_grid = (struct rgba_color){140, 170, 238, 40};
-	theme->scale_note_grid = (struct rgba_color){186, 187, 241, 30};
-	theme->scale_root_piano = (struct rgb_color){140, 170, 238};
-	theme->scale_note_piano = (struct rgb_color){186, 187, 241};
+	theme->scale_root_grid = color_rgba(140, 170, 238, 40);
+	theme->scale_note_grid = color_rgba(186, 187, 241, 30);
+	theme->scale_root_piano = color_rgb(140, 170, 238);
+	theme->scale_note_piano = color_rgb(186, 187, 241);
 
-	theme->note_default = (struct rgb_color){140, 170, 238};
-	theme->note_shadow = (struct rgba_color){0, 0, 0, 60};
+	theme->note_default = color_rgb(140, 170, 238);
+	theme->note_shadow = color_rgba(0, 0, 0, 60);
 
-	theme->playhead = (struct rgba_color){242, 213, 207, 200};
+	theme->playhead = color_rgba(242, 213, 207, 200);
 
-	theme->statusline_bg = (struct rgba_color){41, 44, 60, 242};
-	theme->statusline_text = (struct rgb_color){198, 208, 245};
-	theme->statusline_separator = (struct rgb_color){81, 87, 109};
-	theme->statusline_bpm = (struct rgb_color){229, 200, 144};
-	theme->statusline_highlight_on = (struct rgb_color){166, 209, 137};
-	theme->statusline_highlight_off = (struct rgb_color){98, 104, 128};
+	theme->statusline_bg = color_rgba(41, 44, 60, 242);
+	theme->statusline_text = color_rgb(198, 208, 245);
+	theme->statusline_separator = color_rgb(81, 87, 109);
+	theme->statusline_bpm = color_rgb(229, 200, 144);
+	theme->statusline_highlight_on = color_rgb(166, 209, 137);
+	theme->statusline_highlight_off = color_rgb(98, 104, 128);
 
-	theme->voice_colors[0] = (struct rgb_color){239, 159, 118};
-	theme->voice_colors[1] = (struct rgb_color){229, 200, 144};
-	theme->voice_colors[2] = (struct rgb_color){166, 209, 137};
-	theme->voice_colors[3] = (struct rgb_color){140, 170, 238};
-	theme->voice_colors[4] = (struct rgb_color){202, 158, 230};
-	theme->voice_colors[5] = (struct rgb_color){244, 184, 228};
-	theme->voice_colors[6] = (struct rgb_color){231, 130, 132};
-	theme->voice_colors[7] = (struct rgb_color){131, 139, 167};
+	theme->voice_colors[0] = color_rgb(239, 159, 118);
+	theme->voice_colors[1] = color_rgb(229, 200, 144);
+	theme->voice_colors[2] = color_rgb(166, 209, 137);
+	theme->voice_colors[3] = color_rgb(140, 170, 238);
+	theme->voice_colors[4] = color_rgb(202, 158, 230);
+	theme->voice_colors[5] = color_rgb(244, 184, 228);
+	theme->voice_colors[6] = color_rgb(231, 130, 132);
+	theme->voice_colors[7] = color_rgb(131, 139, 167);
 }
 
 static int hex_char_to_int(char c)
@@ -58,7 +58,7 @@ static int hex_char_to_int(char c)
 	return -1;
 }
 
-bool theme_parse_hex_color(const char *hex, struct rgb_color *color)
+bool theme_parse_hex_color(const char *hex, struct color *color)
 {
 	if (hex == NULL || color == NULL)
 		return false;
@@ -83,6 +83,7 @@ bool theme_parse_hex_color(const char *hex, struct rgb_color *color)
 	color->r = (uint8_t)(r1 * 16 + r2);
 	color->g = (uint8_t)(g1 * 16 + g2);
 	color->b = (uint8_t)(b1 * 16 + b2);
+	color->a = 255;
 
 	return true;
 }

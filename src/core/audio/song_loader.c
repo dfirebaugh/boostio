@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static enum WaveformType string_to_waveform(const char *str)
+static enum waveform_type string_to_waveform(const char *str)
 {
 	if (strcmp(str, "sine") == 0)
 		return WAVEFORM_SINE;
@@ -64,7 +64,7 @@ static char *read_file(const char *filepath)
 	return content;
 }
 
-bool song_loader_load_from_file(struct Audio *audio, struct app_state *state, const char *filepath)
+bool song_loader_load_from_file(struct audio *audio, struct app_state *state, const char *filepath)
 {
 	char *json_content = read_file(filepath);
 	if (!json_content) {
@@ -82,7 +82,7 @@ bool song_loader_load_from_file(struct Audio *audio, struct app_state *state, co
 		return false;
 	}
 
-	struct Sequencer *sequencer = audio_get_sequencer(audio);
+	struct sequencer *sequencer = audio_get_sequencer(audio);
 
 	sequencer_clear_notes(sequencer);
 	sequencer_stop(sequencer);
@@ -134,7 +134,7 @@ bool song_loader_load_from_file(struct Audio *audio, struct app_state *state, co
 	cJSON *note_item = NULL;
 	cJSON_ArrayForEach(note_item, notes_array)
 	{
-		struct NoteParams params = {
+		struct note_params params = {
 			.frequency = 440.0f,
 			.duration_ms = 200.0f,
 			.waveform = WAVEFORM_SINE,

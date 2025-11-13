@@ -11,20 +11,20 @@ static const uint16_t NES_APU_NOISE_PERIODS[16] = {
 	4, 8, 16, 32, 64, 96, 128, 160, 202, 254, 380, 508, 762, 1016, 2034, 4068
 };
 
-void synth_init(struct Synth *synth, uint32_t sample_rate)
+void synth_init(struct synth *synth, uint32_t sample_rate)
 {
-	memset(synth, 0, sizeof(struct Synth));
+	memset(synth, 0, sizeof(struct synth));
 	synth->sample_rate = sample_rate;
 	synth->master_volume = 0.3f;
 }
 
-void synth_play_note_on_voice(struct Synth *synth, struct NoteParams params, uint8_t voice_index)
+static void synth_play_note_on_voice(struct synth *synth, struct note_params params, uint8_t voice_index)
 {
 	if (voice_index >= MAX_VOICES) {
 		return;
 	}
 
-	struct Voice *voice = &synth->voices[voice_index];
+	struct voice *voice = &synth->voices[voice_index];
 	voice->frequency = params.frequency;
 	voice->amplitude = dbfs_to_amplitude(params.amplitude_dbfs);
 
@@ -44,7 +44,7 @@ void synth_play_note_on_voice(struct Synth *synth, struct NoteParams params, uin
 	voice->nes_noise_mode_flag = params.nes_noise_mode_flag;
 }
 
-void synth_play_note(struct Synth *synth, struct NoteParams params)
+void synth_play_note(struct synth *synth, struct note_params params)
 {
 	if (params.voice_index >= 0 && params.voice_index < MAX_VOICES) {
 		synth_play_note_on_voice(synth, params, (uint8_t)params.voice_index);
@@ -59,19 +59,12 @@ void synth_play_note(struct Synth *synth, struct NoteParams params)
 	}
 }
 
-void synth_stop_all(struct Synth *synth)
-{
-	for (int i = 0; i < MAX_VOICES; i++) {
-		synth->voices[i].active = false;
-	}
-}
-
 float dbfs_to_amplitude(int8_t dbfs)
 {
 	return powf(10.0f, (float)dbfs / 20.0f);
 }
 
-static float generate_waveform_with_duty(enum WaveformType type, float phase, uint8_t duty_cycle)
+static float generate_waveform_with_duty(enum waveform_type type, float phase, uint8_t duty_cycle)
 {
 	switch (type) {
 	case WAVEFORM_SINE:
@@ -97,7 +90,7 @@ static float generate_waveform_with_duty(enum WaveformType type, float phase, ui
 	}
 }
 
-void synth_generate_samples(struct Synth *synth, float *buffer, uint32_t num_samples)
+void synth_generate_samples(struct synth *synth, float *buffer, uint32_t num_samples)
 {
 	memset(buffer, 0, num_samples * sizeof(float));
 
@@ -108,7 +101,7 @@ void synth_generate_samples(struct Synth *synth, float *buffer, uint32_t num_sam
 			continue;
 		}
 
-		struct Voice *voice = &synth->voices[v];
+		struct voice *voice = &synth->voices[v];
 
 		for (uint32_t i = 0; i < num_samples; i++) {
 			if (voice->elapsed_ms >= voice->duration_ms) {

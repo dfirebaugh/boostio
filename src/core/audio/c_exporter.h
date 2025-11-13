@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-struct Sequencer;
+struct sequencer;
 
-bool c_exporter_export_to_file(const struct Sequencer *sequencer, const char *filepath);
+bool c_exporter_export_to_file(const struct sequencer *sequencer, const char *filepath);
 
 #endif

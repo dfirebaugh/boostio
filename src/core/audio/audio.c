@@ -5,11 +5,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Audio {
+struct audio {
 	SDL_AudioDeviceID device_id;
 	SDL_AudioStream *stream;
-	struct Synth synth;
-	struct Sequencer sequencer;
+	struct synth synth;
+	struct sequencer sequencer;
 	bool initialized;
 	uint32_t sample_rate;
 	uint32_t last_update_time;
@@ -19,7 +19,7 @@ struct Audio {
 
 static void audio_callback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
 {
-	struct Audio *audio = (struct Audio *)userdata;
+	struct audio *audio = (struct audio *)userdata;
 	if (!audio) {
 		return;
 	}
@@ -40,14 +40,14 @@ static void audio_callback(void *userdata, SDL_AudioStream *stream, int addition
 	}
 }
 
-struct Audio *audio_create(void)
+struct audio *audio_create(void)
 {
-	struct Audio *audio = malloc(sizeof(struct Audio));
+	struct audio *audio = malloc(sizeof(struct audio));
 	if (!audio) {
 		return NULL;
 	}
 
-	memset(audio, 0, sizeof(struct Audio));
+	memset(audio, 0, sizeof(struct audio));
 
 	audio->sample_rate = 48000;
 
@@ -102,7 +102,7 @@ struct Audio *audio_create(void)
 	return audio;
 }
 
-void audio_destroy(struct Audio *audio)
+void audio_destroy(struct audio *audio)
 {
 	if (!audio) {
 		return;
@@ -119,12 +119,12 @@ void audio_destroy(struct Audio *audio)
 	free(audio);
 }
 
-bool audio_is_initialized(const struct Audio *audio)
+bool audio_is_initialized(const struct audio *audio)
 {
 	return audio && audio->initialized;
 }
 
-void audio_start(struct Audio *audio)
+void audio_start(struct audio *audio)
 {
 	if (!audio || !audio->initialized) {
 		return;
@@ -134,7 +134,7 @@ void audio_start(struct Audio *audio)
 	SDL_Log("Audio device resumed");
 }
 
-void audio_stop(struct Audio *audio)
+void audio_stop(struct audio *audio)
 {
 	if (!audio || !audio->initialized) {
 		return;
@@ -143,7 +143,7 @@ void audio_stop(struct Audio *audio)
 	SDL_PauseAudioDevice(audio->device_id);
 }
 
-void audio_update(struct Audio *audio, const bool *voice_solo, const bool *voice_muted)
+void audio_update(struct audio *audio, const bool *voice_solo, const bool *voice_muted)
 {
 	if (!audio || !audio->initialized) {
 		return;
@@ -157,7 +157,7 @@ void audio_update(struct Audio *audio, const bool *voice_solo, const bool *voice
 	}
 }
 
-struct Synth *audio_get_synth(struct Audio *audio)
+struct synth *audio_get_synth(struct audio *audio)
 {
 	if (!audio) {
 		return NULL;
@@ -165,7 +165,7 @@ struct Synth *audio_get_synth(struct Audio *audio)
 	return &audio->synth;
 }
 
-struct Sequencer *audio_get_sequencer(struct Audio *audio)
+struct sequencer *audio_get_sequencer(struct audio *audio)
 {
 	if (!audio) {
 		return NULL;

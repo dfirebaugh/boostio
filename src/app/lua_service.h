@@ -5,12 +5,12 @@
 
 #include "core/lua/lua_api.h"
 #include "core/lua/lua_runtime.h"
-#include "core/platform/platform.h"
 #include "lua_command_registry.h"
 
 struct app_state;
 struct command;
 struct input_event;
+struct platform_paths;
 
 struct lua_service {
 	struct lua_runtime runtime;
@@ -25,8 +25,8 @@ struct lua_service {
 bool lua_service_init(
 	struct lua_service *service,
 	struct app_state *state,
-	struct Graphics *graphics,
-	struct Audio *audio,
+	struct graphics *graphics,
+	struct audio *audio,
 	struct platform_paths *paths
 );
 

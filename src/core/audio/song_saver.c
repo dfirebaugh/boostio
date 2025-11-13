@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const char *waveform_to_string(enum WaveformType waveform)
+static const char *waveform_to_string(enum waveform_type waveform)
 {
 	switch (waveform) {
 	case WAVEFORM_SINE:
@@ -26,12 +26,12 @@ static const char *waveform_to_string(enum WaveformType waveform)
 	}
 }
 
-static uint32_t calculate_song_length_ms(const struct Sequencer *sequencer)
+static uint32_t calculate_song_length_ms(const struct sequencer *sequencer)
 {
 	uint32_t max_end_time = 0;
 
 	for (uint32_t i = 0; i < sequencer->note_count; i++) {
-		const struct Note *note = &sequencer->notes[i];
+		const struct note *note = &sequencer->notes[i];
 		uint32_t end_time = note->time_ms + (uint32_t)note->params.duration_ms;
 
 		if (end_time > max_end_time) {
@@ -43,7 +43,7 @@ static uint32_t calculate_song_length_ms(const struct Sequencer *sequencer)
 }
 
 bool song_saver_save_to_file(
-	const struct app_state *state, const struct Sequencer *sequencer, const char *filepath
+	const struct app_state *state, const struct sequencer *sequencer, const char *filepath
 )
 {
 	if (!state || !sequencer || !filepath) {
@@ -80,8 +80,8 @@ bool song_saver_save_to_file(
 	}
 
 	for (uint32_t i = 0; i < sequencer->note_count; i++) {
-		const struct Note *note = &sequencer->notes[i];
-		const struct NoteParams *params = &note->params;
+		const struct note *note = &sequencer->notes[i];
+		const struct note_params *params = &note->params;
 
 		cJSON *note_obj = cJSON_CreateObject();
 		if (!note_obj) {

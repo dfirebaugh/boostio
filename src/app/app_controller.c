@@ -2,15 +2,17 @@
 #include "core/audio/audio.h"
 #include "core/audio/sequencer.h"
 #include "core/graphics/color.h"
+#include "core/graphics/graphics.h"
 #include "core/graphics/window.h"
+#include "core/input/input_handler.h"
 
 #include <stdbool.h>
 #include <stdio.h>
 
 bool app_controller_init(
 	struct app_controller *controller,
-	struct Graphics *graphics,
-	struct Audio *audio,
+	struct graphics *graphics,
+	struct audio *audio,
 	struct platform_paths *paths
 )
 {
@@ -25,7 +27,7 @@ bool app_controller_init(
 
 	app_state_init(&controller->state);
 
-	struct Window *window = graphics_get_window(graphics);
+	struct window *window = graphics_get_window(graphics);
 	controller->input_handler = input_handler_create(window);
 	if (controller->input_handler == NULL) {
 		fprintf(stderr, "Failed to create input handler\n");
@@ -111,7 +113,7 @@ void app_controller_update(struct app_controller *controller, float delta_time)
 		controller->running = false;
 	}
 
-	struct Window *window = graphics_get_window(controller->graphics);
+	struct window *window = graphics_get_window(controller->graphics);
 	int current_width, current_height;
 	window_get_size(window, &current_width, &current_height);
 
@@ -168,7 +170,7 @@ void app_controller_update(struct app_controller *controller, float delta_time)
 		app_state_scroll_vertical(&controller->state, 1);
 	}
 
-	struct Sequencer *sequencer = audio_get_sequencer(controller->audio);
+	struct sequencer *sequencer = audio_get_sequencer(controller->audio);
 	if (sequencer) {
 		controller->state.playing = sequencer->playing;
 		if (sequencer->sample_rate > 0) {
@@ -190,7 +192,7 @@ void app_controller_render(struct app_controller *controller)
 		return;
 	}
 
-	struct Color bg_color = color_rgb(30, 30, 46);
+	struct color bg_color = color_rgb(30, 30, 46);
 	graphics_clear(controller->graphics, bg_color);
 
 	lua_service_call_render_callbacks(&controller->lua_service);

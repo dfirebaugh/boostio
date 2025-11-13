@@ -4,20 +4,20 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct Shader {
+struct shader {
 	unsigned int program_id;
 	unsigned int vertex_shader;
 	unsigned int fragment_shader;
 };
 
-struct Shader *shader_create(const char *vertex_source, const char *fragment_source)
+struct shader *shader_create(const char *vertex_source, const char *fragment_source)
 {
-	struct Shader *shader = (struct Shader *)malloc(sizeof(struct Shader));
+	struct shader *shader = (struct shader *)malloc(sizeof(struct shader));
 	if (!shader) {
 		return NULL;
 	}
 
-	memset(shader, 0, sizeof(struct Shader));
+	memset(shader, 0, sizeof(struct shader));
 
 	shader->vertex_shader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(shader->vertex_shader, 1, &vertex_source, NULL);
@@ -67,7 +67,7 @@ struct Shader *shader_create(const char *vertex_source, const char *fragment_sou
 	return shader;
 }
 
-void shader_destroy(struct Shader *shader)
+void shader_destroy(struct shader *shader)
 {
 	if (!shader) {
 		return;
@@ -88,14 +88,14 @@ void shader_destroy(struct Shader *shader)
 	free(shader);
 }
 
-void shader_use(const struct Shader *shader)
+void shader_use(const struct shader *shader)
 {
 	if (shader) {
 		glUseProgram(shader->program_id);
 	}
 }
 
-void shader_set_mat4(const struct Shader *shader, const char *name, const float *matrix)
+void shader_set_mat4(const struct shader *shader, const char *name, const float *matrix)
 {
 	if (!shader)
 		return;
@@ -105,7 +105,7 @@ void shader_set_mat4(const struct Shader *shader, const char *name, const float 
 	}
 }
 
-void shader_set_float(const struct Shader *shader, const char *name, float value)
+void shader_set_float(const struct shader *shader, const char *name, float value)
 {
 	if (!shader)
 		return;
@@ -115,7 +115,7 @@ void shader_set_float(const struct Shader *shader, const char *name, float value
 	}
 }
 
-void shader_set_vec2(const struct Shader *shader, const char *name, float x, float y)
+void shader_set_vec2(const struct shader *shader, const char *name, float x, float y)
 {
 	if (!shader)
 		return;
@@ -125,7 +125,7 @@ void shader_set_vec2(const struct Shader *shader, const char *name, float x, flo
 	}
 }
 
-void shader_set_int(const struct Shader *shader, const char *name, int value)
+void shader_set_int(const struct shader *shader, const char *name, int value)
 {
 	if (!shader)
 		return;
