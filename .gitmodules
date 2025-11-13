@@ -13,9 +13,6 @@
 [submodule "external/lua"]
 	path = external/lua
 	url = https://github.com/lua/lua.git
-[submodule "external/glew"]
-	path = external/glew
-	url = https://github.com/Perlmint/glew-cmake.git
 [submodule "external/msdf-atlas-gen"]
 	path = external/msdf-atlas-gen
 	url = https://github.com/Chlumsky/msdf-atlas-gen.git
