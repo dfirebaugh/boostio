@@ -990,4 +990,15 @@ function piano_roll.render()
 	render_piano_keys(state, theme)
 end
 
+function piano_roll.on_key_down(key, shift, ctrl, alt)
+	if key == "escape" then
+		local selection = boostio.getSelection()
+		if selection and #selection > 0 then
+			boostio.clearSelection()
+			return true
+		end
+	end
+	return false
+end
+
 return piano_roll
