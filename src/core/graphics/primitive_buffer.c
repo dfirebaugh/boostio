@@ -82,7 +82,7 @@ static const char *primitive_fragment_shader =
 		"    }\n"
 		"}\n";
 
-typedef struct
+struct primitive_vertex
 {
 	float pos[2];
 	float local_pos[2];
@@ -93,7 +93,7 @@ typedef struct
 	float height;
 	float outline_width;
 	float outline_color[4];
-} PrimitiveVertex;
+};
 
 struct PrimitiveBuffer
 {
@@ -101,7 +101,7 @@ struct PrimitiveBuffer
 	unsigned int vao;
 	unsigned int vbo;
 
-	PrimitiveVertex *vertices;
+	struct primitive_vertex *vertices;
 	int vertex_count;
 	int vertex_capacity;
 };
@@ -183,7 +183,7 @@ struct PrimitiveBuffer *primitive_buffer_create(void)
 	glGenBuffers(1, &buffer->vbo);
 
 	buffer->vertex_capacity = 1024;
-	buffer->vertices = (PrimitiveVertex *)malloc(sizeof(PrimitiveVertex) * buffer->vertex_capacity);
+	buffer->vertices = (struct primitive_vertex *)malloc(sizeof(struct primitive_vertex) * buffer->vertex_capacity);
 
 	return buffer;
 }
@@ -241,8 +241,8 @@ void primitive_buffer_add_rect(
 	if (buffer->vertex_count + 6 > buffer->vertex_capacity)
 	{
 		buffer->vertex_capacity *= 2;
-		buffer->vertices = (PrimitiveVertex *)realloc(
-				buffer->vertices, sizeof(PrimitiveVertex) * buffer->vertex_capacity
+		buffer->vertices = (struct primitive_vertex *)realloc(
+				buffer->vertices, sizeof(struct primitive_vertex) * buffer->vertex_capacity
 		);
 	}
 
@@ -265,7 +265,7 @@ void primitive_buffer_add_rect(
 	float center_x = x + width / 2.0f;
 	float center_y = y + height / 2.0f;
 
-	PrimitiveVertex *v = &buffer->vertices[buffer->vertex_count];
+	struct primitive_vertex *v = &buffer->vertices[buffer->vertex_count];
 
 	v[0].pos[0] = quad_x;
 	v[0].pos[1] = quad_y;
@@ -433,52 +433,52 @@ void primitive_buffer_render(struct PrimitiveBuffer *buffer, int window_width, i
 
 	glBindBuffer(GL_ARRAY_BUFFER, buffer->vbo);
 	glBufferData(
-			GL_ARRAY_BUFFER, buffer->vertex_count * sizeof(PrimitiveVertex), buffer->vertices,
+			GL_ARRAY_BUFFER, buffer->vertex_count * sizeof(struct primitive_vertex), buffer->vertices,
 			GL_DYNAMIC_DRAW
 	);
 
-	size_t stride = sizeof(PrimitiveVertex);
+	size_t stride = sizeof(struct primitive_vertex);
 
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(PrimitiveVertex, pos));
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, pos));
 	glEnableVertexAttribArray(0);
 
 	glVertexAttribPointer(
-			1, 2, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(PrimitiveVertex, local_pos)
+			1, 2, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, local_pos)
 	);
 	glEnableVertexAttribArray(1);
 
 	glVertexAttribPointer(
-			2, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(PrimitiveVertex, op_code)
+			2, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, op_code)
 	);
 	glEnableVertexAttribArray(2);
 
 	glVertexAttribPointer(
-			3, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(PrimitiveVertex, radius)
+			3, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, radius)
 	);
 	glEnableVertexAttribArray(3);
 
 	glVertexAttribPointer(
-			4, 4, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(PrimitiveVertex, color)
+			4, 4, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, color)
 	);
 	glEnableVertexAttribArray(4);
 
 	glVertexAttribPointer(
-			5, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(PrimitiveVertex, width)
+			5, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, width)
 	);
 	glEnableVertexAttribArray(5);
 
 	glVertexAttribPointer(
-			6, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(PrimitiveVertex, height)
+			6, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, height)
 	);
 	glEnableVertexAttribArray(6);
 
 	glVertexAttribPointer(
-			7, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(PrimitiveVertex, outline_width)
+			7, 1, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, outline_width)
 	);
 	glEnableVertexAttribArray(7);
 
 	glVertexAttribPointer(
-			8, 4, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(PrimitiveVertex, outline_color)
+			8, 4, GL_FLOAT, GL_FALSE, stride, (void *)offsetof(struct primitive_vertex, outline_color)
 	);
 	glEnableVertexAttribArray(8);
 

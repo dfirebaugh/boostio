@@ -3,19 +3,6 @@ local playback_controls = {}
 local last_mouse_state = false
 local click_handled = false
 
-local function is_point_in_rect(px, py, x, y, w, h)
-	return px >= x and px <= x + w and py >= y and py <= y + h
-end
-
-local function hex_to_rgb(hex)
-	local hex_clean = hex:gsub("#", "")
-	return {
-		r = tonumber(hex_clean:sub(1, 2), 16) / 255,
-		g = tonumber(hex_clean:sub(3, 4), 16) / 255,
-		b = tonumber(hex_clean:sub(5, 6), 16) / 255,
-	}
-end
-
 function playback_controls.init() end
 
 function playback_controls.render()
@@ -32,13 +19,13 @@ function playback_controls.render()
 	local play_x = start_x
 	local stop_x = play_x + button_width + button_spacing
 
-	local play_hovering = is_point_in_rect(mx, my, play_x, button_y, button_width, button_height)
-	local stop_hovering = is_point_in_rect(mx, my, stop_x, button_y, button_width, button_height)
+	local play_hovering = boostio.isPointInRect(mx, my, play_x, button_y, button_width, button_height)
+	local stop_hovering = boostio.isPointInRect(mx, my, stop_x, button_y, button_width, button_height)
 
-	local bg_color = hex_to_rgb(theme.statusline_bg)
-	local text_color = hex_to_rgb(theme.statusline_text)
-	local green = hex_to_rgb(theme.statusline_highlight_on)
-	local red = hex_to_rgb("#e78284")
+	local bg_color = boostio.hexToRgb(theme.statusline_bg)
+	local text_color = boostio.hexToRgb(theme.statusline_text)
+	local green = boostio.hexToRgb(theme.statusline_highlight_on)
+	local red = boostio.hexToRgb("#e78284")
 
 	local play_r, play_g, play_b = green.r, green.g, green.b
 	local stop_r, stop_g, stop_b = red.r, red.g, red.b

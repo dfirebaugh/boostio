@@ -107,9 +107,19 @@ config = {
 	plugins = {
 		load_list = {
 			{
+				name = "piano_roll",
+				enabled = true,
+				priority = 1,
+			},
+			{
 				name = "toast",
 				enabled = true,
 				priority = 200,
+			},
+			{
+				name = "fps_display",
+				enabled = true,
+				priority = 210,
 			},
 			{
 				name = "statusline",

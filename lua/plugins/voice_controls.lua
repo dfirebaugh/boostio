@@ -12,19 +12,6 @@ local function get_voice_state()
 	}
 end
 
-local function is_point_in_rect(px, py, x, y, w, h)
-	return px >= x and px <= x + w and py >= y and py <= y + h
-end
-
-local function hex_to_rgb(hex)
-	local hex_clean = hex:gsub("#", "")
-	return {
-		r = tonumber(hex_clean:sub(1, 2), 16) / 255,
-		g = tonumber(hex_clean:sub(3, 4), 16) / 255,
-		b = tonumber(hex_clean:sub(5, 6), 16) / 255,
-	}
-end
-
 function voice_controls.init()
 	voice_controls.isVoiceAudible = function(voice)
 		local voice_state = get_voice_state()
@@ -63,8 +50,8 @@ function voice_controls.render()
 	local button_spacing = 3
 	local row_spacing = 2
 
-	local text_color = hex_to_rgb(theme.statusline_text)
-	local bg_color = hex_to_rgb(theme.statusline_bg)
+	local text_color = boostio.hexToRgb(theme.statusline_text)
+	local bg_color = boostio.hexToRgb(theme.statusline_bg)
 
 	local panel_height = button_height * 3 + row_spacing * 2 + 10
 	boostio.drawRoundedRectangle(
@@ -82,8 +69,8 @@ function voice_controls.render()
 	local row_types = { "hidden", "solo", "muted" }
 	local row_colors = {
 		nil, -- voice colors for hidden row
-		hex_to_rgb(theme.palette.yellow),
-		hex_to_rgb(theme.palette.red),
+		boostio.hexToRgb("#e5c890"), -- yellowish for solo
+		boostio.hexToRgb("#ef9062"), -- red/orangeish for mute
 	}
 	local row_labels = { "", "S", "M" }
 
@@ -103,7 +90,7 @@ function voice_controls.render()
 			local x = start_x + voice * (button_width + button_spacing)
 			local y = row_y
 
-			local hovering = is_point_in_rect(mx, my, x, y, button_width, button_height)
+			local hovering = boostio.isPointInRect(mx, my, x, y, button_width, button_height)
 			local is_active = voice_state[row_types[row + 1]][voice + 1]
 
 			-- For mute row, show actual audible state
@@ -120,19 +107,25 @@ function voice_controls.render()
 			local is_selected = (row == 0) and state.selected_voice == voice
 
 			local button_color
+			local bg_r, bg_g, bg_b, bg_a
+
 			if row == 0 then
 				-- Use voice color for hidden row
 				local voice_color_hex = theme.voice_colors[voice + 1]
-				button_color = hex_to_rgb(voice_color_hex)
+				button_color = boostio.hexToRgb(voice_color_hex)
+				bg_r, bg_g, bg_b, bg_a = button_color.r, button_color.g, button_color.b, 0.5
+				if is_active then
+					bg_r, bg_g, bg_b, bg_a = button_color.r * 1.2, button_color.g * 1.2, button_color.b * 1.2, 0.9
+				end
 			else
-				-- Use consistent color for solo/mute rows
-				button_color = row_colors[row + 1]
-			end
-
-			local bg_r, bg_g, bg_b, bg_a = button_color.r, button_color.g, button_color.b, 0.5
-
-			if is_active then
-				bg_r, bg_g, bg_b, bg_a = button_color.r * 1.2, button_color.g * 1.2, button_color.b * 1.2, 0.9
+				-- Solo and mute buttons: grey when off, colored when on
+				if is_active then
+					button_color = row_colors[row + 1]
+					bg_r, bg_g, bg_b, bg_a = button_color.r, button_color.g, button_color.b, 0.9
+				else
+					-- Grey when inactive
+					bg_r, bg_g, bg_b, bg_a = 0.4, 0.4, 0.4, 0.5
+				end
 			end
 
 			if hovering then
@@ -170,7 +163,7 @@ function voice_controls.render()
 				local x = start_x + voice * (button_width + button_spacing)
 				local y = row_y
 
-				if is_point_in_rect(mx, my, x, y, button_width, button_height) then
+				if boostio.isPointInRect(mx, my, x, y, button_width, button_height) then
 					local row_type = row_types[row + 1]
 					local new_value = not voice_state[row_type][voice + 1]
 

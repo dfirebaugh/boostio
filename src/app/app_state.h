@@ -113,6 +113,10 @@ void app_state_zoom_horizontal(struct app_state *state, float factor);
 
 void app_state_zoom_vertical(struct app_state *state, float factor);
 
+void app_state_zoom_horizontal_at_mouse(struct app_state *state, float factor, float mouse_x);
+
+void app_state_zoom_vertical_at_mouse(struct app_state *state, float factor, float mouse_y);
+
 void app_state_sync_notes_from_sequencer(
 		struct app_state *state, const struct Sequencer *sequencer
 );

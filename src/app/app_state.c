@@ -26,7 +26,7 @@ void app_state_init(struct app_state *state)
 	theme_init_default(&state->theme);
 
 	state->viewport.time_offset = 0.0f;
-	state->viewport.note_offset = 60;
+	state->viewport.note_offset = 15;
 	state->viewport.pixels_per_ms = 0.2f;
 	state->viewport.piano_key_height = 20.0f;
 	state->viewport.grid_x = 120.0f;
@@ -175,9 +175,9 @@ void app_state_scroll_vertical(struct app_state *state, int delta_keys)
 	{
 		state->viewport.note_offset = 0;
 	}
-	if (state->viewport.note_offset > 127)
+	if (state->viewport.note_offset > 54)
 	{
-		state->viewport.note_offset = 127;
+		state->viewport.note_offset = 54;
 	}
 }
 
@@ -216,6 +216,84 @@ void app_state_zoom_vertical(struct app_state *state, float factor)
 	if (state->viewport.piano_key_height > 60.0f)
 	{
 		state->viewport.piano_key_height = 60.0f;
+	}
+}
+
+void app_state_zoom_horizontal_at_mouse(struct app_state *state, float factor, float mouse_x)
+{
+	if (state == NULL)
+	{
+		return;
+	}
+
+	if (mouse_x < state->viewport.grid_x || mouse_x > state->viewport.grid_x + state->viewport.grid_width)
+	{
+		app_state_zoom_horizontal(state, factor);
+		return;
+	}
+
+	float old_pixels_per_ms = state->viewport.pixels_per_ms;
+	float relative_x = mouse_x - state->viewport.grid_x;
+	float mouse_time_ms = state->viewport.time_offset + relative_x / old_pixels_per_ms;
+
+	state->viewport.pixels_per_ms *= factor;
+
+	if (state->viewport.pixels_per_ms < 0.05f)
+	{
+		state->viewport.pixels_per_ms = 0.05f;
+	}
+	if (state->viewport.pixels_per_ms > 2.0f)
+	{
+		state->viewport.pixels_per_ms = 2.0f;
+	}
+
+	state->viewport.time_offset = mouse_time_ms - relative_x / state->viewport.pixels_per_ms;
+	if (state->viewport.time_offset < 0.0f)
+	{
+		state->viewport.time_offset = 0.0f;
+	}
+}
+
+void app_state_zoom_vertical_at_mouse(struct app_state *state, float factor, float mouse_y)
+{
+	if (state == NULL)
+	{
+		return;
+	}
+
+	if (mouse_y < state->viewport.grid_y || mouse_y > state->viewport.grid_y + state->viewport.grid_height)
+	{
+		app_state_zoom_vertical(state, factor);
+		return;
+	}
+
+	float old_piano_key_height = state->viewport.piano_key_height;
+	float relative_y = mouse_y - state->viewport.grid_y;
+	float mouse_row = relative_y / old_piano_key_height;
+	int32_t old_note_offset = state->viewport.note_offset;
+
+	state->viewport.piano_key_height *= factor;
+
+	if (state->viewport.piano_key_height < 8.0f)
+	{
+		state->viewport.piano_key_height = 8.0f;
+	}
+	if (state->viewport.piano_key_height > 60.0f)
+	{
+		state->viewport.piano_key_height = 60.0f;
+	}
+
+	float new_row = relative_y / state->viewport.piano_key_height;
+	float row_delta = mouse_row - new_row;
+	state->viewport.note_offset = old_note_offset + (int32_t)(row_delta + 0.5f);
+
+	if (state->viewport.note_offset < 0)
+	{
+		state->viewport.note_offset = 0;
+	}
+	if (state->viewport.note_offset > 54)
+	{
+		state->viewport.note_offset = 54;
 	}
 }
 

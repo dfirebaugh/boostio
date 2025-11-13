@@ -12,15 +12,6 @@ local toast_config = {
 
 local toasts = {}
 
-local function hex_to_rgb(hex)
-	local hex_clean = hex:gsub("#", "")
-	return {
-		r = tonumber(hex_clean:sub(1, 2), 16) / 255,
-		g = tonumber(hex_clean:sub(3, 4), 16) / 255,
-		b = tonumber(hex_clean:sub(5, 6), 16) / 255,
-	}
-end
-
 local types = nil
 
 local function show(message, toast_type, duration)
@@ -82,23 +73,23 @@ end
 function toast_plugin.init()
 	types = {
 		info = {
-			bg_color = hex_to_rgb(config.theme.palette.blue),
-			border_color = hex_to_rgb(config.theme.palette.sapphire),
+			bg_color = boostio.hexToRgb(config.theme.palette.blue),
+			border_color = boostio.hexToRgb(config.theme.palette.sapphire),
 			icon = "i",
 		},
 		success = {
-			bg_color = hex_to_rgb(config.theme.palette.green),
-			border_color = hex_to_rgb(config.theme.palette.teal),
+			bg_color = boostio.hexToRgb(config.theme.palette.green),
+			border_color = boostio.hexToRgb(config.theme.palette.teal),
 			icon = "+",
 		},
 		warning = {
-			bg_color = hex_to_rgb(config.theme.palette.yellow),
-			border_color = hex_to_rgb(config.theme.palette.peach),
+			bg_color = boostio.hexToRgb(config.theme.palette.yellow),
+			border_color = boostio.hexToRgb(config.theme.palette.peach),
 			icon = "!",
 		},
 		error = {
-			bg_color = hex_to_rgb(config.theme.palette.red),
-			border_color = hex_to_rgb(config.theme.palette.maroon),
+			bg_color = boostio.hexToRgb(config.theme.palette.red),
+			border_color = boostio.hexToRgb(config.theme.palette.maroon),
 			icon = "x",
 		},
 	}

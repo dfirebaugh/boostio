@@ -32,7 +32,7 @@ PRIVATE
     src/app/app_controller.c
     src/app/lua_command_registry.c
     src/app/lua_service.c
-    src/app/ui/piano_roll.c
+    src/app/viewport_utils.c
     src/core/platform/platform.c
     src/core/lua/lua_runtime.c
     src/core/lua/lua_api.c

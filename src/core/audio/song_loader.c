@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 static enum WaveformType string_to_waveform(const char *str)
 {
@@ -21,6 +22,19 @@ static enum WaveformType string_to_waveform(const char *str)
 		return WAVEFORM_NES_NOISE;
 
 	return WAVEFORM_SINE;
+}
+
+static uint8_t frequency_to_piano_key(float frequency)
+{
+	float midi_note = 69.0f + 12.0f * log2f(frequency / 440.0f);
+	int32_t rounded = (int32_t)(midi_note + 0.5f);
+
+	if (rounded < 0)
+		return 0;
+	if (rounded > 127)
+		return 127;
+
+	return (uint8_t)rounded;
 }
 
 static char *read_file(const char *filepath)
@@ -140,6 +154,7 @@ bool song_loader_load_from_file(struct Audio *audio, const char *filepath)
 		if (cJSON_IsNumber(frequency_hz))
 		{
 			params.frequency = (float)frequency_hz->valuedouble;
+			params.piano_key = frequency_to_piano_key(params.frequency);
 		}
 
 		if (cJSON_IsNumber(duration_ms))
@@ -187,7 +202,7 @@ bool song_loader_load_from_file(struct Audio *audio, const char *filepath)
 			params.nes_noise_lfsr_init = (uint16_t)nes_noise_lfsr->valueint;
 		}
 
-		if (cJSON_IsNumber(piano_key_json))
+		if (cJSON_IsNumber(piano_key_json) && !cJSON_IsNumber(frequency_hz))
 		{
 			params.piano_key = (uint8_t)piano_key_json->valueint;
 		}

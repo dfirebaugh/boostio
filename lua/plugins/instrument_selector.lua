@@ -3,19 +3,6 @@ local instrument_selector = {}
 local last_mouse_state = false
 local click_handled = false
 
-local function is_point_in_rect(px, py, x, y, w, h)
-	return px >= x and px <= x + w and py >= y and py <= y + h
-end
-
-local function hex_to_rgb(hex)
-	local hex_clean = hex:gsub("#", "")
-	return {
-		r = tonumber(hex_clean:sub(1, 2), 16) / 255,
-		g = tonumber(hex_clean:sub(3, 4), 16) / 255,
-		b = tonumber(hex_clean:sub(5, 6), 16) / 255,
-	}
-end
-
 function instrument_selector.init() end
 
 function instrument_selector.render()
@@ -34,7 +21,7 @@ function instrument_selector.render()
 	local start_x = 140
 	local start_y = 10 + 3
 
-	local text_color = hex_to_rgb(theme.statusline_text)
+	local text_color = boostio.hexToRgb(theme.statusline_text)
 
 	for i = 0, instrument_count - 1 do
 		local inst = boostio.getInstrument(i)
@@ -44,7 +31,7 @@ function instrument_selector.render()
 		local x = start_x + col * (button_width + button_spacing)
 		local y = start_y + row * (button_height + button_spacing)
 
-		local hovering = is_point_in_rect(mx, my, x, y, button_width, button_height)
+		local hovering = boostio.isPointInRect(mx, my, x, y, button_width, button_height)
 		local is_selected = (state.selected_instrument == i)
 
 		local button_r = inst.color_r / 255
@@ -90,7 +77,7 @@ function instrument_selector.render()
 			local x = start_x + col * (button_width + button_spacing)
 			local y = start_y + row * (button_height + button_spacing)
 
-			if is_point_in_rect(mx, my, x, y, button_width, button_height) then
+			if boostio.isPointInRect(mx, my, x, y, button_width, button_height) then
 				boostio.setSelectedInstrument(i)
 
 				if toast then

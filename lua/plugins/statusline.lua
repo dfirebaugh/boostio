@@ -3,22 +3,13 @@ local statusline = {}
 statusline.enabled = true
 statusline.height = 25
 
-local function hex_to_rgb(hex)
-	local hex_clean = hex:gsub("#", "")
-	return {
-		r = tonumber(hex_clean:sub(1, 2), 16) / 255,
-		g = tonumber(hex_clean:sub(3, 4), 16) / 255,
-		b = tonumber(hex_clean:sub(5, 6), 16) / 255,
-	}
-end
-
 local theme = config.theme
-local bg_color_rgb = hex_to_rgb(theme.statusline_bg)
+local bg_color_rgb = common.boostio.hexToRgb(theme.statusline_bg)
 statusline.bg_color = { r = bg_color_rgb.r, g = bg_color_rgb.g, b = bg_color_rgb.b, a = theme.statusline_bg_alpha }
-statusline.text_color_rgb = hex_to_rgb(theme.statusline_text)
+statusline.text_color_rgb = boostio.hexToRgb(theme.statusline_text)
 statusline.text_color =
 	{ r = statusline.text_color_rgb.r, g = statusline.text_color_rgb.g, b = statusline.text_color_rgb.b, a = 1.0 }
-statusline.separator_color_rgb = hex_to_rgb(theme.statusline_separator)
+statusline.separator_color_rgb = boostio.hexToRgb(theme.statusline_separator)
 statusline.separator_color = {
 	r = statusline.separator_color_rgb.r,
 	g = statusline.separator_color_rgb.g,
@@ -28,7 +19,7 @@ statusline.separator_color = {
 
 local voice_colors = {}
 for i, hex in ipairs(theme.voice_colors) do
-	local rgb = hex_to_rgb(hex)
+	local rgb = boostio.hexToRgb(hex)
 	voice_colors[i] = { r = rgb.r, g = rgb.g, b = rgb.b, a = 0.9 }
 end
 
@@ -93,7 +84,7 @@ local function get_group_width(items)
 end
 
 local function create_bpm_component(state)
-	local bpm_color_rgb = hex_to_rgb(theme.statusline_bpm)
+	local bpm_color_rgb = boostio.hexToRgb(theme.statusline_bpm)
 	return {
 		text = string.format("%d BPM", state.bpm),
 		color = { r = bpm_color_rgb.r, g = bpm_color_rgb.g, b = bpm_color_rgb.b, a = 1.0 },
@@ -169,9 +160,9 @@ local function create_highlight_component(state)
 	local text = scale_info.highlight and "[H:ON]" or "[H:OFF]"
 	local color_rgb
 	if scale_info.highlight then
-		color_rgb = hex_to_rgb(theme.statusline_highlight_on)
+		color_rgb = boostio.hexToRgb(theme.statusline_highlight_on)
 	else
-		color_rgb = hex_to_rgb(theme.statusline_highlight_off)
+		color_rgb = boostio.hexToRgb(theme.statusline_highlight_off)
 	end
 
 	return {

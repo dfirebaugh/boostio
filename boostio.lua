@@ -123,10 +123,29 @@ function boostio.drawText(text, x, y, size, r, g, b, a) end
 ---@return number width Width of the text in pixels
 function boostio.measureText(text, size) end
 
+---Convert hex color string to RGB table
+---@param hex string Hex color string (e.g., "#FF0000" or "FF0000")
+---@return table rgb Table with r, g, b fields (0.0-1.0)
+function boostio.hexToRgb(hex) end
+
+---Check if a point is inside a rectangle
+---@param px number Point X coordinate
+---@param py number Point Y coordinate
+---@param x number Rectangle X coordinate
+---@param y number Rectangle Y coordinate
+---@param width number Rectangle width
+---@param height number Rectangle height
+---@return boolean inside True if point is inside rectangle
+function boostio.isPointInRect(px, py, x, y, width, height) end
+
 ---Get the current window dimensions
 ---@return number width Window width in pixels
 ---@return number height Window height in pixels
 function boostio.getWindowSize() end
+
+---Get the current frames per second (FPS)
+---@return number fps Current FPS
+function boostio.getFps() end
 
 ---Get the current mouse position
 ---@return number x Mouse X position in pixels
@@ -250,7 +269,7 @@ function boostio.getScaleInfo() end
 function boostio.toggleFold() end
 
 ---Get comprehensive app state information
----@return table state Table with fields: bpm, selected_voice, waveform, note_count, is_playing, playhead_ms, snap_enabled, snap_ms, selected_scale, selected_root, voice_hidden, voice_solo, voice_muted
+---@return table state Table with fields: bpm, selected_voice, waveform, note_count, is_playing, playhead_ms, snap_enabled, snap_ms, selected_scale, selected_root, voice_hidden, voice_solo, voice_muted, viewport, notes, fold_mode, show_scale_highlights
 function boostio.getAppState() end
 
 ---Set whether a voice is hidden (not displayed visually)
@@ -267,5 +286,93 @@ function boostio.setVoiceSolo(voice, solo) end
 ---@param voice integer Voice index (0-7)
 ---@param muted boolean Whether the voice should be muted
 function boostio.setVoiceMuted(voice, muted) end
+
+---Check if a piano key is in the given scale
+---@param piano_key integer Piano key (0-127)
+---@param scale string Scale type (e.g., "major", "minor", "chromatic")
+---@param root string Root note (e.g., "C", "D#", "A")
+---@return boolean in_scale True if the piano key is in the scale
+function boostio.isNoteInScale(piano_key, scale, root) end
+
+---Check if a piano key is the root note
+---@param piano_key integer Piano key (0-127)
+---@param root string Root note (e.g., "C", "D#", "A")
+---@return boolean is_root True if the piano key is the root note
+function boostio.isRootNote(piano_key, root) end
+
+---Convert milliseconds to X coordinate in the piano roll
+---@param ms number Time in milliseconds
+---@return number x X coordinate in pixels
+function boostio.msToX(ms) end
+
+---Convert X coordinate to milliseconds in the piano roll
+---@param x number X coordinate in pixels
+---@return number ms Time in milliseconds
+function boostio.xToMs(x) end
+
+---Convert piano key to Y coordinate in the piano roll
+---@param piano_key integer Piano key (0-127)
+---@return number y Y coordinate in pixels
+function boostio.pianoKeyToY(piano_key) end
+
+---Convert Y coordinate to piano key in the piano roll
+---@param y number Y coordinate in pixels
+---@return integer piano_key Piano key (0-127)
+function boostio.yToPianoKey(y) end
+
+---Get the list of selected note IDs
+---@return table selected_ids Array of selected note IDs
+function boostio.getSelection() end
+
+---Clear all note selections
+function boostio.clearSelection() end
+
+---Add a note to the selection
+---@param note_id integer ID of the note to select
+function boostio.selectNote(note_id) end
+
+---Remove a note from the selection
+---@param note_id integer ID of the note to deselect
+function boostio.deselectNote(note_id) end
+
+---Check if a note is currently selected
+---@param note_id integer ID of the note to check
+---@return boolean is_selected True if the note is selected
+function boostio.isNoteSelected(note_id) end
+
+---Move a note by a delta amount in time and pitch
+---@param note_id integer ID of the note to move
+---@param delta_ms integer Time delta in milliseconds
+---@param delta_piano_key integer Pitch delta in piano keys
+function boostio.moveNote(note_id, delta_ms, delta_piano_key) end
+
+---Resize a note by adjusting its duration
+---@param note_id integer ID of the note to resize
+---@param delta_duration_ms integer Duration delta in milliseconds
+---@param from_left boolean True to resize from left edge, false for right edge
+function boostio.resizeNote(note_id, delta_duration_ms, from_left) end
+
+---Delete a note from the project
+---@param note_id integer ID of the note to delete
+function boostio.deleteNote(note_id) end
+
+---Play a preview note using the selected instrument
+---@param piano_key integer Piano key to preview (0-127)
+function boostio.playPreviewNote(piano_key) end
+
+---Check if a key is currently pressed down
+---@param key string Key name (e.g., "ctrl", "shift", "alt", "a", "space")
+---@return boolean is_down True if the key is currently pressed
+function boostio.isKeyDown(key) end
+
+---Zoom horizontally (time axis) centered on the mouse cursor position
+---@param factor number Zoom factor (>1 zooms in, <1 zooms out)
+---@param mouse_x number X position of mouse cursor
+function boostio.zoomHorizontalAtMouse(factor, mouse_x) end
+
+---Zoom vertically (pitch axis) centered on the mouse cursor position
+---@param factor number Zoom factor (>1 zooms in, <1 zooms out)
+---@param mouse_y number Y position of mouse cursor
+function boostio.zoomVerticalAtMouse(factor, mouse_y) end
 
 return boostio

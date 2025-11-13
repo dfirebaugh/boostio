@@ -1,5 +1,4 @@
 #include "app/app_controller.h"
-#include "app/ui/piano_roll.h"
 #include "core/audio/audio.h"
 #include "core/audio/sequencer.h"
 #include "core/graphics/color.h"
@@ -197,8 +196,6 @@ void app_controller_render(struct app_controller *controller)
 
 	struct Color bg_color = color_rgb(30, 30, 46);
 	graphics_clear(controller->graphics, bg_color);
-
-	piano_roll_render(controller->graphics, &controller->state);
 
 	lua_service_call_render_callbacks(&controller->lua_service);
 }

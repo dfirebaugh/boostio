@@ -1,9 +1,13 @@
 boostio.registerCommand("zoom_in", function()
-	boostio.zoomIn()
+	local mouse_x, mouse_y = boostio.getMousePosition()
+	boostio.zoomHorizontalAtMouse(1.2, mouse_x)
+	boostio.zoomVerticalAtMouse(1.2, mouse_y)
 end)
 
 boostio.registerCommand("zoom_out", function()
-	boostio.zoomOut()
+	local mouse_x, mouse_y = boostio.getMousePosition()
+	boostio.zoomHorizontalAtMouse(1.0 / 1.2, mouse_x)
+	boostio.zoomVerticalAtMouse(1.0 / 1.2, mouse_y)
 end)
 
 boostio.registerCommand("toggle_fold", function()

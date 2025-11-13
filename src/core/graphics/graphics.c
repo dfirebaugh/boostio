@@ -67,6 +67,10 @@ struct Graphics
 	unsigned int text_ebo;
 
 	struct PrimitiveBuffer *primitive_buffer;
+
+	uint64_t last_fps_update_time;
+	uint32_t frame_count;
+	float current_fps;
 };
 
 struct Graphics *graphics_create(struct Window *window)
@@ -87,6 +91,9 @@ struct Graphics *graphics_create(struct Window *window)
 	memset(graphics, 0, sizeof(struct Graphics));
 	graphics->window = window;
 	graphics->current_color = COLOR_WHITE;
+	graphics->last_fps_update_time = SDL_GetPerformanceCounter();
+	graphics->frame_count = 0;
+	graphics->current_fps = 0.0f;
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -389,6 +396,19 @@ void graphics_present(struct Graphics *graphics)
 	}
 
 	SDL_GL_SwapWindow(graphics->window->window);
+
+	graphics->frame_count++;
+
+	uint64_t current_time = SDL_GetPerformanceCounter();
+	uint64_t frequency = SDL_GetPerformanceFrequency();
+	double elapsed = (double)(current_time - graphics->last_fps_update_time) / frequency;
+
+	if (elapsed >= 0.5)
+	{
+		graphics->current_fps = graphics->frame_count / elapsed;
+		graphics->frame_count = 0;
+		graphics->last_fps_update_time = current_time;
+	}
 }
 
 bool graphics_should_close(const struct Graphics *graphics)
@@ -637,4 +657,14 @@ struct Window *graphics_get_window(struct Graphics *graphics)
 	}
 
 	return graphics->window;
+}
+
+float graphics_get_fps(const struct Graphics *graphics)
+{
+	if (graphics == NULL)
+	{
+		return 0.0f;
+	}
+
+	return graphics->current_fps;
 }

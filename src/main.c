@@ -136,8 +136,6 @@ int main(int argc, char *argv[])
 		app_controller_render(&controller);
 
 		graphics_present(graphics);
-
-		SDL_Delay(16);
 	}
 
 	app_controller_deinit(&controller);

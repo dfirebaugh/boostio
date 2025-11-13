@@ -1,0 +1,776 @@
+local piano_roll = {}
+
+piano_roll.enabled = true
+
+local mouse_state = {
+	down = false,
+	down_x = 0,
+	down_y = 0,
+	drag_mode = "none",
+	drag_threshold = 5,
+	drag_started = false,
+	selection_box = {
+		active = false,
+		start_x = 0,
+		start_y = 0,
+		end_x = 0,
+		end_y = 0,
+	},
+	drag_data = {
+		initial_positions = {},
+		initial_durations = {},
+		initial_piano_keys = {},
+		primary_note_id = nil,
+	},
+	clicked_note_id = nil,
+	resize_from_left = false,
+}
+
+local function is_black_key(piano_key)
+	local note = piano_key % 12
+	return (note == 1 or note == 3 or note == 6 or note == 8 or note == 10)
+end
+
+local function get_note_name(piano_key)
+	local names = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"}
+	local note = piano_key % 12
+	local octave = math.floor(piano_key / 12) - 1
+	return names[note + 1] .. octave
+end
+
+local function piano_key_to_folded_row(piano_key, scale, root)
+	local row = 0
+	for key = 99, 45, -1 do
+		if boostio.isNoteInScale(key, scale, root) then
+			if key == piano_key then
+				return row
+			end
+			row = row + 1
+		end
+	end
+	return -1
+end
+
+local function y_to_piano_key_folded(y, vp, scale, root)
+	local relative_y = y - vp.grid_y
+	local target_row = math.floor(relative_y / vp.piano_key_height) + vp.note_offset
+
+	local current_row = 0
+	for key = 99, 45, -1 do
+		if boostio.isNoteInScale(key, scale, root) then
+			if current_row == target_row then
+				return key
+			end
+			current_row = current_row + 1
+		end
+	end
+
+	return 72
+end
+
+local function get_note_rect(vp, note, fold_mode, scale, root)
+	local x = boostio.msToX(note.ms)
+	local y
+
+	if fold_mode then
+		local folded_row = piano_key_to_folded_row(note.piano_key, scale, root)
+		if folded_row < 0 then
+			return {x = -1000, y = -1000, width = 0, height = 0}
+		end
+		local offset_row = folded_row - vp.note_offset
+		y = vp.grid_y + offset_row * vp.piano_key_height
+	else
+		y = boostio.pianoKeyToY(note.piano_key)
+	end
+
+	local width = note.duration_ms * vp.pixels_per_ms
+	local height = vp.piano_key_height - 2
+
+	return {x = x, y = y, width = width, height = height}
+end
+
+local function point_in_rect(px, py, rect)
+	return px >= rect.x and px <= rect.x + rect.width and
+	       py >= rect.y and py <= rect.y + rect.height
+end
+
+local function find_note_at_position(x, y, state)
+	for i = #state.notes, 1, -1 do
+		local note = state.notes[i]
+		local rect = get_note_rect(state.viewport, note, state.fold_mode, state.selected_scale, state.selected_root)
+
+		if point_in_rect(x, y, rect) then
+			local edge_threshold = 5
+			local is_left_edge = (x - rect.x) <= edge_threshold
+			local is_right_edge = (rect.x + rect.width - x) <= edge_threshold
+
+			return note.id, is_left_edge, is_right_edge
+		end
+	end
+	return nil, false, false
+end
+
+local function snap_to_grid(ms, state)
+	if not state.snap_enabled then
+		return ms
+	end
+
+	local ms_per_beat = 60000.0 / state.bpm
+	local ms_per_32nd = ms_per_beat / 8.0
+	local grid_index = math.floor(ms / ms_per_32nd + 0.5)
+	return grid_index * ms_per_32nd
+end
+
+local function handle_mouse_down(x, y, button, state)
+	if button ~= boostio.MOUSE_BUTTON_LEFT then
+		return
+	end
+
+	local vp = state.viewport
+
+	if x >= 0 and x < vp.grid_x and y >= vp.grid_y and y < vp.grid_y + vp.grid_height then
+		local piano_key
+		if state.fold_mode then
+			piano_key = y_to_piano_key_folded(y, vp, state.selected_scale, state.selected_root)
+		else
+			piano_key = boostio.yToPianoKey(y)
+		end
+		boostio.playPreviewNote(piano_key)
+		return
+	end
+
+	if x < vp.grid_x or x > vp.grid_x + vp.grid_width or
+	   y < vp.grid_y or y > vp.grid_y + vp.grid_height then
+		return
+	end
+
+	mouse_state.down = true
+	mouse_state.down_x = x
+	mouse_state.down_y = y
+	mouse_state.drag_started = false
+
+	local note_id, is_left_edge, is_right_edge = find_note_at_position(x, y, state)
+	mouse_state.clicked_note_id = note_id
+
+	local ctrl_held = boostio.isKeyDown("ctrl")
+
+	if note_id then
+		if is_left_edge then
+			mouse_state.drag_mode = "resize_left"
+			mouse_state.resize_from_left = true
+
+			mouse_state.drag_data.initial_positions = {}
+			mouse_state.drag_data.initial_durations = {}
+			mouse_state.drag_data.initial_piano_keys = {}
+
+			local selection = boostio.getSelection()
+			if #selection == 0 or not boostio.isNoteSelected(note_id) then
+				for _, note in ipairs(state.notes) do
+					if note.id == note_id then
+						mouse_state.drag_data.initial_positions[note.id] = note.ms
+						mouse_state.drag_data.initial_durations[note.id] = note.duration_ms
+						mouse_state.drag_data.initial_piano_keys[note.id] = note.piano_key
+						break
+					end
+				end
+			else
+				for _, selected_id in ipairs(selection) do
+					for _, note in ipairs(state.notes) do
+						if note.id == selected_id then
+							mouse_state.drag_data.initial_positions[note.id] = note.ms
+							mouse_state.drag_data.initial_durations[note.id] = note.duration_ms
+							mouse_state.drag_data.initial_piano_keys[note.id] = note.piano_key
+							break
+						end
+					end
+				end
+			end
+
+		elseif is_right_edge then
+			mouse_state.drag_mode = "resize_right"
+			mouse_state.resize_from_left = false
+
+			mouse_state.drag_data.initial_positions = {}
+			mouse_state.drag_data.initial_durations = {}
+			mouse_state.drag_data.initial_piano_keys = {}
+
+			local selection = boostio.getSelection()
+			if #selection == 0 or not boostio.isNoteSelected(note_id) then
+				for _, note in ipairs(state.notes) do
+					if note.id == note_id then
+						mouse_state.drag_data.initial_durations[note.id] = note.duration_ms
+						mouse_state.drag_data.initial_piano_keys[note.id] = note.piano_key
+						break
+					end
+				end
+			else
+				for _, selected_id in ipairs(selection) do
+					for _, note in ipairs(state.notes) do
+						if note.id == selected_id then
+							mouse_state.drag_data.initial_durations[note.id] = note.duration_ms
+							mouse_state.drag_data.initial_piano_keys[note.id] = note.piano_key
+							break
+						end
+					end
+				end
+			end
+		else
+			mouse_state.drag_mode = "move"
+			mouse_state.drag_data.primary_note_id = note_id
+
+			mouse_state.drag_data.initial_positions = {}
+			mouse_state.drag_data.initial_durations = {}
+			mouse_state.drag_data.initial_piano_keys = {}
+
+			local selection = boostio.getSelection()
+			if #selection == 0 or not boostio.isNoteSelected(note_id) then
+				if not ctrl_held then
+					boostio.clearSelection()
+				end
+				boostio.selectNote(note_id)
+
+				for _, note in ipairs(state.notes) do
+					if note.id == note_id then
+						mouse_state.drag_data.initial_positions[note.id] = note.ms
+						mouse_state.drag_data.initial_durations[note.id] = note.duration_ms
+						mouse_state.drag_data.initial_piano_keys[note.id] = note.piano_key
+						break
+					end
+				end
+			else
+				if ctrl_held then
+					boostio.deselectNote(note_id)
+				else
+					for _, selected_id in ipairs(selection) do
+						for _, note in ipairs(state.notes) do
+							if note.id == selected_id then
+								mouse_state.drag_data.initial_positions[note.id] = note.ms
+								mouse_state.drag_data.initial_durations[note.id] = note.duration_ms
+								mouse_state.drag_data.initial_piano_keys[note.id] = note.piano_key
+								break
+							end
+						end
+					end
+				end
+			end
+		end
+	else
+		if not ctrl_held then
+			boostio.clearSelection()
+		end
+		mouse_state.drag_mode = "box_select"
+		mouse_state.selection_box.active = true
+		mouse_state.selection_box.start_x = x
+		mouse_state.selection_box.start_y = y
+		mouse_state.selection_box.end_x = x
+		mouse_state.selection_box.end_y = y
+	end
+end
+
+local function handle_mouse_move(x, y, state)
+	if not mouse_state.down then
+		return
+	end
+
+	local dx = x - mouse_state.down_x
+	local dy = y - mouse_state.down_y
+	local distance = math.sqrt(dx * dx + dy * dy)
+
+	if distance > mouse_state.drag_threshold then
+		mouse_state.drag_started = true
+	end
+
+	if not mouse_state.drag_started then
+		return
+	end
+
+	if mouse_state.drag_mode == "move" then
+		local delta_ms = boostio.xToMs(x) - boostio.xToMs(mouse_state.down_x)
+		local delta_piano_key = boostio.yToPianoKey(y) - boostio.yToPianoKey(mouse_state.down_y)
+
+		local primary_note = nil
+		if mouse_state.drag_data.primary_note_id then
+			for _, note in ipairs(state.notes) do
+				if note.id == mouse_state.drag_data.primary_note_id then
+					primary_note = note
+					break
+				end
+			end
+		end
+
+		if primary_note and state.snap_enabled then
+			local initial_ms = mouse_state.drag_data.initial_positions[primary_note.id]
+			local target_ms = initial_ms + delta_ms
+			local snapped_ms = snap_to_grid(target_ms, state)
+			delta_ms = snapped_ms - initial_ms
+		end
+
+		for note_id, initial_ms in pairs(mouse_state.drag_data.initial_positions) do
+			local initial_piano_key = mouse_state.drag_data.initial_piano_keys[note_id]
+			for _, note in ipairs(state.notes) do
+				if note.id == note_id then
+					note.ms = math.max(0, initial_ms + delta_ms)
+					local new_key = initial_piano_key + delta_piano_key
+					note.piano_key = math.max(0, math.min(127, math.floor(new_key + 0.5)))
+					break
+				end
+			end
+		end
+
+	elseif mouse_state.drag_mode == "resize_left" then
+		local delta_ms = boostio.xToMs(x) - boostio.xToMs(mouse_state.down_x)
+
+		for note_id, initial_ms in pairs(mouse_state.drag_data.initial_positions) do
+			local initial_duration = mouse_state.drag_data.initial_durations[note_id]
+			local target_ms = initial_ms + delta_ms
+
+			if state.snap_enabled then
+				target_ms = snap_to_grid(target_ms, state)
+				delta_ms = target_ms - initial_ms
+			end
+
+			local new_duration = initial_duration - delta_ms
+			if new_duration < 10 then
+				delta_ms = initial_duration - 10
+				new_duration = 10
+			end
+
+			for _, note in ipairs(state.notes) do
+				if note.id == note_id then
+					note.ms = math.max(0, initial_ms + delta_ms)
+					note.duration_ms = math.floor(new_duration)
+					break
+				end
+			end
+		end
+
+	elseif mouse_state.drag_mode == "resize_right" then
+		local delta_ms = boostio.xToMs(x) - boostio.xToMs(mouse_state.down_x)
+
+		for note_id, initial_duration in pairs(mouse_state.drag_data.initial_durations) do
+			local new_duration = initial_duration + delta_ms
+
+			if state.snap_enabled then
+				for _, note in ipairs(state.notes) do
+					if note.id == note_id then
+						local end_ms = note.ms + initial_duration + delta_ms
+						local snapped_end_ms = snap_to_grid(end_ms, state)
+						new_duration = snapped_end_ms - note.ms
+						break
+					end
+				end
+			end
+
+			if new_duration < 10 then
+				new_duration = 10
+			end
+
+			for _, note in ipairs(state.notes) do
+				if note.id == note_id then
+					note.duration_ms = math.floor(new_duration)
+					break
+				end
+			end
+		end
+
+	elseif mouse_state.drag_mode == "box_select" then
+		mouse_state.selection_box.end_x = x
+		mouse_state.selection_box.end_y = y
+
+		local box = mouse_state.selection_box
+		local min_x = math.min(box.start_x, box.end_x)
+		local max_x = math.max(box.start_x, box.end_x)
+		local min_y = math.min(box.start_y, box.end_y)
+		local max_y = math.max(box.start_y, box.end_y)
+
+		local ctrl_held = boostio.isKeyDown("ctrl")
+		if not ctrl_held then
+			boostio.clearSelection()
+		end
+
+		for _, note in ipairs(state.notes) do
+			local rect = get_note_rect(state.viewport, note, state.fold_mode, state.selected_scale, state.selected_root)
+
+			local note_min_x = rect.x
+			local note_max_x = rect.x + rect.width
+			local note_min_y = rect.y
+			local note_max_y = rect.y + rect.height
+
+			local intersects = not (note_max_x < min_x or note_min_x > max_x or
+			                       note_max_y < min_y or note_min_y > max_y)
+
+			if intersects then
+				boostio.selectNote(note.id)
+			end
+		end
+	end
+end
+
+local function handle_mouse_up(x, y, button, state)
+	if button ~= boostio.MOUSE_BUTTON_LEFT then
+		return
+	end
+
+	if mouse_state.down and not mouse_state.drag_started then
+		local note_id = mouse_state.clicked_note_id
+		local ctrl_held = boostio.isKeyDown("ctrl")
+
+		if note_id then
+			if ctrl_held then
+				if boostio.isNoteSelected(note_id) then
+					boostio.deselectNote(note_id)
+				else
+					boostio.selectNote(note_id)
+				end
+			else
+				boostio.clearSelection()
+				boostio.selectNote(note_id)
+			end
+		else
+			if not ctrl_held then
+				boostio.clearSelection()
+			end
+		end
+	end
+
+	mouse_state.down = false
+	mouse_state.drag_mode = "none"
+	mouse_state.drag_started = false
+	mouse_state.selection_box.active = false
+	mouse_state.clicked_note_id = nil
+	mouse_state.drag_data.initial_positions = {}
+	mouse_state.drag_data.initial_durations = {}
+	mouse_state.drag_data.primary_note_id = nil
+end
+
+local function update(state)
+	local mouse_x, mouse_y = boostio.getMousePosition()
+
+	if boostio.isMouseButtonPressed(boostio.MOUSE_BUTTON_LEFT) then
+		handle_mouse_down(mouse_x, mouse_y, boostio.MOUSE_BUTTON_LEFT, state)
+	end
+
+	if mouse_state.down then
+		handle_mouse_move(mouse_x, mouse_y, state)
+	end
+
+	if not boostio.isMouseButtonDown(boostio.MOUSE_BUTTON_LEFT) and mouse_state.down then
+		handle_mouse_up(mouse_x, mouse_y, boostio.MOUSE_BUTTON_LEFT, state)
+	end
+end
+
+local function render_grid(state, theme)
+	local vp = state.viewport
+
+	local bg = boostio.hexToRgb(theme.grid_background)
+	boostio.drawRectangle(vp.grid_x, vp.grid_y, vp.grid_width, vp.grid_height, bg.r, bg.g, bg.b, 1.0)
+
+	local visible_keys = math.floor(vp.grid_height / vp.piano_key_height) + 2
+	local start_key = 99 - (vp.note_offset + visible_keys)
+	local end_key = 99 - vp.note_offset
+
+	if start_key < 45 then start_key = 45 end
+	if end_key > 99 then end_key = 99 end
+
+	if state.fold_mode then
+		local row_y = vp.grid_y
+		local current_row = 0
+
+		for key = 99, 45, -1 do
+			if boostio.isNoteInScale(key, state.selected_scale, state.selected_root) then
+				if current_row >= vp.note_offset then
+					if row_y >= vp.grid_y + vp.grid_height then
+						break
+					end
+
+					if state.show_scale_highlights then
+						if boostio.isRootNote(key, state.selected_root) then
+							local color = boostio.hexToRgb(theme.scale_root_grid)
+							boostio.drawRectangle(vp.grid_x, row_y, vp.grid_width, vp.piano_key_height, color.r, color.g, color.b, theme.scale_root_grid_alpha)
+						else
+							local color = boostio.hexToRgb(theme.scale_note_grid)
+							boostio.drawRectangle(vp.grid_x, row_y, vp.grid_width, vp.piano_key_height, color.r, color.g, color.b, theme.scale_note_grid_alpha)
+						end
+					end
+
+					local line_color = boostio.hexToRgb(theme.grid_line)
+					boostio.drawLine(vp.grid_x, row_y, vp.grid_x + vp.grid_width, row_y, line_color.r, line_color.g, line_color.b, 1.0)
+
+					row_y = row_y + vp.piano_key_height
+				end
+				current_row = current_row + 1
+			end
+		end
+	else
+		for key = start_key, end_key do
+			local y = boostio.pianoKeyToY(key)
+
+			if is_black_key(key) then
+				local color = boostio.hexToRgb(theme.piano_key_black)
+				boostio.drawRectangle(vp.grid_x, y, vp.grid_width, vp.piano_key_height, color.r, color.g, color.b, 1.0)
+			end
+
+			if state.show_scale_highlights then
+				if boostio.isRootNote(key, state.selected_root) then
+					local color = boostio.hexToRgb(theme.scale_root_grid)
+					boostio.drawRectangle(vp.grid_x, y, vp.grid_width, vp.piano_key_height, color.r, color.g, color.b, theme.scale_root_grid_alpha)
+				elseif boostio.isNoteInScale(key, state.selected_scale, state.selected_root) then
+					local color = boostio.hexToRgb(theme.scale_note_grid)
+					boostio.drawRectangle(vp.grid_x, y, vp.grid_width, vp.piano_key_height, color.r, color.g, color.b, theme.scale_note_grid_alpha)
+				end
+			end
+
+			local line_color = boostio.hexToRgb(theme.grid_line)
+			boostio.drawLine(vp.grid_x, y, vp.grid_x + vp.grid_width, y, line_color.r, line_color.g, line_color.b, 1.0)
+		end
+	end
+
+	local ms_per_beat = 60000.0 / state.bpm
+	local ms_per_bar = ms_per_beat * 4.0
+
+	local start_ms = vp.time_offset
+	local end_ms = start_ms + (vp.grid_width / vp.pixels_per_ms)
+
+	if state.snap_enabled then
+		local ms_per_32nd = ms_per_beat / 8.0
+		local first_32nd = math.floor(start_ms / ms_per_32nd)
+		local last_32nd = math.floor(end_ms / ms_per_32nd) + 1
+
+		for note_32nd = first_32nd, last_32nd do
+			local note_ms_float = note_32nd * ms_per_32nd
+			local x = boostio.msToX(note_ms_float)
+
+			if x >= vp.grid_x and x <= vp.grid_x + vp.grid_width then
+				local is_beat = (note_32nd % 8) == 0
+				local is_bar = is_beat and ((math.floor(note_32nd / 8) % 4) == 0)
+
+				if is_bar then
+					local bar = math.floor(note_32nd / 32)
+					if bar % 2 == 0 then
+						local color = boostio.hexToRgb(theme.grid_line)
+						boostio.drawRectangle(x, vp.grid_y, ms_per_bar * vp.pixels_per_ms, vp.grid_height, color.r, color.g, color.b, 0.5)
+					end
+
+					local beat_color = boostio.hexToRgb(theme.grid_beat_line)
+					boostio.drawLine(x, vp.grid_y, x, vp.grid_y + vp.grid_height, beat_color.r, beat_color.g, beat_color.b, 1.0)
+				elseif is_beat then
+					local color = boostio.hexToRgb(theme.grid_line)
+					boostio.drawLine(x, vp.grid_y, x, vp.grid_y + vp.grid_height, color.r, color.g, color.b, 0.78)
+				else
+					local color = boostio.hexToRgb(theme.grid_line)
+					boostio.drawLine(x, vp.grid_y, x, vp.grid_y + vp.grid_height, color.r, color.g, color.b, 0.23)
+				end
+			end
+		end
+	else
+		local first_bar = math.floor(start_ms / ms_per_bar)
+		local last_bar = math.floor(end_ms / ms_per_bar) + 1
+
+		for bar = first_bar, last_bar do
+			local bar_ms_float = bar * ms_per_bar
+			local x = boostio.msToX(bar_ms_float)
+
+			if x >= vp.grid_x and x <= vp.grid_x + vp.grid_width then
+				if bar % 2 == 0 then
+					local color = boostio.hexToRgb(theme.grid_line)
+					boostio.drawRectangle(x, vp.grid_y, ms_per_bar * vp.pixels_per_ms, vp.grid_height, color.r, color.g, color.b, 0.5)
+				end
+
+				local beat_color = boostio.hexToRgb(theme.grid_beat_line)
+				boostio.drawLine(x, vp.grid_y, x, vp.grid_y + vp.grid_height, beat_color.r, beat_color.g, beat_color.b, 1.0)
+			end
+		end
+	end
+end
+
+local function render_piano_keys(state, theme)
+	local vp = state.viewport
+	local piano_width = vp.grid_x
+
+	local bg = boostio.hexToRgb(theme.background)
+	boostio.drawRectangle(0, vp.grid_y, piano_width, vp.grid_height, bg.r, bg.g, bg.b, 1.0)
+
+	local visible_keys = math.floor(vp.grid_height / vp.piano_key_height) + 2
+	local start_key = 99 - (vp.note_offset + visible_keys)
+	local end_key = 99 - vp.note_offset
+
+	if start_key < 45 then start_key = 45 end
+	if end_key > 99 then end_key = 99 end
+
+	if state.fold_mode then
+		local row_y = vp.grid_y
+		local current_row = 0
+
+		for key = 99, 45, -1 do
+			if boostio.isNoteInScale(key, state.selected_scale, state.selected_root) then
+				if current_row >= vp.note_offset then
+					if row_y >= vp.grid_y + vp.grid_height then
+						break
+					end
+
+					if state.show_scale_highlights then
+						local is_root = boostio.isRootNote(key, state.selected_root)
+
+						if is_root then
+							local color = boostio.hexToRgb(theme.scale_root_piano)
+							boostio.drawRectangle(5, row_y + 1, piano_width - 10, vp.piano_key_height - 2, color.r, color.g, color.b, 1.0)
+						else
+							local color = boostio.hexToRgb(theme.scale_note_piano)
+							boostio.drawRectangle(5, row_y + 1, piano_width - 10, vp.piano_key_height - 2, color.r, color.g, color.b, 1.0)
+						end
+					else
+						local color = boostio.hexToRgb(theme.piano_key_white)
+						boostio.drawRectangle(5, row_y + 1, piano_width - 10, vp.piano_key_height - 2, color.r, color.g, color.b, 1.0)
+					end
+
+					local sep_color = boostio.hexToRgb(theme.piano_key_separator)
+					boostio.drawLine(0, row_y, piano_width, row_y, sep_color.r, sep_color.g, sep_color.b, 1.0)
+
+					if not is_black_key(key) and vp.piano_key_height >= 15.0 then
+						local note_name = get_note_name(key)
+						local text_color = boostio.hexToRgb(theme.piano_key_white_text)
+						boostio.drawText(note_name, 10, row_y + vp.piano_key_height / 2.0 + 4.0, 12, text_color.r, text_color.g, text_color.b, 1.0)
+					end
+
+					row_y = row_y + vp.piano_key_height
+				end
+				current_row = current_row + 1
+			end
+		end
+	else
+		for key = start_key, end_key do
+			local y = boostio.pianoKeyToY(key)
+
+			local is_black = is_black_key(key)
+			local is_root = state.show_scale_highlights and boostio.isRootNote(key, state.selected_root)
+			local in_scale = state.show_scale_highlights and boostio.isNoteInScale(key, state.selected_scale, state.selected_root)
+
+			if is_black then
+				local color = boostio.hexToRgb(theme.piano_key_black)
+				boostio.drawRectangle(5, y + 1, piano_width - 10, vp.piano_key_height - 2, color.r, color.g, color.b, 1.0)
+			else
+				local color = boostio.hexToRgb(theme.piano_key_white)
+				boostio.drawRectangle(5, y + 1, piano_width - 10, vp.piano_key_height - 2, color.r, color.g, color.b, 1.0)
+			end
+
+			if is_root then
+				local color = boostio.hexToRgb(theme.scale_root_piano)
+				boostio.drawRectangle(5, y + 1, piano_width - 10, vp.piano_key_height - 2, color.r, color.g, color.b, 0.7)
+			elseif in_scale then
+				local color = boostio.hexToRgb(theme.scale_note_piano)
+				boostio.drawRectangle(5, y + 1, piano_width - 10, vp.piano_key_height - 2, color.r, color.g, color.b, 0.55)
+			end
+
+			local sep_color = boostio.hexToRgb(theme.piano_key_separator)
+			boostio.drawLine(0, y, piano_width, y, sep_color.r, sep_color.g, sep_color.b, 1.0)
+
+			if not is_black_key(key) and vp.piano_key_height >= 15.0 then
+				local note_name = get_note_name(key)
+				local text_color = boostio.hexToRgb(theme.piano_key_white_text)
+				boostio.drawText(note_name, 10, y + vp.piano_key_height / 2.0 + 4.0, 12, text_color.r, text_color.g, text_color.b, 1.0)
+			end
+		end
+	end
+end
+
+local function render_notes(state, theme)
+	local vp = state.viewport
+
+	local has_solo = false
+	for i = 1, 8 do
+		if state.voice_solo[i] then
+			has_solo = true
+			break
+		end
+	end
+
+	for i, note in ipairs(state.notes) do
+		local voice = note.voice % 8
+
+		if not state.voice_hidden[voice + 1] then
+			local is_audible = true
+			if has_solo then
+				is_audible = state.voice_solo[voice + 1]
+			else
+				is_audible = not state.voice_muted[voice + 1]
+			end
+
+			local rect = get_note_rect(vp, note, state.fold_mode, state.selected_scale, state.selected_root)
+
+			if not (rect.x + rect.width < vp.grid_x or rect.x > vp.grid_x + vp.grid_width) then
+				if not (rect.y + rect.height < vp.grid_y or rect.y > vp.grid_y + vp.grid_height) then
+					local voice_color = boostio.hexToRgb(theme.voice_colors[voice + 1])
+					local note_color = {r = voice_color.r, g = voice_color.g, b = voice_color.b, a = 1.0}
+
+					local is_selected = boostio.isNoteSelected(note.id)
+
+					if not is_audible then
+						note_color.r = note_color.r * 0.3
+						note_color.g = note_color.g * 0.3
+						note_color.b = note_color.b * 0.3
+						note_color.a = 0.5
+					elseif is_selected then
+						note_color.r = math.min(1.0, note_color.r * 1.3)
+						note_color.g = math.min(1.0, note_color.g * 1.3)
+						note_color.b = math.min(1.0, note_color.b * 1.3)
+					end
+
+					boostio.drawRoundedRectangle(rect.x, rect.y, rect.width, rect.height, 3, note_color.r, note_color.g, note_color.b, note_color.a)
+
+					if is_selected then
+						boostio.strokeRoundedRectangle(rect.x, rect.y, rect.width, rect.height, 3, 1.0, 1.0, 1.0, 1.0)
+					end
+
+					if is_audible then
+						local shadow = boostio.hexToRgb(theme.note_shadow)
+						boostio.drawRectangle(rect.x + 2, rect.y + rect.height - 4, rect.width - 4, 3, shadow.r, shadow.g, shadow.b, theme.note_shadow_alpha)
+					end
+				end
+			end
+		end
+	end
+end
+
+local function render_selection_box(theme)
+	if not mouse_state.selection_box.active then
+		return
+	end
+
+	local box = mouse_state.selection_box
+	local min_x = math.min(box.start_x, box.end_x)
+	local max_x = math.max(box.start_x, box.end_x)
+	local min_y = math.min(box.start_y, box.end_y)
+	local max_y = math.max(box.start_y, box.end_y)
+	local width = max_x - min_x
+	local height = max_y - min_y
+
+	boostio.drawRectangle(min_x, min_y, width, height, 0.5, 0.7, 1.0, 0.2)
+	boostio.strokeRectangle(min_x, min_y, width, height, 0.5, 0.7, 1.0, 0.8)
+end
+
+local function render_playhead(state, theme)
+	local vp = state.viewport
+	local x = boostio.msToX(state.playhead_ms)
+
+	if x >= vp.grid_x and x <= vp.grid_x + vp.grid_width then
+		local color = boostio.hexToRgb(theme.playhead)
+		local win_width, win_height = boostio.getWindowSize()
+		boostio.drawRectangle(x - 1, vp.grid_y, 1, win_height, color.r, color.g, color.b, theme.playhead_alpha)
+		boostio.drawRectangle(x - 5, vp.grid_y - 10, 10, 10, color.r, color.g, color.b, theme.playhead_alpha)
+	end
+end
+
+function piano_roll.render()
+	local state = boostio.getAppState()
+	local theme = config.theme
+
+	update(state)
+
+	render_grid(state, theme)
+	render_notes(state, theme)
+	render_selection_box(theme)
+	render_playhead(state, theme)
+	render_piano_keys(state, theme)
+end
+
+return piano_roll

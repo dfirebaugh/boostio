@@ -49,5 +49,6 @@ float graphics_measure_text(struct Graphics *graphics, const char *text, int siz
 bool graphics_should_close(const struct Graphics *graphics);
 bool graphics_poll_events(struct Graphics *graphics);
 struct Window *graphics_get_window(struct Graphics *graphics);
+float graphics_get_fps(const struct Graphics *graphics);
 
 #endif
