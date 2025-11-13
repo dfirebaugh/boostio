@@ -145,7 +145,7 @@ static float generate_sample(struct render_voice *voice, uint32_t current_time_m
 
 	voice->phase += 1.0f;
 
-	return sample * final_amplitude * 0.8f;
+	return sample * final_amplitude * 0.2f;
 }
 
 static void write_wav_header(FILE *file, uint32_t data_size)
