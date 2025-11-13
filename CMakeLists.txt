@@ -40,6 +40,8 @@ PRIVATE
     src/core/graphics/msdf_atlas.c
     src/core/graphics/shader.c
     src/core/graphics/primitive_buffer.c
+    src/core/input/input_mapper.c
+    src/core/input/input_handler.c
     external/glad_generated/src/gl.c
 )
 

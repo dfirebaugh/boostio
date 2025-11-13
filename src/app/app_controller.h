@@ -6,6 +6,7 @@
 #include "app/ui_components/button.h"
 #include "core/graphics/graphics.h"
 #include "core/platform/platform.h"
+#include "core/input/input_handler.h"
 
 #include <stdbool.h>
 
@@ -15,6 +16,7 @@ struct app_controller
 	struct lua_service lua_service;
 	struct Graphics *graphics;
 	struct platform_paths *paths;
+	struct input_handler *input_handler;
 	bool running;
 
 	struct button test_button;

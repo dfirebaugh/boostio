@@ -1,5 +1,6 @@
 #include "app/app_controller.h"
 #include "core/graphics/color.h"
+#include "core/graphics/window.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -19,6 +20,14 @@ bool app_controller_init(
 
 	app_state_init(&controller->state);
 
+	struct Window *window = graphics_get_window(graphics);
+	controller->input_handler = input_handler_create(window);
+	if (controller->input_handler == NULL)
+	{
+		fprintf(stderr, "Failed to create input handler\n");
+		return false;
+	}
+
 	controller->test_button.text = "click me";
 	controller->test_button.x = 350;
 	controller->test_button.y = 350;
@@ -36,6 +45,7 @@ void app_controller_deinit(struct app_controller *controller)
 	}
 
 	lua_service_deinit(&controller->lua_service);
+	input_handler_destroy(controller->input_handler);
 }
 
 bool app_controller_init_lua(struct app_controller *controller, const char *config_path)
@@ -70,6 +80,49 @@ bool app_controller_init_lua(struct app_controller *controller, const char *conf
 	return true;
 }
 
+static void handle_input_event(struct app_controller *controller, struct input_event *event)
+{
+	if (event == NULL)
+	{
+		return;
+	}
+
+	switch (event->type)
+	{
+	case INPUT_EVENT_KEY_DOWN:
+		printf(
+				"Key down: %d (shift=%d, ctrl=%d, alt=%d)\n", event->data.key_down.key,
+				event->data.key_down.shift, event->data.key_down.ctrl, event->data.key_down.alt
+		);
+		break;
+
+	case INPUT_EVENT_KEY_UP:
+		printf("Key up: %d\n", event->data.key_up.key);
+		break;
+
+	case INPUT_EVENT_MOUSE_DOWN:
+		printf(
+				"Mouse down: button=%d at (%.1f, %.1f)\n", event->data.mouse_down.button,
+				event->data.mouse_down.x, event->data.mouse_down.y
+		);
+		break;
+
+	case INPUT_EVENT_MOUSE_UP:
+		printf(
+				"Mouse up: button=%d at (%.1f, %.1f)\n", event->data.mouse_up.button,
+				event->data.mouse_up.x, event->data.mouse_up.y
+		);
+		break;
+
+	case INPUT_EVENT_MOUSE_MOVE:
+		break;
+
+	case INPUT_EVENT_SCROLL:
+		printf("Scroll: (%.1f, %.1f)\n", event->data.scroll.dx, event->data.scroll.dy);
+		break;
+	}
+}
+
 void app_controller_update(struct app_controller *controller, float delta_time)
 {
 	if (controller == NULL)
@@ -80,6 +133,14 @@ void app_controller_update(struct app_controller *controller, float delta_time)
 	if (graphics_should_close(controller->graphics))
 	{
 		controller->running = false;
+	}
+
+	struct input_event events[64];
+	size_t event_count = input_handler_poll_events(controller->input_handler, events, 64);
+
+	for (size_t i = 0; i < event_count; i++)
+	{
+		handle_input_event(controller, &events[i]);
 	}
 }
 

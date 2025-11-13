@@ -628,3 +628,13 @@ bool graphics_poll_events(struct Graphics *graphics)
 
 	return window_poll_events(graphics->window);
 }
+
+struct Window *graphics_get_window(struct Graphics *graphics)
+{
+	if (graphics == NULL)
+	{
+		return NULL;
+	}
+
+	return graphics->window;
+}
