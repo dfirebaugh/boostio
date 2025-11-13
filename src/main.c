@@ -98,18 +98,18 @@ int main(int argc, char *argv[])
 	if (argc > 1) {
 		const char *song_path = argv[1];
 		printf("Loading song from: %s\n", song_path);
+		strncpy(controller.state.current_file_path, song_path, 511);
+		controller.state.current_file_path[511] = '\0';
+		printf("Set current file path: %s\n", song_path);
+
 		if (song_loader_load_from_file(audio, &controller.state, song_path)) {
 			printf("Song loaded successfully\n");
-
-			strncpy(controller.state.current_file_path, song_path, 511);
-			controller.state.current_file_path[511] = '\0';
-			printf("Set current file path: %s\n", song_path);
 
 			struct sequencer *sequencer = audio_get_sequencer(audio);
 			app_state_sync_notes_from_sequencer(&controller.state, sequencer);
 			printf("Synced %d notes to UI\n", controller.state.note_count);
 		} else {
-			fprintf(stderr, "Failed to load song from %s\n", song_path);
+			fprintf(stderr, "Failed to load song from %s, starting with empty song\n", song_path);
 		}
 	}
 
