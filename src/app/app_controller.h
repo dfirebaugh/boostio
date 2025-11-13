@@ -1,12 +1,13 @@
 #ifndef BOOSTIO_APP_CONTROLLER_H
 #define BOOSTIO_APP_CONTROLLER_H
 
-#include <stdbool.h>
-
 #include "app/app_state.h"
 #include "app/lua_service.h"
+#include "app/ui_components/button.h"
 #include "core/graphics/graphics.h"
 #include "core/platform/platform.h"
+
+#include <stdbool.h>
 
 struct app_controller
 {
@@ -15,10 +16,13 @@ struct app_controller
 	struct Graphics *graphics;
 	struct platform_paths *paths;
 	bool running;
+
+	struct button test_button;
 };
 
-bool app_controller_init(struct app_controller *controller, struct Graphics *graphics,
-						 struct platform_paths *paths);
+bool app_controller_init(
+		struct app_controller *controller, struct Graphics *graphics, struct platform_paths *paths
+);
 
 void app_controller_deinit(struct app_controller *controller);
 

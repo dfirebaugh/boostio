@@ -1,12 +1,12 @@
-#include <stdbool.h>
-#include <stdio.h>
-
 #include "app/app_controller.h"
 #include "core/graphics/color.h"
 
+#include <stdbool.h>
+#include <stdio.h>
 
-bool app_controller_init(struct app_controller *controller, struct Graphics *graphics,
-						 struct platform_paths *paths)
+bool app_controller_init(
+		struct app_controller *controller, struct Graphics *graphics, struct platform_paths *paths
+)
 {
 	if (controller == NULL || graphics == NULL)
 	{
@@ -18,6 +18,12 @@ bool app_controller_init(struct app_controller *controller, struct Graphics *gra
 	controller->running = true;
 
 	app_state_init(&controller->state);
+
+	controller->test_button.text = "click me";
+	controller->test_button.x = 350;
+	controller->test_button.y = 350;
+	controller->test_button.width = 80;
+	controller->test_button.height = 50;
 
 	return true;
 }
@@ -39,8 +45,10 @@ bool app_controller_init_lua(struct app_controller *controller, const char *conf
 		return false;
 	}
 
-	if (!lua_service_init(&controller->lua_service, &controller->state, controller->graphics,
-						  controller->paths))
+	if (!lua_service_init(
+				&controller->lua_service, &controller->state, controller->graphics,
+				controller->paths
+		))
 	{
 		fprintf(stderr, "Failed to initialize Lua service\n");
 		return false;
@@ -85,6 +93,8 @@ void app_controller_render(struct app_controller *controller)
 	struct Color bg_color = color_rgb(30, 30, 46);
 	graphics_clear(controller->graphics, bg_color);
 
+	/* test button */
+	button_render(controller->graphics, &controller->test_button);
 	lua_service_call_render_callbacks(&controller->lua_service);
 }
 
