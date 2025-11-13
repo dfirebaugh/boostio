@@ -2,12 +2,37 @@ local piano_roll = {}
 
 piano_roll.enabled = true
 
+local default_options = {
+	edge_threshold = 5,
+	drag_threshold = 5,
+	double_click_threshold_ms = 500,
+	min_note_duration_ms = 10,
+	default_note_duration_ms = 500,
+	piano_key_min = 45,
+	piano_key_max = 99,
+}
+
+local options = {}
+
+function piano_roll.init(config_options)
+	for k, v in pairs(default_options) do
+		options[k] = v
+	end
+
+	if config_options then
+		for k, v in pairs(config_options) do
+			if default_options[k] ~= nil then
+				options[k] = v
+			end
+		end
+	end
+end
+
 local mouse_state = {
 	down = false,
 	down_x = 0,
 	down_y = 0,
 	drag_mode = "none",
-	drag_threshold = 5,
 	drag_started = false,
 	selection_box = {
 		active = false,
@@ -28,7 +53,6 @@ local mouse_state = {
 	resize_from_left = false,
 	last_click_time = 0,
 	last_clicked_note_id = nil,
-	double_click_threshold_ms = 500,
 }
 
 local function is_black_key(piano_key)
@@ -49,7 +73,7 @@ local function piano_key_to_folded_row(piano_key, scale, root)
 	end
 
 	local row = 0
-	for key = 99, 45, -1 do
+	for key = options.piano_key_max, options.piano_key_min, -1 do
 		local success, in_scale = pcall(boostio.isNoteInScale, key, scale, root)
 		if success and in_scale then
 			if key == piano_key then
@@ -70,7 +94,7 @@ local function y_to_piano_key_folded(y, vp, scale, root)
 	local target_row = math.floor(relative_y / vp.piano_key_height) + vp.note_offset
 
 	local current_row = 0
-	for key = 99, 45, -1 do
+	for key = options.piano_key_max, options.piano_key_min, -1 do
 		local success, in_scale = pcall(boostio.isNoteInScale, key, scale, root)
 		if success and in_scale then
 			if current_row == target_row then
@@ -115,9 +139,8 @@ local function find_note_at_position(x, y, state)
 		local rect = get_note_rect(state.viewport, note, state.fold_mode, state.selected_scale, state.selected_root)
 
 		if point_in_rect(x, y, rect) then
-			local edge_threshold = 5
-			local is_left_edge = (x - rect.x) <= edge_threshold
-			local is_right_edge = (rect.x + rect.width - x) <= edge_threshold
+			local is_left_edge = (x - rect.x) <= options.edge_threshold
+			local is_right_edge = (rect.x + rect.width - x) <= options.edge_threshold
 
 			return note.id, is_left_edge, is_right_edge
 		end
@@ -298,7 +321,7 @@ local function handle_mouse_move(x, y, state)
 	local dy = y - mouse_state.down_y
 	local distance = math.sqrt(dx * dx + dy * dy)
 
-	if distance > mouse_state.drag_threshold then
+	if distance > options.drag_threshold then
 		if not mouse_state.drag_started then
 			mouse_state.drag_started = true
 
@@ -403,7 +426,7 @@ local function handle_mouse_move(x, y, state)
 						local current_row = 0
 						local new_key = initial_piano_key
 						if boostio and boostio.isNoteInScale then
-							for key = 99, 45, -1 do
+							for key = options.piano_key_max, options.piano_key_min, -1 do
 								local success, in_scale = pcall(boostio.isNoteInScale, key, state.selected_scale, state.selected_root)
 								if success and in_scale then
 									if current_row == target_row then
@@ -437,9 +460,9 @@ local function handle_mouse_move(x, y, state)
 			end
 
 			local new_duration = initial_duration - delta_ms
-			if new_duration < 10 then
-				delta_ms = initial_duration - 10
-				new_duration = 10
+			if new_duration < options.min_note_duration_ms then
+				delta_ms = initial_duration - options.min_note_duration_ms
+				new_duration = options.min_note_duration_ms
 			end
 
 			for _, note in ipairs(state.notes) do
@@ -468,8 +491,8 @@ local function handle_mouse_move(x, y, state)
 				end
 			end
 
-			if new_duration < 10 then
-				new_duration = 10
+			if new_duration < options.min_note_duration_ms then
+				new_duration = options.min_note_duration_ms
 			end
 
 			for _, note in ipairs(state.notes) do
@@ -565,7 +588,7 @@ local function handle_mouse_up(x, y, button, state)
 
 		if note_id then
 			local time_since_last_click = current_time - mouse_state.last_click_time
-			local is_double_click = (time_since_last_click < mouse_state.double_click_threshold_ms) and
+			local is_double_click = (time_since_last_click < options.double_click_threshold_ms) and
 			                        (note_id == mouse_state.last_clicked_note_id)
 
 			if is_double_click then
@@ -615,7 +638,7 @@ local function handle_mouse_up(x, y, button, state)
 				ms = math.max(0, ms)
 
 				if piano_key >= 0 and piano_key <= 87 then
-					local default_duration = 500
+					local default_duration = options.default_note_duration_ms
 					if state.snap_enabled and state.snap_ms > 0 then
 						default_duration = state.snap_ms
 					end
@@ -666,18 +689,18 @@ local function render_grid(state, theme)
 	boostio.drawRectangle(vp.grid_x, vp.grid_y, vp.grid_width, vp.grid_height, bg.r, bg.g, bg.b, 1.0)
 
 	local visible_keys = math.floor(vp.grid_height / vp.piano_key_height) + 2
-	local start_key = 99 - (vp.note_offset + visible_keys)
-	local end_key = 99 - vp.note_offset
+	local start_key = options.piano_key_max - (vp.note_offset + visible_keys)
+	local end_key = options.piano_key_max - vp.note_offset
 
-	if start_key < 45 then start_key = 45 end
-	if end_key > 99 then end_key = 99 end
+	if start_key < options.piano_key_min then start_key = options.piano_key_min end
+	if end_key > options.piano_key_max then end_key = options.piano_key_max end
 
 	if state.fold_mode then
 		local row_y = vp.grid_y
 		local current_row = 0
 
 		if boostio and boostio.isNoteInScale then
-			for key = 99, 45, -1 do
+			for key = options.piano_key_max, options.piano_key_min, -1 do
 				local success, in_scale = pcall(boostio.isNoteInScale, key, state.selected_scale, state.selected_root)
 				if success and in_scale then
 					if current_row >= vp.note_offset then
@@ -801,18 +824,18 @@ local function render_piano_keys(state, theme)
 	boostio.drawRectangle(0, vp.grid_y, piano_width, vp.grid_height, bg.r, bg.g, bg.b, 1.0)
 
 	local visible_keys = math.floor(vp.grid_height / vp.piano_key_height) + 2
-	local start_key = 99 - (vp.note_offset + visible_keys)
-	local end_key = 99 - vp.note_offset
+	local start_key = options.piano_key_max - (vp.note_offset + visible_keys)
+	local end_key = options.piano_key_max - vp.note_offset
 
-	if start_key < 45 then start_key = 45 end
-	if end_key > 99 then end_key = 99 end
+	if start_key < options.piano_key_min then start_key = options.piano_key_min end
+	if end_key > options.piano_key_max then end_key = options.piano_key_max end
 
 	if state.fold_mode then
 		local row_y = vp.grid_y
 		local current_row = 0
 
 		if boostio and boostio.isNoteInScale then
-			for key = 99, 45, -1 do
+			for key = options.piano_key_max, options.piano_key_min, -1 do
 				local success, in_scale = pcall(boostio.isNoteInScale, key, state.selected_scale, state.selected_root)
 				if success and in_scale then
 					if current_row >= vp.note_offset then

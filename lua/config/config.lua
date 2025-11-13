@@ -110,6 +110,20 @@ config = {
 				name = "piano_roll",
 				enabled = true,
 				priority = 1,
+				options = {
+					-- Interaction settings
+					-- edge_threshold = 5,              -- Pixels from note edge to trigger resize
+					-- drag_threshold = 5,              -- Pixels to move before drag starts
+					-- double_click_threshold_ms = 500, -- Max time between clicks for double-click
+
+					-- Note settings
+					-- min_note_duration_ms = 10,       -- Minimum duration when resizing notes
+					-- default_note_duration_ms = 500,  -- Default duration for new notes
+
+					-- Piano key range
+					-- piano_key_min = 45,              -- Lowest piano key to display (A2)
+					-- piano_key_max = 99,              -- Highest piano key to display (D#7)
+				},
 			},
 			{
 				name = "toast",

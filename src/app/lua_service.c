@@ -132,24 +132,6 @@ bool lua_service_load_plugin(struct lua_service *service, const char *plugin_pat
 
 	lua_setglobal(L, name_buffer);
 
-	lua_getglobal(L, name_buffer);
-	if (lua_type(L, -1) == LUA_TTABLE) {
-		lua_getfield(L, -1, "init");
-		if (lua_type(L, -1) == LUA_TFUNCTION) {
-			if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
-				fprintf(stderr,
-					"Failed to initialize plugin %s: %s\n",
-					name_buffer,
-					lua_tostring(L, -1));
-				lua_pop(L, 2);
-				return false;
-			}
-		} else {
-			lua_pop(L, 1);
-		}
-	}
-	lua_pop(L, 1);
-
 	printf("Loaded plugin: %s (as %s)\n", plugin_path, name_buffer);
 	return true;
 }
@@ -227,6 +209,32 @@ bool lua_service_load_plugins(struct lua_service *service)
 				service->loaded_plugins[service->plugin_count] =
 					strdup(plugin_name);
 				service->plugin_count++;
+
+				lua_getglobal(L, plugin_name);
+				if (lua_type(L, -1) == LUA_TTABLE) {
+					lua_getfield(L, -1, "init");
+					if (lua_type(L, -1) == LUA_TFUNCTION) {
+						lua_getfield(L, -3, "options");
+						if (lua_type(L, -1) != LUA_TTABLE) {
+							lua_pop(L, 1);
+							lua_pushnil(L);
+						}
+
+						if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
+							fprintf(stderr,
+								"Failed to initialize plugin %s: %s\n",
+								plugin_name,
+								lua_tostring(L, -1));
+							lua_pop(L, 2);
+						} else {
+							lua_pop(L, 1);
+						}
+					} else {
+						lua_pop(L, 2);
+					}
+				} else {
+					lua_pop(L, 1);
+				}
 			}
 		}
 
