@@ -14,7 +14,7 @@ function instrument_selector.render()
 
 	local cols = 3
 	local rows = math.ceil(instrument_count / cols)
-	local button_width = 75
+	local button_width = 90
 	local button_height = 24
 	local button_spacing = 3
 
