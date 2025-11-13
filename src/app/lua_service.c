@@ -147,6 +147,10 @@ bool lua_service_load_plugins(struct lua_service *service)
 		return false;
 	}
 
+	char plugins_dir[512];
+	snprintf(plugins_dir, sizeof(plugins_dir), "%s/plugins", service->paths->data_dir);
+	lua_runtime_add_package_path(&service->runtime, plugins_dir);
+
 	lua_getglobal(L, "config");
 	if (lua_type(L, -1) != LUA_TTABLE) {
 		fprintf(stderr, "Config not found or not a table\n");
