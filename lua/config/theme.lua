@@ -47,8 +47,6 @@ return {
 	scale_note_piano = palette.lavender,
 
 	note_default = palette.blue,
-	note_shadow = "#000000",
-	note_shadow_alpha = 60,
 
 	playhead = palette.rosewater,
 	playhead_alpha = 200,

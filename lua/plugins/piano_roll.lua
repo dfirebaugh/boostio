@@ -451,9 +451,13 @@ local function handle_mouse_move(x, y, state)
 					note.piano_key = math.max(0, math.min(127, math.floor(new_key + 0.5)))
 				end
 
-				if note_id == mouse_state.drag_data.primary_note_id and playback_controls and
-				    playback_controls.is_preview_on_drag_enabled and
-				    playback_controls.is_preview_on_drag_enabled() and not state.is_playing then
+				if
+				    note_id == mouse_state.drag_data.primary_note_id
+				    and playback_controls
+				    and playback_controls.is_preview_on_drag_enabled
+				    and playback_controls.is_preview_on_drag_enabled()
+				    and not state.is_playing
+				then
 					if note.piano_key ~= mouse_state.last_preview_piano_key then
 						boostio.playPreviewNote(note.piano_key)
 						mouse_state.last_preview_piano_key = note.piano_key
@@ -606,8 +610,12 @@ local function handle_mouse_up(x, y, button, state)
 
 				local note = find_note_by_id(state, note_id)
 				if note and is_voice_visible(note.voice) then
-					if playback_controls and playback_controls.is_preview_on_drag_enabled and
-					    playback_controls.is_preview_on_drag_enabled() and not state.is_playing then
+					if
+					    playback_controls
+					    and playback_controls.is_preview_on_drag_enabled
+					    and playback_controls.is_preview_on_drag_enabled()
+					    and not state.is_playing
+					then
 						boostio.playPreviewNote(note.piano_key)
 					end
 
@@ -1008,8 +1016,9 @@ local function render_piano_keys(state, theme)
 
 						if vp.piano_key_height >= 15.0 then
 							local note_name = get_note_name(key)
-							local text_color_key = is_black_key(key) and "piano_key_black_text" or
-							    "piano_key_white_text"
+							local text_color_key = is_black_key(key) and
+							    "piano_key_black_text"
+							    or "piano_key_white_text"
 							local text_color = boostio.hexToRgb(theme[text_color_key])
 							boostio.drawText(
 								note_name,
@@ -1172,20 +1181,6 @@ local function render_notes(state, theme)
 					if is_selected then
 						boostio.strokeRoundedRectangle(rect.x, rect.y, rect.width, rect.height, 3,
 							1.0, 1.0, 1.0, 1.0)
-					end
-
-					if is_audible then
-						local shadow = boostio.hexToRgb(theme.note_shadow)
-						boostio.drawRectangle(
-							rect.x + 2,
-							rect.y + rect.height - 4,
-							rect.width - 4,
-							3,
-							shadow.r,
-							shadow.g,
-							shadow.b,
-							theme.note_shadow_alpha
-						)
 					end
 				end
 			end
