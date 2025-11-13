@@ -37,3 +37,5 @@ If you clone this repo and run `bash ./scripts/copy_lua.sh` it should copy the a
 If you don't have these files in place, you will likely just see a grey window when you run the app.
 
 
+### Writing Plugins
+Take a look at `./boostio.lua` to see the function signatures of the lua api. 
