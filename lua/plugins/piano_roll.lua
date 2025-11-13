@@ -24,6 +24,9 @@ local mouse_state = {
 	},
 	clicked_note_id = nil,
 	resize_from_left = false,
+	last_click_time = 0,
+	last_clicked_note_id = nil,
+	double_click_threshold_ms = 500,
 }
 
 local function is_black_key(piano_key)
@@ -414,21 +417,69 @@ local function handle_mouse_up(x, y, button, state)
 	if mouse_state.down and not mouse_state.drag_started then
 		local note_id = mouse_state.clicked_note_id
 		local ctrl_held = boostio.isKeyDown("ctrl")
+		local current_time = os.clock() * 1000
 
 		if note_id then
-			if ctrl_held then
-				if boostio.isNoteSelected(note_id) then
-					boostio.deselectNote(note_id)
+			local time_since_last_click = current_time - mouse_state.last_click_time
+			local is_double_click = (time_since_last_click < mouse_state.double_click_threshold_ms) and
+			                        (note_id == mouse_state.last_clicked_note_id)
+
+			if is_double_click then
+				boostio.deleteNote(note_id)
+				mouse_state.last_click_time = 0
+				mouse_state.last_clicked_note_id = nil
+			else
+				mouse_state.last_click_time = current_time
+				mouse_state.last_clicked_note_id = note_id
+
+				if ctrl_held then
+					if boostio.isNoteSelected(note_id) then
+						boostio.deselectNote(note_id)
+					else
+						boostio.selectNote(note_id)
+					end
 				else
+					boostio.clearSelection()
 					boostio.selectNote(note_id)
 				end
-			else
-				boostio.clearSelection()
-				boostio.selectNote(note_id)
 			end
 		else
+			mouse_state.last_click_time = 0
+			mouse_state.last_clicked_note_id = nil
+
 			if not ctrl_held then
 				boostio.clearSelection()
+			end
+
+			local vp = state.viewport
+			if x >= vp.grid_x and x <= vp.grid_x + vp.grid_width and
+			   y >= vp.grid_y and y <= vp.grid_y + vp.grid_height then
+				local ms = boostio.xToMs(x)
+				local piano_key
+				if state.fold_mode then
+					piano_key = y_to_piano_key_folded(y, vp, state.selected_scale, state.selected_root)
+				else
+					piano_key = boostio.yToPianoKey(y)
+				end
+
+				if state.snap_enabled and state.snap_ms > 0 then
+					ms = math.floor(ms / state.snap_ms + 0.5) * state.snap_ms
+				end
+
+				ms = math.max(0, ms)
+
+				if piano_key >= 0 and piano_key <= 87 then
+					local default_duration = 500
+					if state.snap_enabled and state.snap_ms > 0 then
+						default_duration = state.snap_ms
+					end
+
+					local new_note_id = boostio.addNote(ms, piano_key, default_duration)
+					if new_note_id then
+						boostio.clearSelection()
+						boostio.selectNote(new_note_id)
+					end
+				end
 			end
 		end
 	end

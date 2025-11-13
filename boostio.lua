@@ -199,11 +199,13 @@ function boostio.setPlayhead(position_ms) end
 ---@field nes_noise_period number? NES noise period index 0-15 (default: 15)
 ---@field nes_noise_mode_flag boolean? NES noise mode: true=tonal, false=white noise (default: false)
 
----Add a note to the sequencer
+---Add a note to the sequencer with the currently selected instrument settings
+---Uses the selected voice and selected instrument's parameters by default
 ---@param start_ms number Note start time in milliseconds
 ---@param pitch number MIDI pitch (0-127, where 60 is middle C, 69 is A4 at 440Hz)
 ---@param duration_ms number Note duration in milliseconds
----@param params number|NoteParams? Either waveform type or table with advanced parameters
+---@param params number|NoteParams? Either waveform type or table with advanced parameters (can include voice field to override selected voice)
+---@return integer note_id The unique ID of the created note
 function boostio.addNote(start_ms, pitch, duration_ms, params) end
 
 ---Quit the application
@@ -377,6 +379,19 @@ function boostio.deleteNote(note_id) end
 ---Play a preview note using the selected instrument
 ---@param piano_key integer Piano key to preview (0-127)
 function boostio.playPreviewNote(piano_key) end
+
+---Get the number of available instruments
+---@return integer count Number of instruments available
+function boostio.getInstrumentCount() end
+
+---Get instrument properties by index
+---@param index integer Instrument index (0-based)
+---@return Instrument? instrument Instrument data or nil if invalid index
+function boostio.getInstrument(index) end
+
+---Set the selected instrument for placing new notes
+---@param index integer Instrument index (0-based)
+function boostio.setSelectedInstrument(index) end
 
 ---Check if a key is currently pressed down
 ---@param key string Key name (e.g., "ctrl", "shift", "alt", "a", "space")

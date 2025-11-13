@@ -500,7 +500,8 @@ static int lua_api_set_playhead(lua_State *L)
 
 static int lua_api_add_note(lua_State *L)
 {
-	if (global_context == NULL || global_context->audio == NULL) {
+	if (global_context == NULL || global_context->audio == NULL ||
+	    global_context->app_state == NULL) {
 		return luaL_error(L, "Audio not available");
 	}
 
@@ -508,20 +509,38 @@ static int lua_api_add_note(lua_State *L)
 	uint8_t pitch = (uint8_t)luaL_checknumber(L, 2);
 	uint32_t duration_ms = (uint32_t)luaL_checknumber(L, 3);
 
+	struct app_state *state = global_context->app_state;
+	uint8_t voice = state->selected_voice;
+
+	if (state->selected_instrument >= state->instrument_count) {
+		return luaL_error(L, "Invalid instrument selected");
+	}
+
+	struct instrument *instr = &state->instruments[state->selected_instrument];
+
 	struct NoteParams params = {
 		.frequency = note_to_frequency(pitch),
 		.duration_ms = (float)duration_ms,
-		.waveform = WAVEFORM_SINE,
-		.duty_cycle = 128,
-		.decay = 0,
-		.amplitude_dbfs = -3,
+		.waveform = instr->waveform,
+		.duty_cycle = instr->duty_cycle,
+		.decay = instr->decay,
+		.amplitude_dbfs = instr->amplitude_dbfs,
 		.nes_noise_period = 15,
-		.nes_noise_mode_flag = false,
-		.voice_index = -1,
+		.nes_noise_mode_flag = instr->nes_noise_mode_flag,
+		.nes_noise_lfsr_init = instr->nes_noise_lfsr,
+		.restart_phase = true,
+		.voice_index = voice,
 		.piano_key = pitch
 	};
 
 	if (lua_istable(L, 4)) {
+		lua_getfield(L, 4, "voice");
+		if (!lua_isnil(L, -1)) {
+			voice = (uint8_t)lua_tointeger(L, -1);
+			params.voice_index = voice;
+		}
+		lua_pop(L, 1);
+
 		lua_getfield(L, 4, "waveform");
 		if (!lua_isnil(L, -1)) {
 			params.waveform = (enum WaveformType)lua_tointeger(L, -1);
@@ -566,12 +585,18 @@ static int lua_api_add_note(lua_State *L)
 		sequencer_add_note(sequencer, start_ms, params);
 	}
 
-	printf("Note added: pitch=%d (%.2f Hz) at %ums for %ums waveform=%d\n",
-	       pitch,
-	       params.frequency,
-	       start_ms,
-	       duration_ms,
-	       params.waveform);
+	if (state->note_count < UI_MAX_NOTES) {
+		struct ui_note *ui_note = &state->notes[state->note_count];
+		ui_note->id = state->next_note_id++;
+		ui_note->ms = start_ms;
+		ui_note->duration_ms = (uint16_t)duration_ms;
+		ui_note->voice = voice;
+		ui_note->piano_key = pitch;
+		state->note_count++;
+
+		lua_pushinteger(L, ui_note->id);
+		return 1;
+	}
 
 	return 0;
 }
