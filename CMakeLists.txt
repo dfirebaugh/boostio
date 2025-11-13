@@ -30,6 +30,7 @@ PRIVATE
     src/main.c
     src/app/app_state.c
     src/app/app_controller.c
+    src/app/lua_command_registry.c
     src/app/lua_service.c
     src/app/ui_components/button.c
     src/core/platform/platform.c

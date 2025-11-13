@@ -6,13 +6,17 @@
 #include "core/lua/lua_api.h"
 #include "core/lua/lua_runtime.h"
 #include "core/platform/platform.h"
+#include "lua_command_registry.h"
 
 struct app_state;
+struct command;
+struct input_event;
 
 struct lua_service
 {
 	struct lua_runtime runtime;
 	struct lua_api_context api_context;
+	struct lua_command_registry command_registry;
 	bool initialized;
 	char **loaded_plugins;
 	int plugin_count;
@@ -35,5 +39,15 @@ bool lua_service_load_plugin(struct lua_service *service, const char *plugin_pat
 void lua_service_call_render_callbacks(struct lua_service *service);
 
 void lua_service_apply_config_to_state(struct lua_service *service, struct app_state *state);
+
+const char *lua_service_get_command_for_event(
+		struct lua_service *service, struct input_event *event
+);
+
+bool lua_service_execute_lua_command(struct lua_service *service, const char *command_name);
+
+void lua_service_set_app_controller(
+		struct lua_service *service, struct app_controller *controller
+);
 
 #endif

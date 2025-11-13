@@ -72,6 +72,8 @@ bool app_controller_init_lua(struct app_controller *controller, const char *conf
 
 	lua_service_apply_config_to_state(&controller->lua_service, &controller->state);
 
+	lua_service_set_app_controller(&controller->lua_service, controller);
+
 	if (!lua_service_load_plugins(&controller->lua_service))
 	{
 		fprintf(stderr, "Warning: Failed to load some plugins\n");
@@ -87,39 +89,12 @@ static void handle_input_event(struct app_controller *controller, struct input_e
 		return;
 	}
 
-	switch (event->type)
+	const char *command_name =
+			lua_service_get_command_for_event(&controller->lua_service, event);
+
+	if (command_name != NULL)
 	{
-	case INPUT_EVENT_KEY_DOWN:
-		printf(
-				"Key down: %d (shift=%d, ctrl=%d, alt=%d)\n", event->data.key_down.key,
-				event->data.key_down.shift, event->data.key_down.ctrl, event->data.key_down.alt
-		);
-		break;
-
-	case INPUT_EVENT_KEY_UP:
-		printf("Key up: %d\n", event->data.key_up.key);
-		break;
-
-	case INPUT_EVENT_MOUSE_DOWN:
-		printf(
-				"Mouse down: button=%d at (%.1f, %.1f)\n", event->data.mouse_down.button,
-				event->data.mouse_down.x, event->data.mouse_down.y
-		);
-		break;
-
-	case INPUT_EVENT_MOUSE_UP:
-		printf(
-				"Mouse up: button=%d at (%.1f, %.1f)\n", event->data.mouse_up.button,
-				event->data.mouse_up.x, event->data.mouse_up.y
-		);
-		break;
-
-	case INPUT_EVENT_MOUSE_MOVE:
-		break;
-
-	case INPUT_EVENT_SCROLL:
-		printf("Scroll: (%.1f, %.1f)\n", event->data.scroll.dx, event->data.scroll.dy);
-		break;
+		lua_service_execute_lua_command(&controller->lua_service, command_name);
 	}
 }
 

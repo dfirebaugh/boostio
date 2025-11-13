@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "app/app_state.h"
+#include "app_state.h"
 
 void app_state_init(struct app_state *state)
 {

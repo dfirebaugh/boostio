@@ -51,8 +51,8 @@ int main(int argc, char *argv[])
 	snprintf(atlas_json_path, sizeof(atlas_json_path), "%s/noto-atlas.json", paths.data_dir);
 
 	if (!msdf_atlas_generate(
-				"assets/fonts/Noto/NotoSansMNerdFontMono-Regular.ttf",
-				atlas_png_path, atlas_json_path
+				"assets/fonts/Noto/NotoSansMNerdFontMono-Regular.ttf", atlas_png_path,
+				atlas_json_path
 		))
 	{
 		fprintf(stderr, "Failed to generate font atlas\n");
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 	}
 
 	char config_path[512];
-	snprintf(config_path, sizeof(config_path), "%s/init.lua", paths.config_dir);
+	snprintf(config_path, sizeof(config_path), "%s/config.lua", paths.config_dir);
 
 	if (!app_controller_init_lua(&controller, config_path))
 	{

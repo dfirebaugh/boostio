@@ -1,13 +1,16 @@
+#include "app/lua_service.h"
+#include "app/app_state.h"
+#include "core/input/input_types.h"
+
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "app/lua_service.h"
-#include "app/app_state.h"
-
-bool lua_service_init(struct lua_service *service, struct app_state *state,
-					  struct Graphics *graphics, struct platform_paths *paths)
+bool lua_service_init(
+		struct lua_service *service, struct app_state *state, struct Graphics *graphics,
+		struct platform_paths *paths
+)
 {
 	if (service == NULL)
 	{
@@ -25,7 +28,16 @@ bool lua_service_init(struct lua_service *service, struct app_state *state,
 		return false;
 	}
 
+	if (!lua_command_registry_init(&service->command_registry, &service->runtime))
+	{
+		fprintf(stderr, "Failed to initialize Lua command registry\n");
+		lua_runtime_deinit(&service->runtime);
+		return false;
+	}
+
 	service->api_context.graphics = graphics;
+	service->api_context.command_registry = &service->command_registry;
+	service->api_context.app_state = state;
 
 	lua_api_register_all(&service->runtime, &service->api_context);
 
@@ -50,6 +62,7 @@ void lua_service_deinit(struct lua_service *service)
 		service->loaded_plugins = NULL;
 	}
 
+	lua_command_registry_deinit(&service->command_registry);
 	lua_runtime_deinit(&service->runtime);
 	service->initialized = false;
 }
@@ -59,6 +72,15 @@ bool lua_service_load_config(struct lua_service *service, const char *config_pat
 	if (service == NULL || !service->initialized || config_path == NULL)
 	{
 		return false;
+	}
+
+	const char *last_slash = strrchr(config_path, '/');
+	if (last_slash != NULL)
+	{
+		size_t dir_len = last_slash - config_path;
+		char config_dir[512];
+		snprintf(config_dir, sizeof(config_dir), "%.*s", (int)dir_len, config_path);
+		lua_runtime_add_package_path(&service->runtime, config_dir);
 	}
 
 	if (!lua_runtime_load_file(&service->runtime, config_path))
@@ -191,8 +213,10 @@ bool lua_service_load_plugins(struct lua_service *service)
 		if (plugin_name != NULL)
 		{
 			char plugin_path[512];
-			snprintf(plugin_path, sizeof(plugin_path), "%s/plugins/%s.lua",
-					 service->paths->data_dir, plugin_name);
+			snprintf(
+					plugin_path, sizeof(plugin_path), "%s/plugins/%s.lua", service->paths->data_dir,
+					plugin_name
+			);
 
 			if (lua_service_load_plugin(service, plugin_path))
 			{
@@ -260,11 +284,53 @@ void lua_service_apply_config_to_state(struct lua_service *service, struct app_s
 	int height = lua_runtime_get_config_int(&service->runtime, "window.height", 600);
 	app_state_update_dimensions(state, width, height);
 
-	uint32_t bpm = (uint32_t)lua_runtime_get_config_int(&service->runtime, "playback.default_bpm",
-														 120);
+	uint32_t bpm =
+			(uint32_t)lua_runtime_get_config_int(&service->runtime, "playback.default_bpm", 120);
 	app_state_set_bpm(state, bpm);
 
 	state->snap_enabled = lua_runtime_get_config_bool(&service->runtime, "grid.snap_enabled", true);
 
 	printf("Applied config to state: %dx%d, BPM=%d\n", width, height, bpm);
+}
+
+const char *lua_service_get_command_for_event(
+		struct lua_service *service, struct input_event *event
+)
+{
+	if (service == NULL || !service->initialized || event == NULL)
+	{
+		return NULL;
+	}
+
+	if (event->type != INPUT_EVENT_KEY_DOWN)
+	{
+		return NULL;
+	}
+
+	return lua_command_registry_get_command_for_key(
+			&service->command_registry, &event->data.key_down
+	);
+}
+
+bool lua_service_execute_lua_command(struct lua_service *service, const char *command_name)
+{
+	if (service == NULL || !service->initialized || command_name == NULL)
+	{
+		return false;
+	}
+
+	return lua_command_registry_execute_command(&service->command_registry, command_name);
+}
+
+void lua_service_set_app_controller(
+		struct lua_service *service, struct app_controller *controller
+)
+{
+	if (service == NULL || !service->initialized)
+	{
+		return;
+	}
+
+	service->api_context.app_controller = controller;
+	lua_api_set_context(&service->api_context);
 }

@@ -5,8 +5,8 @@
 #include "app/lua_service.h"
 #include "app/ui_components/button.h"
 #include "core/graphics/graphics.h"
-#include "core/platform/platform.h"
 #include "core/input/input_handler.h"
+#include "core/platform/platform.h"
 
 #include <stdbool.h>
 

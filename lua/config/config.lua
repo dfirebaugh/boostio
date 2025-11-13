@@ -1,3 +1,5 @@
+require("keybindings")
+
 config = {
 	window = {
 		width = 800,
@@ -52,6 +54,11 @@ config = {
 			},
 			{
 				name = "draw_test",
+				enabled = true,
+				priority = 50,
+			},
+			{
+				name = "test_commands",
 				enabled = true,
 				priority = 50,
 			},

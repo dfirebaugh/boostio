@@ -116,4 +116,77 @@ function boostio.measureText(text, size) end
 ---@return any value The configuration value, or nil if not found
 function boostio.getConfig(key) end
 
+---Register a custom Lua command
+---@param name string Command name
+---@param callback function Function to call when command is executed
+function boostio.registerCommand(name, callback) end
+
+---@class KeybindingModifiers
+---@field shift boolean? Shift key modifier (default: false)
+---@field ctrl boolean? Control key modifier (default: false)
+---@field alt boolean? Alt key modifier (default: false)
+
+---Register a keybinding
+---@param key string Key name: "a"-"z", "0"-"9", "space", "escape", "enter", "tab", "f1"-"f12", "up", "down", "left", "right", "minus", "equals"
+---@param command_name string Name of the command to execute
+---@param modifiers KeybindingModifiers? Optional modifier keys (shift, ctrl, alt)
+function boostio.registerKeybinding(key, command_name, modifiers) end
+
+---Set the BPM (beats per minute)
+---@param bpm number BPM value
+function boostio.setBpm(bpm) end
+
+---Set the playhead position
+---@param position_ms number Position in milliseconds
+function boostio.setPlayhead(position_ms) end
+
+---Add a note to the sequencer
+---@param start_ms number Note start time in milliseconds
+---@param pitch number MIDI pitch (0-127)
+---@param duration_ms number Note duration in milliseconds
+---@param voice number? Voice index (default: 0)
+function boostio.addNote(start_ms, pitch, duration_ms, voice) end
+
+---Quit the application
+function boostio.quit() end
+
+---Save the current project
+function boostio.save() end
+
+---Load a project
+function boostio.load() end
+
+---Undo the last action
+function boostio.undo() end
+
+---Redo the last undone action
+function boostio.redo() end
+
+---Toggle play/pause
+function boostio.togglePlay() end
+
+---Start playback
+function boostio.play() end
+
+---Pause playback
+function boostio.pause() end
+
+---Stop playback
+function boostio.stop() end
+
+---Toggle grid snapping
+function boostio.toggleSnap() end
+
+---Zoom in
+function boostio.zoomIn() end
+
+---Zoom out
+function boostio.zoomOut() end
+
+---Transpose selected notes up
+function boostio.transposeUp() end
+
+---Transpose selected notes down
+function boostio.transposeDown() end
+
 return boostio
