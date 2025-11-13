@@ -1,6 +1,7 @@
 #include "input_handler.h"
 #include "input_mapper.h"
-#include "core/graphics/window.h"
+#include "window.h"
+
 #include <SDL3/SDL.h>
 #include <stdlib.h>
 #include <string.h>

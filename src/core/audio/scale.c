@@ -1,4 +1,5 @@
 #include "scale.h"
+
 #include <stddef.h>
 #include <string.h>
 

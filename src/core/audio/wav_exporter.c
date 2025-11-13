@@ -1,6 +1,7 @@
 #include "wav_exporter.h"
 #include "sequencer.h"
 #include "synth.h"
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

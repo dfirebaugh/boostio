@@ -1,5 +1,6 @@
 #include "synth.h"
 #include <math.h>
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -18,7 +19,8 @@ void synth_init(struct synth *synth, uint32_t sample_rate)
 	synth->master_volume = 0.3f;
 }
 
-static void synth_play_note_on_voice(struct synth *synth, struct note_params params, uint8_t voice_index)
+static void
+synth_play_note_on_voice(struct synth *synth, struct note_params params, uint8_t voice_index)
 {
 	if (voice_index >= MAX_VOICES) {
 		return;

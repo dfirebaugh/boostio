@@ -1,9 +1,9 @@
-#include "app/lua_service.h"
-#include "app/app_state.h"
-#include "core/audio/audio.h"
-#include "core/graphics/graphics.h"
-#include "core/input/input_types.h"
-#include "core/platform/platform.h"
+#include "lua_service.h"
+#include "app_state.h"
+#include "audio.h"
+#include "graphics.h"
+#include "input_types.h"
+#include "platform.h"
 
 #include <dirent.h>
 #include <stdio.h>
@@ -222,7 +222,8 @@ bool lua_service_load_plugins(struct lua_service *service)
 
 						if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
 							fprintf(stderr,
-								"Failed to initialize plugin %s: %s\n",
+								"Failed to initialize plugin %s: "
+								"%s\n",
 								plugin_name,
 								lua_tostring(L, -1));
 							lua_pop(L, 2);
@@ -280,9 +281,7 @@ void lua_service_call_render_callbacks(struct lua_service *service)
 	}
 }
 
-bool lua_service_dispatch_key_event(
-	struct lua_service *service, struct input_event_key_down *event
-)
+bool lua_service_dispatch_key_event(struct lua_service *service, struct input_event_key_down *event)
 {
 	if (service == NULL || !service->initialized || event == NULL) {
 		return false;
@@ -321,12 +320,10 @@ bool lua_service_dispatch_key_event(
 		int result = lua_pcall(L, 4, 1, 0);
 		if (result != LUA_OK) {
 			const char *error_msg = lua_tostring(L, -1);
-			fprintf(
-				stderr,
+			fprintf(stderr,
 				"Lua key event error in %s: %s\n",
 				plugin_name,
-				error_msg ? error_msg : "unknown error"
-			);
+				error_msg ? error_msg : "unknown error");
 			lua_pop(L, 2);
 			continue;
 		}

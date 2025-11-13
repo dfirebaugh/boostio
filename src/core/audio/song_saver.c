@@ -1,9 +1,10 @@
 #include "song_saver.h"
-#include "app/app_state.h"
+#include "app_state.h"
 #include "cJSON.h"
 #include "scale.h"
 #include "sequencer.h"
 #include "synth.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

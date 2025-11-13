@@ -84,6 +84,14 @@ target_link_libraries(${EXECUTABLE_NAME} PUBLIC
 
 target_include_directories(${EXECUTABLE_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/app
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/audio
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/graphics
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/input
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/lua
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/platform
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/theme
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/core/undo
     ${CMAKE_CURRENT_SOURCE_DIR}/msdf-atlas-gen
     ${CMAKE_CURRENT_SOURCE_DIR}/external/freetype/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/msdf-atlas-gen

@@ -1,7 +1,8 @@
 #ifndef COMMAND_HISTORY_H
 #define COMMAND_HISTORY_H
 
-#include "../audio/synth.h"
+#include "synth.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 

@@ -2,6 +2,7 @@
 #define INPUT_MAPPER_H
 
 #include "input_types.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 

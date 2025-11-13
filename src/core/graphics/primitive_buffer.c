@@ -1,5 +1,6 @@
 #include "primitive_buffer.h"
 #include "color.h"
+
 #include <glad/gl.h>
 #include <math.h>
 #include <stddef.h>

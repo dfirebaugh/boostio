@@ -4,10 +4,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "core/audio/scale.h"
-#include "core/audio/synth.h"
-#include "core/theme/theme.h"
-#include "core/undo/command_history.h"
+#include "command_history.h"
+#include "scale.h"
+#include "synth.h"
+#include "theme.h"
 
 struct sequencer;
 struct audio;

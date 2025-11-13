@@ -3,8 +3,8 @@
 
 #include <stdbool.h>
 
-#include "app/app_state.h"
-#include "app/lua_service.h"
+#include "app_state.h"
+#include "lua_service.h"
 
 struct graphics;
 struct audio;

@@ -1,5 +1,6 @@
 #include "msdf_atlas.h"
 #include "../../msdf-atlas-gen/atlas_wrapper.h"
+
 #include <cJSON.h>
 #include <GL/gl.h>
 #include <png.h>
@@ -183,8 +184,9 @@ struct msdf_atlas *msdf_atlas_load(const char *json_path, const char *png_path)
 	atlas->glyphs =
 		(struct msdf_glyph *)malloc(sizeof(struct msdf_glyph) * atlas->glyph_capacity);
 	atlas->kerning_capacity = 256;
-	atlas->kerning =
-		(struct kerning_pair *)malloc(sizeof(struct kerning_pair) * atlas->kerning_capacity);
+	atlas->kerning = (struct kerning_pair *)malloc(
+		sizeof(struct kerning_pair) * atlas->kerning_capacity
+	);
 
 	cJSON *atlas_obj = cJSON_GetObjectItem(root, "atlas");
 	if (atlas_obj) {
@@ -281,7 +283,8 @@ struct msdf_atlas *msdf_atlas_load(const char *json_path, const char *png_path)
 					atlas->kerning_capacity *= 2;
 					atlas->kerning = (struct kerning_pair *)realloc(
 						atlas->kerning,
-						sizeof(struct kerning_pair) * atlas->kerning_capacity
+						sizeof(struct kerning_pair) *
+							atlas->kerning_capacity
 					);
 				}
 

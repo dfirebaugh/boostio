@@ -1,7 +1,7 @@
 #ifndef BOOSTIO_LUA_API_H
 #define BOOSTIO_LUA_API_H
 
-#include "core/lua/lua_runtime.h"
+#include "lua_runtime.h"
 
 struct graphics;
 struct audio;

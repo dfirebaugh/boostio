@@ -1,4 +1,5 @@
-#include "core/lua/lua_runtime.h"
+#include "lua_runtime.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

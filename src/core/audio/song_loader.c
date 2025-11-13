@@ -1,10 +1,11 @@
 #include "song_loader.h"
+#include "app_state.h"
 #include "audio.h"
 #include "cJSON.h"
 #include "scale.h"
 #include "sequencer.h"
 #include "synth.h"
-#include "app/app_state.h"
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -117,10 +118,12 @@ bool song_loader_load_from_file(struct audio *audio, struct app_state *state, co
 		printf("Loaded fold_mode: %s\n", state->fold_mode ? "true" : "false");
 	}
 
-	cJSON *show_scale_highlights_item = cJSON_GetObjectItemCaseSensitive(root, "show_scale_highlights");
+	cJSON *show_scale_highlights_item =
+		cJSON_GetObjectItemCaseSensitive(root, "show_scale_highlights");
 	if (cJSON_IsBool(show_scale_highlights_item) && state) {
 		state->show_scale_highlights = cJSON_IsTrue(show_scale_highlights_item);
-		printf("Loaded show_scale_highlights: %s\n", state->show_scale_highlights ? "true" : "false");
+		printf("Loaded show_scale_highlights: %s\n",
+		       state->show_scale_highlights ? "true" : "false");
 	}
 
 	cJSON *notes_array = cJSON_GetObjectItemCaseSensitive(root, "notes");

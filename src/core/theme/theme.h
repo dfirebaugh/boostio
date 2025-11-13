@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#include "core/graphics/color.h"
+#include "color.h"
 
 struct theme {
 	struct color background;

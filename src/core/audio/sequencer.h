@@ -2,6 +2,7 @@
 #define SEQUENCER_H
 
 #include "synth.h"
+
 #include <stdbool.h>
 #include <stdint.h>
 

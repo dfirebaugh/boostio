@@ -1,20 +1,20 @@
-#include "core/lua/lua_api.h"
-#include "app/app_state.h"
-#include "app/lua_command_registry.h"
-#include "app/viewport_utils.h"
-#include "core/audio/audio.h"
-#include "core/audio/c_exporter.h"
-#include "core/audio/scale.h"
-#include "core/audio/sequencer.h"
-#include "core/audio/song_loader.h"
-#include "core/audio/song_saver.h"
-#include "core/audio/synth.h"
-#include "core/audio/wav_exporter.h"
-#include "core/graphics/color.h"
-#include "core/graphics/graphics.h"
-#include "core/graphics/window.h"
-#include "core/input/input_types.h"
-#include "core/platform/path_utils.h"
+#include "lua_api.h"
+#include "app_state.h"
+#include "audio.h"
+#include "c_exporter.h"
+#include "color.h"
+#include "graphics.h"
+#include "input_types.h"
+#include "lua_command_registry.h"
+#include "path_utils.h"
+#include "scale.h"
+#include "sequencer.h"
+#include "song_loader.h"
+#include "song_saver.h"
+#include "synth.h"
+#include "viewport_utils.h"
+#include "wav_exporter.h"
+#include "window.h"
 
 #include <SDL3/SDL.h>
 #include <string.h>
@@ -1214,7 +1214,8 @@ static int lua_api_set_note_instrument(lua_State *L)
 				state->notes[i].nes_noise_mode_flag;
 			cmd.data.set_note_instrument.old_nes_noise_lfsr_init =
 				state->notes[i].nes_noise_lfsr_init;
-			cmd.data.set_note_instrument.new_instrument_index = (uint8_t)instrument_index;
+			cmd.data.set_note_instrument.new_instrument_index =
+				(uint8_t)instrument_index;
 			command_history_push(&state->history, cmd);
 
 			state->notes[i].waveform = instr->waveform;
@@ -1847,9 +1848,12 @@ static int lua_api_delete_note(lua_State *L)
 			cmd.data.delete_note.note.duty_cycle = state->notes[i].duty_cycle;
 			cmd.data.delete_note.note.decay = state->notes[i].decay;
 			cmd.data.delete_note.note.amplitude_dbfs = state->notes[i].amplitude_dbfs;
-			cmd.data.delete_note.note.nes_noise_period = state->notes[i].nes_noise_period;
-			cmd.data.delete_note.note.nes_noise_mode_flag = state->notes[i].nes_noise_mode_flag;
-			cmd.data.delete_note.note.nes_noise_lfsr_init = state->notes[i].nes_noise_lfsr_init;
+			cmd.data.delete_note.note.nes_noise_period =
+				state->notes[i].nes_noise_period;
+			cmd.data.delete_note.note.nes_noise_mode_flag =
+				state->notes[i].nes_noise_mode_flag;
+			cmd.data.delete_note.note.nes_noise_lfsr_init =
+				state->notes[i].nes_noise_lfsr_init;
 			cmd.data.delete_note.note.restart_phase = state->notes[i].restart_phase;
 			cmd.data.delete_note.index = i;
 			command_history_push(&state->history, cmd);

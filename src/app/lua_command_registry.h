@@ -1,7 +1,7 @@
 #ifndef LUA_COMMAND_REGISTRY_H
 #define LUA_COMMAND_REGISTRY_H
 
-#include "core/input/input_types.h"
+#include "input_types.h"
 
 #include <stdbool.h>
 #include <stddef.h>

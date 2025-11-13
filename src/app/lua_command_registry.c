@@ -1,5 +1,5 @@
 #include "lua_command_registry.h"
-#include "core/lua/lua_runtime.h"
+#include "lua_runtime.h"
 
 #include <stdio.h>
 #include <stdlib.h>

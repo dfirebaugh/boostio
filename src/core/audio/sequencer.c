@@ -1,5 +1,5 @@
 #include "sequencer.h"
-#include <stdio.h>
+
 #include <string.h>
 
 void sequencer_init(struct sequencer *sequencer)
@@ -42,7 +42,8 @@ void sequencer_update(
 
 	sequencer->playhead_samples += samples;
 
-	uint32_t playhead_ms = (uint32_t)((sequencer->playhead_samples * 1000) / sequencer->sample_rate);
+	uint32_t playhead_ms =
+		(uint32_t)((sequencer->playhead_samples * 1000) / sequencer->sample_rate);
 
 	bool has_untriggered_notes = false;
 

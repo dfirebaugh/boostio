@@ -1,10 +1,10 @@
-#include "app/app_controller.h"
-#include "core/audio/audio.h"
-#include "core/audio/sequencer.h"
-#include "core/graphics/color.h"
-#include "core/graphics/graphics.h"
-#include "core/graphics/window.h"
-#include "core/input/input_handler.h"
+#include "app_controller.h"
+#include "audio.h"
+#include "color.h"
+#include "graphics.h"
+#include "input_handler.h"
+#include "sequencer.h"
+#include "window.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -174,7 +174,9 @@ void app_controller_update(struct app_controller *controller, float delta_time)
 	if (sequencer) {
 		controller->state.playing = sequencer->playing;
 		if (sequencer->sample_rate > 0) {
-			controller->state.playhead_ms = (uint32_t)((sequencer->playhead_samples * 1000) / sequencer->sample_rate);
+			controller->state.playhead_ms =
+				(uint32_t)((sequencer->playhead_samples * 1000) /
+					   sequencer->sample_rate);
 		}
 	}
 

@@ -1,6 +1,7 @@
 #include "audio.h"
 #include "sequencer.h"
 #include "synth.h"
+
 #include <SDL3/SDL.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,7 +18,8 @@ struct audio {
 	bool voice_muted_cache[8];
 };
 
-static void audio_callback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
+static void
+audio_callback(void *userdata, SDL_AudioStream *stream, int additional_amount, int total_amount)
 {
 	struct audio *audio = (struct audio *)userdata;
 	if (!audio) {
@@ -28,10 +30,17 @@ static void audio_callback(void *userdata, SDL_AudioStream *stream, int addition
 	int samples_needed = additional_amount / sizeof(float);
 
 	while (samples_needed > 0) {
-		uint32_t samples = (samples_needed > (int)buffer_size) ? buffer_size : (uint32_t)samples_needed;
+		uint32_t samples = (samples_needed > (int)buffer_size) ? buffer_size
+								       : (uint32_t)samples_needed;
 		float buffer[buffer_size];
 
-		sequencer_update(&audio->sequencer, &audio->synth, samples, audio->voice_solo_cache, audio->voice_muted_cache);
+		sequencer_update(
+			&audio->sequencer,
+			&audio->synth,
+			samples,
+			audio->voice_solo_cache,
+			audio->voice_muted_cache
+		);
 
 		synth_generate_samples(&audio->synth, buffer, samples);
 		SDL_PutAudioStreamData(stream, buffer, samples * sizeof(float));

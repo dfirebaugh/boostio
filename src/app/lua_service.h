@@ -3,9 +3,9 @@
 
 #include <stdbool.h>
 
-#include "core/lua/lua_api.h"
-#include "core/lua/lua_runtime.h"
+#include "lua_api.h"
 #include "lua_command_registry.h"
+#include "lua_runtime.h"
 
 struct app_state;
 struct command;

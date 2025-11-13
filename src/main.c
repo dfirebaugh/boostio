@@ -2,15 +2,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "app/app_controller.h"
-#include "app/app_state.h"
-#include "core/audio/audio.h"
-#include "core/audio/sequencer.h"
-#include "core/audio/song_loader.h"
-#include "core/graphics/graphics.h"
-#include "core/graphics/msdf_atlas.h"
-#include "core/graphics/window.h"
-#include "core/platform/platform.h"
+#include "app_controller.h"
+#include "app_state.h"
+#include "audio.h"
+#include "graphics.h"
+#include "msdf_atlas.h"
+#include "platform.h"
+#include "sequencer.h"
+#include "song_loader.h"
+#include "window.h"
 
 int main(int argc, char *argv[])
 {

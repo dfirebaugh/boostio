@@ -1,7 +1,7 @@
 #include "command_history.h"
-#include "../../app/app_state.h"
-#include "../audio/audio.h"
-#include "../audio/sequencer.h"
+#include "app_state.h"
+#include "audio.h"
+#include "sequencer.h"
 
 #include <string.h>
 

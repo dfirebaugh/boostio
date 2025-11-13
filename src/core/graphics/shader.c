@@ -1,4 +1,5 @@
 #include "shader.h"
+
 #include <glad/gl.h>
 #include <stdio.h>
 #include <stdlib.h>

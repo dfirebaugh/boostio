@@ -1,4 +1,5 @@
 #include "input_mapper.h"
+
 #include <SDL3/SDL.h>
 
 struct scancode_mapping {

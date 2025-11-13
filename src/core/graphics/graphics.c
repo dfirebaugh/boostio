@@ -4,6 +4,7 @@
 #include "primitive_buffer.h"
 #include "shader.h"
 #include "window.h"
+
 #include <glad/gl.h>
 #include <SDL3/SDL.h>
 #include <stdio.h>
