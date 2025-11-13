@@ -59,6 +59,7 @@ local mouse_state = {
 	resize_from_left = false,
 	last_click_time = 0,
 	last_clicked_note_id = nil,
+	last_preview_piano_key = nil,
 }
 
 local function is_black_key(piano_key)
@@ -449,6 +450,15 @@ local function handle_mouse_move(x, y, state)
 					local new_key = initial_piano_key + delta_piano_key
 					note.piano_key = math.max(0, math.min(127, math.floor(new_key + 0.5)))
 				end
+
+				if note_id == mouse_state.drag_data.primary_note_id and playback_controls and
+				    playback_controls.is_preview_on_drag_enabled and
+				    playback_controls.is_preview_on_drag_enabled() and not state.is_playing then
+					if note.piano_key ~= mouse_state.last_preview_piano_key then
+						boostio.playPreviewNote(note.piano_key)
+						mouse_state.last_preview_piano_key = note.piano_key
+					end
+				end
 			end
 		end
 	elseif mouse_state.drag_mode == "resize_left" then
@@ -596,6 +606,11 @@ local function handle_mouse_up(x, y, button, state)
 
 				local note = find_note_by_id(state, note_id)
 				if note and is_voice_visible(note.voice) then
+					if playback_controls and playback_controls.is_preview_on_drag_enabled and
+					    playback_controls.is_preview_on_drag_enabled() and not state.is_playing then
+						boostio.playPreviewNote(note.piano_key)
+					end
+
 					if ctrl_held then
 						if boostio.isNoteSelected(note_id) then
 							boostio.deselectNote(note_id)
@@ -662,6 +677,7 @@ local function handle_mouse_up(x, y, button, state)
 	mouse_state.drag_started = false
 	mouse_state.selection_box.active = false
 	mouse_state.clicked_note_id = nil
+	mouse_state.last_preview_piano_key = nil
 	mouse_state.drag_data.initial_positions = {}
 	mouse_state.drag_data.initial_durations = {}
 	mouse_state.drag_data.initial_piano_keys = {}

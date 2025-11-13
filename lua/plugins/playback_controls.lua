@@ -2,6 +2,7 @@ local playback_controls = {}
 
 local last_mouse_state = false
 local click_handled = false
+local preview_on_drag_enabled = true
 
 function playback_controls.init() end
 
@@ -19,13 +20,20 @@ function playback_controls.render()
 	local play_x = start_x
 	local stop_x = play_x + button_width + button_spacing
 
+	local preview_button_width = button_width
+	local preview_button_height = 25
+	local preview_button_y = button_y + button_height + 5
+	local preview_x = start_x
+
 	local play_hovering = boostio.isPointInRect(mx, my, play_x, button_y, button_width, button_height)
 	local stop_hovering = boostio.isPointInRect(mx, my, stop_x, button_y, button_width, button_height)
+	local preview_hovering = boostio.isPointInRect(mx, my, preview_x, preview_button_y, preview_button_width, preview_button_height)
 
 	local bg_color = boostio.hexToRgb(theme.statusline_bg)
 	local text_color = boostio.hexToRgb(theme.statusline_text)
 	local green = boostio.hexToRgb(theme.statusline_highlight_on)
 	local red = boostio.hexToRgb("#e78284")
+	local blue = boostio.hexToRgb("#8caaee")
 
 	local play_r, play_g, play_b = green.r, green.g, green.b
 	local stop_r, stop_g, stop_b = red.r, red.g, red.b
@@ -101,6 +109,42 @@ function playback_controls.render()
 		1.0
 	)
 
+	local preview_r, preview_g, preview_b
+	if preview_on_drag_enabled then
+		preview_r, preview_g, preview_b = blue.r, blue.g, blue.b
+	else
+		preview_r, preview_g, preview_b = 0.4, 0.4, 0.4
+	end
+
+	if preview_hovering then
+		preview_r, preview_g, preview_b = preview_r * 1.2, preview_g * 1.2, preview_b * 1.2
+	end
+
+	boostio.drawRoundedRectangle(
+		preview_x,
+		preview_button_y,
+		preview_button_width,
+		preview_button_height,
+		4,
+		preview_r,
+		preview_g,
+		preview_b,
+		theme.statusline_bg_alpha
+	)
+
+	local preview_text = "Preview"
+	local preview_text_width = boostio.measureText(preview_text, 10)
+	boostio.drawText(
+		preview_text,
+		preview_x + (preview_button_width - preview_text_width) / 2,
+		preview_button_y + preview_button_height / 2 + 3,
+		10,
+		text_color.r,
+		text_color.g,
+		text_color.b,
+		1.0
+	)
+
 	local mouse_down = boostio.isMouseButtonDown(boostio.MOUSE_BUTTON_LEFT)
 
 	if mouse_down and not last_mouse_state and not click_handled then
@@ -110,6 +154,9 @@ function playback_controls.render()
 		elseif stop_hovering then
 			boostio.stop()
 			click_handled = true
+		elseif preview_hovering then
+			preview_on_drag_enabled = not preview_on_drag_enabled
+			click_handled = true
 		end
 	end
 
@@ -118,6 +165,10 @@ function playback_controls.render()
 	end
 
 	last_mouse_state = mouse_down
+end
+
+function playback_controls.is_preview_on_drag_enabled()
+	return preview_on_drag_enabled
 end
 
 return playback_controls
