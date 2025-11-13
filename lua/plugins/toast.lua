@@ -60,10 +60,11 @@ local function render_toast(t, index, viewport_width, viewport_height)
 	boostio.drawRectangle(x + 2, y + 2, toast_config.width, toast_config.height, 0, 0, 0, t.opacity * 0.3)
 
 	local bg = type_config.bg_color
-	boostio.drawRoundedRectangle(x, y, toast_config.width, toast_config.height, 8, bg.r, bg.g, bg.b, 0.95 * t.opacity)
+	boostio.drawRoundedRectangle(x, y, toast_config.width, toast_config.height, 8, bg.r, bg.g, bg.b, 0.95 * t
+	.opacity)
 
 	local border = type_config.border_color
-	boostio.drawRectangle(x, y, toast_config.width, 3, border.r, border.g, border.b, t.opacity)
+	boostio.drawRectangle(x, y, toast_config.width, 10, border.r, border.g, border.b, t.opacity)
 
 	boostio.drawText(type_config.icon, x + 15, y + toast_config.height / 2 + 6, 18, 1, 1, 1, t.opacity)
 
